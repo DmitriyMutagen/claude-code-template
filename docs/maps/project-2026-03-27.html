@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>template-project -- Обзор проекта</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1b26; }
+  svg.markmap { width: 100%; height: 100vh; }
+  .controls {
+    position: fixed; top: 12px; right: 16px; z-index: 10;
+    display: flex; gap: 8px;
+  }
+  .controls button {
+    background: #24283b; color: #a9b1d6; border: 1px solid #414868;
+    border-radius: 6px; padding: 6px 14px; cursor: pointer; font-size: 13px;
+  }
+  .controls button:hover { background: #414868; }
+  .info {
+    position: fixed; bottom: 12px; left: 16px; z-index: 10;
+    color: #565f89; font-family: monospace; font-size: 11px;
+  }
+</style>
+</head>
+<body>
+<div class="controls">
+  <button onclick="location.reload()">Обновить</button>
+</div>
+<div class="info">template-project -- Обзор проекта | 2026-03-27 | mindmap-generator.py</div>
+<div class="markmap">
+<script type="text/template">
+---
+markmap:
+  colorFreezeLevel: 3
+  maxWidth: 300
+  initialExpandLevel: 3
+  color:
+    - '#7aa2f7'
+    - '#bb9af7'
+    - '#7dcfff'
+    - '#9ece6a'
+    - '#e0af68'
+    - '#f7768e'
+---
+
+# template-project -- Полный обзор
+### Технологии
+#### Backend**: Python 3.11+ / FastAPI
+#### Database**: PostgreSQL + SQLAlchemy 2.0 (async)
+#### Cache**: Redis
+#### AI**: OpenRouter / LM Studio (Qwen 2.5)
+#### Deploy**: Docker → VPS (94.198.219.232)
+#### CI/CD**: GitHub Actions
+### Overview
+#### [One-line: what this project does and for whom]
+### Architecture
+#### Clean Architecture:
+#### `src/core/` — business logic, domain
+#### `src/api/` — HTTP endpoints
+#### `src/connectors/` — external API integrations
+#### `src/models/` — data models (SQLAlchemy)
+#### `src/utils/` — shared utilities
+### Running
+#### docker compose up -d          # start services
+#### pip install -r requirements.txt  # local dev
+#### pytest tests/ -v               # run tests
+#### ruff check . --fix            # lint
+### Current Sprint
+#### [What's being worked on NOW]
+### Структура проекта
+#### src/
+##### api/
+###### __init__.py
+###### health.py
+##### connectors/
+##### core/
+###### __init__.py
+##### models/
+##### utils/
+##### main.py
+#### tests/
+##### e2e/
+###### test_homepage.py
+##### test_api/
+##### test_core/
+##### conftest.py
+##### test_health.py
+#### docs/
+##### adr/
+###### 000-template.md
+##### done/
+##### plans/
+##### SELF-LEARNING-SETUP.md
+#### scripts/
+##### setup.sh
+### Конфигурация
+#### docker-compose.dev.yml
+#### docker-compose.yml
+#### pyproject.toml
+### Прочее
+#### Project State
+##### Current phase**: Initial setup
+##### Last completed**: Project scaffold
+##### Next action**: Define requirements
+##### Blockers**: None
+#### Key Facts
+##### Tech stack: [Python/TypeScript] + [FastAPI/Next.js]
+##### Database: PostgreSQL
+##### Deploy: Docker → VPS 94.198.219.232
+#### Lessons Learned
+### Последние коммиты
+#### feat: Full self-learning Claude Code infrastructure template (33f7a72)
+### ## Status
+#### ADR-000: Template
+##### ## Date
+##### What follows from this decision — positive and negative.
+</script>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader"></script>
+</body>
+</html>
