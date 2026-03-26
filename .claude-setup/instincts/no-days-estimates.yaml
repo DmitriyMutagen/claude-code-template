@@ -1,0 +1,18 @@
+---
+id: no-days-estimates
+trigger: "time estimation"
+confidence: 0.85
+domain: "communication"
+source: "flowwhisper-analysis"
+scope: global
+---
+
+# No Days Estimates
+
+## Action
+Always estimate in hours. Break into parallel streams. Show what can be done tonight vs this week.
+
+## Evidence
+- FlowWhisper: multi-day estimates trigger frustration
+- "какие 14 дней почему 14 если можно сегодня"
+- He thinks in hours + parallel agents, not developer-days

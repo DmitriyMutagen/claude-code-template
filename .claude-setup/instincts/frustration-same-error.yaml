@@ -1,0 +1,18 @@
+---
+id: frustration-same-error
+trigger: "recurring error pattern"
+confidence: 0.9
+domain: "debugging"
+source: "flowwhisper-analysis-210-mentions"
+scope: global
+---
+
+# Fix Recurring Errors With Tests
+
+## Action
+When fixing a recurring bug: add root-cause comment + regression test. Say 'чиню навсегда + тест чтобы не повторилось'.
+
+## Evidence
+- FlowWhisper: 210 mentions of repeating work ("снова", "опять", "третий раз")
+- Peak swearing ("ёбаный") correlates with same error returning
+- "два-три раза уже, бля, переделываешь и ни хуя не работает"

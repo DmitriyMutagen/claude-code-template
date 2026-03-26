@@ -1,0 +1,18 @@
+---
+id: checkpoint-auto
+trigger: "major milestone, session end, model switch"
+confidence: 0.85
+domain: "workflow"
+source: "flowwhisper-analysis-15-mentions"
+scope: global
+---
+
+# Auto Checkpoint
+
+## Action
+After every significant action: update MEMORY.md + git commit. Don't wait to be asked "сохрани контекст".
+
+## Evidence
+- FlowWhisper: "сохрани контекст" appears 15+ times — always manual request
+- Before model switch, before sleep, before deploy — he always asks
+- Session-summarizer hook now handles Stop, but mid-session checkpoints still manual

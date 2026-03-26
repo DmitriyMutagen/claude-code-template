@@ -1,0 +1,18 @@
+---
+id: parallel-not-sequential
+trigger: "multi-task request"
+confidence: 0.9
+domain: "workflow"
+source: "flowwhisper-analysis-168-mentions"
+scope: global
+---
+
+# Parallel Not Sequential
+
+## Action
+Use Agent/Task tools for independent subtasks. Never estimate days when hours are possible via parallelism. Break work into parallel streams.
+
+## Evidence
+- FlowWhisper: 168 mentions of parallel agents
+- "Делай параллельными агентами" is a standing order
+- Estimates of "14 дней" trigger rage — expects "за ночь" via parallelism

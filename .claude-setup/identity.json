@@ -1,0 +1,16 @@
+{
+  "name": "Dmitriy Gagauz",
+  "role": "Solo Founder + CTO",
+  "company": "Aragant.group / SoulWay",
+  "technical_level": "advanced",
+  "preferred_languages": ["python", "typescript"],
+  "frameworks": ["fastapi", "react", "next.js", "three.js"],
+  "style": "functional, async-first, clean-architecture",
+  "voice_input": true,
+  "voice_tool": "FlowWhisper",
+  "projects": 6,
+  "mcp_servers": 109,
+  "agent_teams": true,
+  "timezone": "Europe/Moscow",
+  "created_at": "2026-03-26T23:30:00Z"
+}

@@ -1,0 +1,249 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000",
+    "# ADD YOUR API KEYS HERE": "",
+    "TELEGRAM_BOT_TOKEN": "YOUR_BOT_TOKEN",
+    "TELEGRAM_USER_ID": "YOUR_USER_ID"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "Read(*)",
+      "Edit(*)",
+      "MultiEdit(*)",
+      "Write(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "NotebookEdit(*)",
+      "Task(*)",
+      "Agent(*)",
+      "mcp__*"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(sudo rm -rf *)",
+      "Bash(format *)",
+      "Bash(> ~/.zshrc)",
+      "Bash(> ~/.bashrc)",
+      "Bash(rm -rf ~/Documents*)",
+      "Bash(rm -rf ~/.claude*)",
+      "Bash(rm -rf ~/.ssh*)"
+    ],
+    "defaultMode": "bypassPermissions",
+    "additionalDirectories": [
+      "/Users/Dmitrij/.claude",
+      "/Users/Dmitrij/Documents",
+      "/Users/Dmitrij/.claude/plans"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=$(cat); FILE_PATH=$(echo \"$INPUT\" | jq -r '.tool_input.file_path // empty' 2>/dev/null); if [ -n \"$FILE_PATH\" ]; then case \"$FILE_PATH\" in *.env|*.env.*|*credentials*|*secrets*|*.pem|*.key) echo \"BLOCKED: Cannot modify sensitive file: $FILE_PATH\" >&2; exit 2;; esac; fi; exit 0"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=$(cat); CMD=$(echo \"$INPUT\" | jq -r '.tool_input.command // empty' 2>/dev/null); if echo \"$CMD\" | grep -qE 'git push.*(main|master)'; then if echo \"$CMD\" | grep -q '\\.claude'; then exit 0; fi; echo 'BLOCKED: Direct push to main/master. Use feature branches.' >&2; exit 2; fi; exit 0"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=$(cat); FILE=$(echo \"$INPUT\" | python3 -c \"import json,sys; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path',''))\" 2>/dev/null); if echo \"$FILE\" | grep -qE '(/tests/[^/]+\\.py$|/tests/[^/]+\\.ts$)'; then echo \"WARNING: нельзя изменять тестовые директории без явного разрешения.\" >&2; exit 0; fi; exit 0"
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/skills/continuous-learning-v2/hooks/observe.sh pre"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=$(cat); FILE=$(echo \"$INPUT\" | python3 -c \"import json,sys; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path',''))\" 2>/dev/null); if echo \"$FILE\" | grep -q '/Users/Dmitrij/.claude/'; then git -C /Users/Dmitrij/.claude add -A && git -C /Users/Dmitrij/.claude diff --staged --quiet || git -C /Users/Dmitrij/.claude commit -m 'memory: auto-sync' 2>/dev/null || true; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=$(cat); FILE=$(echo \"$INPUT\" | python3 -c \"import json,sys; d=json.load(sys.stdin); print(d.get('tool_input',{}).get('file_path',''))\" 2>/dev/null); if echo \"$FILE\" | grep -qE '\\.py$'; then ruff check --fix --quiet \"$FILE\" 2>/dev/null || true; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit|Bash|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/gamification/hooks/post_tool_use.py 2>/dev/null || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/skills/continuous-learning-v2/hooks/observe.sh post"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude Code needs attention\" with title \"Claude Code\" sound name \"Glass\"' 2>/dev/null || true; curl -s -X POST \"https://api.telegram.org/bot7974402245:AAGZpnnQseJ2bIqWO1qYU8KcejOKooOLPjU/sendMessage\" -d \"chat_id=926967075&text=🤖 Claude Code needs attention — $PWD\" > /dev/null 2>&1 || true"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/quality-sentinel.sh 2>&1 || true",
+            "timeout": 15,
+            "statusMessage": "Quality sentinel scanning..."
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PROJ=$(basename \"$PWD\"); HANDOFF_DIR=\"$PWD/.claude\"; mkdir -p \"$HANDOFF_DIR\"; BRANCH=$(git -C \"$PWD\" branch --show-current 2>/dev/null || echo 'no git'); COMMITS=$(git -C \"$PWD\" log --oneline -5 2>/dev/null || echo 'none'); GIT_STATUS=$(git -C \"$PWD\" status --short 2>/dev/null || echo 'not a git repo'); NOW=$(date '+%Y-%m-%d %H:%M:%S'); RECENT_FILES=$(git -C \"$PWD\" diff --name-only --diff-filter=AM \"@{24 hours ago}\" 2>/dev/null | head -20); TODOS=$(if [ -n \"$RECENT_FILES\" ]; then echo \"$RECENT_FILES\" | while IFS= read -r f; do fp=\"$PWD/$f\"; [ -f \"$fp\" ] && grep -n 'TODO\\|FIXME\\|HACK\\|XXX' \"$fp\" 2>/dev/null | sed \"s|^|$f:\"; done; fi); cat > \"$HANDOFF_DIR/session-handoff.md\" <<HEREDOC\n# Session Handoff\n\n## Snapshot: $NOW\n\n### Project\n- Name: $PROJ\n- Path: $PWD\n\n### Git\n- Branch: $BRANCH\n\n#### Last 5 Commits\n$COMMITS\n\n#### Modified Files (git status)\n$GIT_STATUS\n\n### TODO / FIXME in Recently Modified Files (last 24h)\n${TODOS:-none found}\nHEREDOC\necho \"$(date '+%Y-%m-%d %H:%M:%S') | session ended | cwd: $PWD\" >> /tmp/claude-code-activity.log 2>/dev/null; cd ~/.claude && git add memory/ plans/ commands/ agents/ 2>/dev/null && git diff --staged --quiet || git commit -m \"memory: auto-snapshot $(date '+%Y-%m-%d %H:%M')\" 2>/dev/null; git push origin main 2>/dev/null || true; bash ~/.claude/scripts/export-session.sh 2>/dev/null || true; exit 0"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/gamification/hooks/session_stop.py 2>/dev/null || true",
+            "timeout": 10,
+            "statusMessage": "Saving session stats..."
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/session-summarizer.py 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/skill-auto-activate.py",
+            "timeout": 5,
+            "statusMessage": "Checking skill activations..."
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo ''; echo '═══════════════════════════════════════'; echo '🧠 MEMORY RESTORED — Дмитрий Гагауз'; echo '═══════════════════════════════════════'; cat ~/.claude/memory/GLOBAL_MEMORY.md 2>/dev/null | head -40; echo ''; PROJ=$(basename $PWD); HANDOFF=\"$PWD/.claude/session-handoff.md\"; if [ -f \"$HANDOFF\" ]; then echo '📋 ПОСЛЕДНЯЯ СЕССИЯ:'; tail -20 \"$HANDOFF\"; fi; MEMORY=\"$PWD/MEMORY.md\"; if [ -f \"$MEMORY\" ]; then echo ''; echo '📁 PROJECT MEMORY:'; head -30 \"$MEMORY\"; fi; echo '═══════════════════════════════════════'; echo '💡 /continue — восстановить контекст | /checkpoint — сохранить прогресс'; echo ''"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/gamification/hooks/session_start.py 2>/dev/null || true",
+            "timeout": 8,
+            "statusMessage": "Loading gamification..."
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/memory-decay.py 2>/dev/null || true"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/mcp-health-check.py 2>/dev/null || true",
+            "timeout": 5,
+            "statusMessage": "Checking MCP servers..."
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.claude/hooks/process-watchdog.py 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{}' | python3 ~/.claude/hooks/auto-checkpoint.py 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}

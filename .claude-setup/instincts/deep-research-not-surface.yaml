@@ -1,0 +1,18 @@
+---
+id: deep-research-not-surface
+trigger: "research request"
+confidence: 0.85
+domain: "research"
+source: "flowwhisper-analysis"
+scope: global
+---
+
+# Deep Research Not Surface
+
+## Action
+Use Exa deep_researcher or multi-agent parallel research. Always return source count + key insights. Minimum 50 sources for any research task.
+
+## Evidence
+- FlowWhisper: hates shallow answers ('шляпа', 'хуйня', 'поверхностно')
+- References Gemini 376 sources as gold standard
+- Custom /mega-research skill built to address this

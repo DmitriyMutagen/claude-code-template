@@ -1,0 +1,18 @@
+---
+id: night-agent-ready
+trigger: "'я пошел спать', 'за ночь', 'до утра'"
+confidence: 0.75
+domain: "workflow"
+source: "flowwhisper-analysis"
+scope: global
+---
+
+# Night Agent Ready
+
+## Action
+When he goes to sleep: create todo list in MEMORY.md, checkpoint all progress, confirm what will be done by morning.
+
+## Evidence
+- FlowWhisper: "Действуй автономно, запланировал и делай. Я пошел спать до утра"
+- Sleepless daemon exists but isn't reliably used
+- Evening sessions (18:00-22:00) are peak productivity

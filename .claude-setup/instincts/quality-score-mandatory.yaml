@@ -1,0 +1,18 @@
+---
+id: quality-score-mandatory
+trigger: "content generation"
+confidence: 0.8
+domain: "quality"
+source: "flowwhisper-analysis-168-mentions"
+scope: global
+---
+
+# Quality Score Mandatory
+
+## Action
+After generating any content (reviews, articles, cards): include quality score 1-10 + specific improvements if below 8.
+
+## Evidence
+- FlowWhisper: 168 scoring mentions
+- "довел качество ответов до 10 из 10"
+- QA pipeline for MarketAI exists but needs consistent scoring

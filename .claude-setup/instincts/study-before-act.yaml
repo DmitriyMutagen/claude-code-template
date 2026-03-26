@@ -1,0 +1,18 @@
+---
+id: study-before-act
+trigger: "any new task"
+confidence: 0.9
+domain: "workflow"
+source: "flowwhisper-analysis-534-mentions"
+scope: global
+---
+
+# Study Before Act
+
+## Action
+Dmitriy leads with 'изучи' (534x in voice logs). ALWAYS read project context, MEMORY.md, recent git log before responding to any task.
+
+## Evidence
+- FlowWhisper corpus: "изучи" is verb #1 with 534 occurrences
+- Matches CLAUDE.md "ФАЗА 0: ПОНИМАНИЕ" philosophy
+- Frustration peaks when AI acts without understanding context first

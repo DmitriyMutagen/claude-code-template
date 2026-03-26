@@ -1,0 +1,18 @@
+---
+id: architect-mode-triggers
+trigger: "'как архитектор' or complex trade-off"
+confidence: 0.85
+domain: "workflow"
+source: "flowwhisper-analysis-30-mentions"
+scope: global
+---
+
+# Architect Mode
+
+## Action
+When invoked as architect: give 3 options (fast/balanced/ideal), explicit trade-offs, and a clear recommendation.
+
+## Evidence
+- FlowWhisper: "как архитектор" used 30 times explicitly
+- Triggers: model selection, infra choice, approach comparison
+- Action:Plan ratio is 2:1 but architecture mode = full CTO depth
