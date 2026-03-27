@@ -60,7 +60,23 @@ echo "  ✅ Gamification скопирована"
 echo "⚙️  Настраиваю settings.json..."
 python3 "$TEMPLATE_DIR/.claude-setup/merge-settings.py" 2>/dev/null || echo "  ⚠️  Ручная настройка settings.json нужна"
 
-# ─── 9. Copy CL v2.1 skill (if not already installed) ───
+# ─── 9. Copy global CLAUDE.md (CTO instructions) ───
+if [ -f "$TEMPLATE_DIR/.claude-setup/CLAUDE.md.global" ] && [ ! -f "$CLAUDE_DIR/CLAUDE.md" ]; then
+  cp "$TEMPLATE_DIR/.claude-setup/CLAUDE.md.global" "$CLAUDE_DIR/CLAUDE.md"
+  echo "  ✅ Global CLAUDE.md (CTO instructions) installed"
+else
+  echo "  ⏭️  CLAUDE.md already exists"
+fi
+
+# ─── 9b. Copy CL v2.1 observations (learning history) ───
+if [ -d "$TEMPLATE_DIR/.claude-setup/observations-backup" ]; then
+  for obs_file in "$TEMPLATE_DIR/.claude-setup/observations-backup/"*.jsonl; do
+    [ -f "$obs_file" ] || continue
+    echo "  📊 Copied learning data: $(basename $obs_file)"
+  done
+fi
+
+# ─── 10. Copy CL v2.1 skill (if not already installed) ───
 if [ ! -d "$CLAUDE_DIR/skills/continuous-learning-v2" ]; then
   echo "📦 Копирую Continuous Learning v2.1..."
   cp -r "$TEMPLATE_DIR/.claude-setup/skills/continuous-learning-v2" "$CLAUDE_DIR/skills/" 2>/dev/null || true

@@ -1,0 +1,50 @@
+{
+  "8fc76ca79cd9": {
+    "id": "8fc76ca79cd9",
+    "name": "skolkovo",
+    "root": "/Users/Dmitrij/Documents/skolkovo",
+    "remote": "https://github.com/DmitriyMutagen/bionovacia.git",
+    "created_at": "2026-03-26T20:19:48.234704Z",
+    "last_seen": "2026-03-27T05:56:00.347812Z"
+  },
+  "9d76379e7d59": {
+    "id": "9d76379e7d59",
+    "name": "Dmitrij",
+    "root": "/Users/Dmitrij",
+    "remote": "",
+    "created_at": "2026-03-26T20:19:53.763376Z",
+    "last_seen": "2026-03-27T05:56:03.424454Z"
+  },
+  "0c14649a8bdf": {
+    "id": "0c14649a8bdf",
+    "name": "marketai",
+    "root": "/Users/Dmitrij/Documents/marketai/marketai",
+    "remote": "https://github.com/DmitriyMutagen/marketai.git",
+    "created_at": "2026-03-26T20:21:03.550941Z",
+    "last_seen": "2026-03-27T05:55:38.261885Z"
+  },
+  "e875ebccb89e": {
+    "id": "e875ebccb89e",
+    "name": "frontend-react",
+    "root": "/Users/Dmitrij/Documents/marketai/marketai/frontend-react",
+    "remote": "",
+    "created_at": "2026-03-26T20:25:17.392113Z",
+    "last_seen": "2026-03-26T21:47:04.025239Z"
+  },
+  "057046fe1cb8": {
+    "id": "057046fe1cb8",
+    "name": "template-project",
+    "root": "/Users/Dmitrij/Documents/template-project",
+    "remote": "",
+    "created_at": "2026-03-26T21:22:00.433068Z",
+    "last_seen": "2026-03-26T21:22:18.890899Z"
+  },
+  "9a40af984db3": {
+    "id": "9a40af984db3",
+    "name": "template-project",
+    "root": "/Users/Dmitrij/Documents/template-project",
+    "remote": "https://github.com/DmitriyMutagen/claude-code-template.git",
+    "created_at": "2026-03-26T21:22:22.473131Z",
+    "last_seen": "2026-03-27T05:47:13.355866Z"
+  }
+}
