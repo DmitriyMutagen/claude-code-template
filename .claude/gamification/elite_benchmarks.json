@@ -1,0 +1,285 @@
+{
+  "version": "1.0",
+  "archetypes": {
+    "chief_architect": {
+      "name": "Chief Architect",
+      "icons": "🏗️",
+      "exemplars": ["Martin Fowler", "Sam Newman", "Gregor Hohpe", "Kelsey Hightower"],
+      "benchmarks": {
+        "adr_coverage_pct": 100,
+        "commits_per_day": 12,
+        "tests_per_day": 20,
+        "deploys_per_week": 5,
+        "rfc_per_month": 2,
+        "docs_updated_weekly": true
+      },
+      "skills_required": {
+        "architecture": 4,
+        "quality": 4,
+        "management": 4,
+        "development": 4
+      }
+    },
+    "cto": {
+      "name": "CTO",
+      "icons": "🧠",
+      "exemplars": ["Werner Vogels", "Patrick Collison", "Tobi Lütke", "Guillermo Rauch"],
+      "benchmarks": {
+        "deploys_per_week": 14,
+        "uptime_slo_pct": 99.9,
+        "sentry_coverage_pct": 100,
+        "health_endpoint_coverage": 100,
+        "tech_radar_quarterly": true,
+        "dora_elite": true
+      },
+      "skills_required": {
+        "devops": 5,
+        "architecture": 5,
+        "management": 4,
+        "ai_dev": 4
+      }
+    },
+    "solo_founder": {
+      "name": "Solo Founder",
+      "icons": "🚀",
+      "exemplars": ["Pieter Levels", "Marc Lou", "Danny Postma", "DHH"],
+      "benchmarks": {
+        "idea_to_deploy_hours": 24,
+        "deploys_per_week": 7,
+        "revenue_tracked": true,
+        "ai_agents_per_project": 5,
+        "stripe_integrated": true
+      },
+      "skills_required": {
+        "development": 4,
+        "devops": 3,
+        "ai_dev": 5,
+        "management": 3
+      }
+    },
+    "seo_growth_engineer": {
+      "name": "SEO/Growth Engineer",
+      "icons": "📈",
+      "exemplars": ["Rand Fishkin", "Eli Schwartz", "Ross Hudgens", "Glen Allsopp"],
+      "benchmarks": {
+        "core_web_vitals_green": true,
+        "schema_markup_coverage": 100,
+        "programmatic_pages": 100,
+        "content_per_month": 30,
+        "search_console_connected": true
+      },
+      "skills_required": {
+        "seo": 4,
+        "development": 3,
+        "management": 3
+      }
+    }
+  },
+  "learning_tracks": {
+    "chief_architect": {
+      "name": "Path to Chief Architect",
+      "duration_months": 6,
+      "milestones": [
+        {
+          "month": 1,
+          "title": "Foundations",
+          "tasks": [
+            "Добавить docs/adr/ во ВСЕ 6 проектов",
+            "Нарисовать C4 Context для Aragant через /diagram",
+            "Прочитать DDIA глава 1-3 (Kleppmann)"
+          ],
+          "metric": "5+ ADR созданы",
+          "xp": 500
+        },
+        {
+          "month": 2,
+          "title": "Distributed Systems",
+          "tasks": [
+            "Прочитать Microservices Patterns глава 1-4",
+            "Написать /rfc для следующего крупного решения",
+            "Добавить event log в Aragant"
+          ],
+          "metric": "1 RFC завершён",
+          "xp": 800
+        },
+        {
+          "month": 3,
+          "title": "API Mastery",
+          "tasks": [
+            "Aragant API — OpenAPI spec + /api/v1/ versioning",
+            "Context7 перед КАЖДЫМ новым API (7 дней дисциплины)"
+          ],
+          "metric": "OpenAPI docs online",
+          "xp": 600
+        },
+        {
+          "month": 4,
+          "title": "Caching & Performance",
+          "tasks": [
+            "Redis cache-aside для топ-5 тяжёлых запросов в Aragant",
+            "PostgreSQL EXPLAIN ANALYZE на каждый медленный запрос"
+          ],
+          "metric": "P99 < 200ms на /api/v1/products",
+          "xp": 700
+        },
+        {
+          "month": 5,
+          "title": "Observability",
+          "tasks": [
+            "Distributed tracing (OpenTelemetry) в Aragant",
+            "Structured logging (structlog) везде"
+          ],
+          "metric": "Полный trace от HTTP до БД",
+          "xp": 600
+        },
+        {
+          "month": 6,
+          "title": "Scale Design",
+          "tasks": [
+            "Chaos engineering: убить Redis, убить БД, задокументировать результат",
+            "Написать runbook для каждого сценария падения"
+          ],
+          "metric": "RTO < 5 мин для любого сервиса",
+          "xp": 1000
+        }
+      ]
+    },
+    "cto": {
+      "name": "Path to CTO",
+      "duration_months": 3,
+      "milestones": [
+        {
+          "month": 1,
+          "title": "Reliability Engineering",
+          "tasks": [
+            "Sentry SDK в каждый проект (3ч)",
+            "/health endpoint в каждый сервис (2ч)",
+            "DORA baseline self-assessment"
+          ],
+          "metric": "100% Sentry coverage",
+          "xp": 400
+        },
+        {
+          "month": 2,
+          "title": "Technical Strategy",
+          "tasks": [
+            "/tech-radar для всего стека",
+            "Tech debt backlog в MEMORY.md"
+          ],
+          "metric": "Tech Radar v1 готов",
+          "xp": 300
+        },
+        {
+          "month": 3,
+          "title": "AI Team Mastery",
+          "tasks": [
+            "Sleepless daemon 5 ночей подряд",
+            "Agent Teams для 2+ проектов"
+          ],
+          "metric": "10+ ночных задач выполнено",
+          "xp": 500
+        }
+      ]
+    },
+    "solo_founder": {
+      "name": "Path to Solo Founder",
+      "duration_months": 1,
+      "milestones": [
+        {
+          "week": 1,
+          "title": "Ship Speed",
+          "tasks": [
+            "Замерить текущий idea->deploy time",
+            "Задеплоить что-то новое за 4 часа"
+          ],
+          "metric": "Deploy <4h достигнут",
+          "xp": 300
+        },
+        {
+          "week": 2,
+          "title": "Revenue First",
+          "tasks": [
+            "Stripe webhook в Aragant",
+            "Revenue dashboard"
+          ],
+          "metric": "Первая транзакция",
+          "xp": 500
+        },
+        {
+          "week": 3,
+          "title": "Automation",
+          "tasks": [
+            "1 скрипт заменяет ручную задачу (Python, не N8N)",
+            "Sleepless ночная очередь заполнена задачами"
+          ],
+          "metric": "5+ ручных задач автоматизированы",
+          "xp": 400
+        },
+        {
+          "week": 4,
+          "title": "Validation Loop",
+          "tasks": [
+            "Показать продукт 5 потенциальным пользователям за 24ч",
+            "Замерить conversion от лендинга"
+          ],
+          "metric": "5 реальных отзывов получено",
+          "xp": 300
+        }
+      ]
+    },
+    "seo_growth_engineer": {
+      "name": "Path to SEO/Growth Engineer",
+      "duration_months": 2,
+      "milestones": [
+        {
+          "month": 1,
+          "title": "Technical SEO Foundation",
+          "tasks": [
+            "Core Web Vitals все зелёные на bio-stm.ru",
+            "Schema markup на всех ключевых страницах",
+            "Sitemap + IndexNow настроен",
+            "GSC + Yandex Webmaster через API"
+          ],
+          "metric": "Все Core Web Vitals зелёные, IndexNow активен",
+          "xp": 500
+        },
+        {
+          "month": 2,
+          "title": "Programmatic SEO",
+          "tasks": [
+            "Шаблон для 100+ страниц",
+            "Auto-publishing pipeline: ключи -> AI -> WP API",
+            "GSC API weekly report в Telegram"
+          ],
+          "metric": "50+ новых страниц в индексе",
+          "xp": 800
+        }
+      ]
+    }
+  },
+  "industry_benchmarks": {
+    "companies": {
+      "anthropic": {
+        "commits_per_day": 25,
+        "test_pass_rate_pct": 99
+      },
+      "google": {
+        "tests_per_day_per_eng": 40,
+        "coverage_required_pct": 80
+      },
+      "stripe": {
+        "deploys_per_week": 14,
+        "api_uptime_pct": 99.99
+      },
+      "netflix": {
+        "adr_coverage_pct": 100,
+        "chaos_engineering": true
+      },
+      "pieter_levels": {
+        "idea_to_deploy_hours": 4,
+        "revenue_per_year_usd": 3000000,
+        "team_size": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "version": "1.0",
+  "owner": "Дмитрий Гагауз",
+  "last_updated": "2026-03-27",
+  "active_tracks": ["chief_architect", "solo_founder"],
+  "tracks_progress": {
+    "chief_architect": {
+      "name": "Path to Chief Architect",
+      "started": "2026-03-27",
+      "current_month": 1,
+      "current_milestone": 0,
+      "completed_tasks": [],
+      "xp_earned": 0,
+      "next_action": "Добавить docs/adr/ в Aragant (20 мин, +50 XP)"
+    },
+    "solo_founder": {
+      "name": "Path to Solo Founder",
+      "started": "2026-03-27",
+      "current_week": 1,
+      "current_milestone": 0,
+      "completed_tasks": [],
+      "xp_earned": 0,
+      "next_action": "Замерить текущий idea→deploy time"
+    }
+  },
+  "skill_assessments": {
+    "last_assessed": "2026-03-27",
+    "architecture": {"level": 4, "trend": "+0"},
+    "development": {"level": 4, "trend": "+0"},
+    "quality": {"level": 2, "trend": "+0"},
+    "devops": {"level": 3, "trend": "+0"},
+    "management": {"level": 4, "trend": "+0"},
+    "ai_dev": {"level": 5, "trend": "+0"},
+    "seo": {"level": 2, "trend": "+0"}
+  },
+  "elite_comparisons": {
+    "commits_per_day": {"mine": 8, "target": 25, "source": "Anthropic"},
+    "tests_per_day": {"mine": 3, "target": 40, "source": "Google TDD"},
+    "deploys_per_week": {"mine": 1, "target": 14, "source": "Stripe DORA"},
+    "adr_coverage": {"mine": 0, "target": 100, "source": "Netflix"},
+    "ship_speed_hours": {"mine": 72, "target": 4, "source": "Pieter Levels"}
+  }
+}

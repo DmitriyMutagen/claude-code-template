@@ -1,0 +1,1462 @@
+{
+  "version": "1.0",
+  "description": "Top-100 world creators reference database for Elite Learning System",
+  "last_updated": "2026-03-27",
+  "categories": {
+    "solo_builders": {
+      "description": "Соло-разработчики с $1M+ revenue без команды",
+      "creators": [
+        {
+          "name": "Pieter Levels (@levelsio)",
+          "title": "Serial Solo Founder",
+          "companies": ["Nomad List ($3M/year)", "Remote OK", "Photo AI ($4M/year)", "Interior AI"],
+          "revenue": "$5M+/year solo",
+          "team_size": 0,
+          "key_metrics": {
+            "idea_to_launch_days": 1,
+            "products_launched": 70,
+            "failed_products": 60,
+            "revenue_per_employee": "$5M",
+            "tech_stack": ["PHP", "SQLite", "Bootstrap", "Stripe"],
+            "ai_tools": ["Claude", "Midjourney", "Stable Diffusion"]
+          },
+          "philosophy": [
+            "Start charging money immediately — free users give feedback, paid users give direction",
+            "Make it, ship it, fuck it — launch in 24h or abandon",
+            "Revenue is the best metric. Not users, not downloads.",
+            "Build in public — transparency builds trust and marketing",
+            "Small is beautiful — no VC, no team, just you and your tools"
+          ],
+          "approach": {
+            "validation": "Twitter post + Stripe link = validation in 24h",
+            "development": "PHP + SQLite = deploys in minutes, no DevOps hell",
+            "marketing": "Build in public on Twitter, document journey",
+            "revenue": "Charge from day 1, even $1",
+            "scaling": "Automation over hiring"
+          },
+          "quotes": [
+            "The biggest mistake founders make is spending too much time building and too little time selling",
+            "I've launched 70+ products. Most failed. That's fine.",
+            "Your first version should embarrass you"
+          ],
+          "what_to_copy": [
+            "24h MVP launch cycle",
+            "Revenue from day 1",
+            "Build in public on social",
+            "Automation-first thinking",
+            "Small tech stack (don't over-engineer)"
+          ],
+          "github": "https://github.com/levelsio",
+          "twitter": "@levelsio"
+        },
+        {
+          "name": "Marc Lou",
+          "title": "Solo SaaS Builder",
+          "companies": ["ShipFast ($1M in 6 months)", "ZenVoice", "MakeLanding"],
+          "revenue": "$2M+/year",
+          "team_size": 0,
+          "key_metrics": {
+            "shipfast_revenue": "$1M в 6 месяцев",
+            "tech_stack": ["Next.js", "Supabase", "Stripe", "Tailwind"],
+            "launch_time": "1 week per product"
+          },
+          "philosophy": [
+            "Ship it in a week or don't ship it",
+            "The boilerplate is the product — sell the starting point",
+            "Next.js + Supabase + Stripe = 80% of any SaaS"
+          ],
+          "quotes": [
+            "Stop building features. Start building marketing.",
+            "The indie hacker's dream: ship once, sell forever"
+          ],
+          "what_to_copy": [
+            "Boilerplate-first approach (не изобретай базу каждый раз)",
+            "Next.js App Router + Supabase stack",
+            "Weekly shipping cadence",
+            "Sell the starting point, not just the product"
+          ],
+          "twitter": "@marc_louvion",
+          "github": "https://github.com/moinulmoin"
+        },
+        {
+          "name": "Danny Postma",
+          "title": "AI SaaS Solo Founder",
+          "companies": ["HeadshotPro ($1M в 3 месяца)", "SEO.ai"],
+          "revenue": "$3M+/year",
+          "team_size": 0,
+          "key_metrics": {
+            "headshot_pro_time_to_1M": "3 months",
+            "tech_stack": ["Next.js", "Stripe", "Replicate API", "Vercel"]
+          },
+          "philosophy": [
+            "AI-wrapper is a valid business model",
+            "Find the pain point, wrap an AI model, charge for convenience",
+            "SEO-first: rank before you build the product"
+          ],
+          "what_to_copy": [
+            "AI-wrapper SaaS (wrap existing AI models)",
+            "Vercel edge deploy = zero infra overhead",
+            "SEO-first content strategy",
+            "Replicate.com for AI model hosting"
+          ],
+          "twitter": "@dannypostmaa"
+        },
+        {
+          "name": "Tibo Louis-Lucas (@tibo_maker)",
+          "title": "Solo Founder + Maker",
+          "companies": ["Tweet Hunter ($2M ARR)", "Taplio"],
+          "revenue": "$5M ARR (продано Lempire)",
+          "team_size": 2,
+          "philosophy": [
+            "Niche down aggressively",
+            "AI content tools are 10x easier to sell than generic SaaS",
+            "Twitter is the best B2B acquisition channel for indie hackers"
+          ],
+          "what_to_copy": [
+            "SaaS в нише (Twitter automation)",
+            "AI content generation as core feature",
+            "Acquisition exit strategy",
+            "Build + sell = valid founder path"
+          ],
+          "twitter": "@tibo_maker"
+        },
+        {
+          "name": "Arvid Kahl",
+          "title": "Solo Founder + Author",
+          "companies": ["FeedbackPanda ($55K MRR, продан за $55K)", "Bootstrapped Founder"],
+          "revenue": "Exit $55K + книги",
+          "team_size": 1,
+          "philosophy": [
+            "Embedded entrepreneur — become part of the community you're selling to",
+            "Audience before product",
+            "Build in public is a growth strategy, not just transparency"
+          ],
+          "books": ["The Bootstrapped Founder", "Zero to Sold"],
+          "what_to_copy": [
+            "Audience-first product development",
+            "Embedded in community (understand problems deeply)",
+            "Build in public with storytelling",
+            "Bootstrap to exit (no VC needed)"
+          ],
+          "twitter": "@arvidkahl"
+        },
+        {
+          "name": "Tony Dinh",
+          "title": "Solo SaaS Developer",
+          "companies": ["Xnapper ($1M+ ARR)", "ScreenshotOne", "BlackMagic.so"],
+          "revenue": "$1.5M+/year",
+          "team_size": 0,
+          "key_metrics": {
+            "tech_stack": ["Next.js", "Tailwind", "Supabase", "Lemon Squeezy"],
+            "time_to_launch": "< 2 weeks per product"
+          },
+          "philosophy": [
+            "Developer tools = best niche for solo devs",
+            "Build what you wish existed",
+            "Small monthly subscription beats one-time payment for stability"
+          ],
+          "what_to_copy": [
+            "Developer tools niche (high willingness to pay)",
+            "Lemon Squeezy over Stripe for simplicity",
+            "Multiple small products > one big product"
+          ],
+          "twitter": "@tonydinh"
+        },
+        {
+          "name": "Sahil Lavingia",
+          "title": "Founder Gumroad",
+          "companies": ["Gumroad ($21M ARR)"],
+          "revenue": "$21M ARR (fully remote, async team)",
+          "team_size": 25,
+          "philosophy": [
+            "Minimalist company: no meetings, async everything",
+            "Profitability over growth",
+            "The smallest viable team",
+            "Creator economy is the future"
+          ],
+          "quotes": [
+            "Reflecting on My Failure to Build a Billion-Dollar Company",
+            "Building a business is just finding people with problems and solving them"
+          ],
+          "what_to_copy": [
+            "Async-first company culture",
+            "Profitability as metric (not growth)",
+            "Creator-focused monetization tools",
+            "Public financials = trust signal"
+          ],
+          "twitter": "@shl"
+        },
+        {
+          "name": "Jon Yongfook",
+          "title": "Solo Founder Bannerbear",
+          "companies": ["Bannerbear ($2M+ ARR)"],
+          "revenue": "$2M+/year",
+          "team_size": 0,
+          "philosophy": [
+            "API-first product = developer acquisition channel",
+            "Boring is beautiful in SaaS",
+            "Automation-first: let the API do the work"
+          ],
+          "what_to_copy": [
+            "API-first product strategy",
+            "Boring but profitable niche (image generation API)",
+            "Developer community as marketing"
+          ],
+          "twitter": "@yongfook"
+        }
+      ]
+    },
+    "world_class_cto": {
+      "description": "CTO компаний с миллиардными оценками — инженерная культура",
+      "creators": [
+        {
+          "name": "Werner Vogels",
+          "title": "CTO Amazon / AWS",
+          "company": "Amazon",
+          "scale": "200M+ customers, 1M+ servers",
+          "philosophy": [
+            "Everything fails, all the time — design for failure, not success",
+            "You build it, you run it — developers own production",
+            "Working backwards from the customer (Press Release before code)",
+            "Two-pizza teams — если нельзя накормить двумя пиццами, команда большая",
+            "Single-threaded owner — один человек отвечает за всё"
+          ],
+          "key_contributions": [
+            "Microservices at scale (AWS SOA 2006)",
+            "Eventual consistency theory",
+            "Well-Architected Framework",
+            "Chaos Engineering precursor",
+            "S3, EC2, DynamoDB architecture"
+          ],
+          "what_to_copy": [
+            "Design for failure (healthchecks, auto-restart, retry)",
+            "Working backwards (spec first, then code)",
+            "You own it in production (DevOps culture)",
+            "Small autonomous teams",
+            "Measure everything (CloudWatch before Datadog existed)"
+          ],
+          "metrics": {
+            "uptime_target": "99.999%",
+            "deploy_frequency": "thousands/day at Amazon",
+            "mttr": "< 5 minutes"
+          }
+        },
+        {
+          "name": "Patrick Collison",
+          "title": "CEO/Co-founder Stripe",
+          "company": "Stripe",
+          "valuation": "$65B",
+          "philosophy": [
+            "7 lines to get started — API должен быть проще простого",
+            "Move fast and don't break things (vs Facebook's motto)",
+            "The best API is one you never have to read docs for",
+            "Hire for trajectory, not pedigree",
+            "Write like you think — clear writing = clear thinking"
+          ],
+          "key_contributions": [
+            "Best developer API in the world (7 lines Stripe integration)",
+            "Stripe Atlas — infrastructure for internet economy",
+            "API versioning done right (never break old clients)",
+            "Stripe Press — publishing house for ambitious books"
+          ],
+          "what_to_copy": [
+            "7-line integration test for any API you build",
+            "Never break backward compatibility",
+            "Documentation as product (docs.stripe.com = gold standard)",
+            "API versioning (/v1/, /v2/)",
+            "Developer experience as competitive advantage"
+          ],
+          "twitter": "@patrickc"
+        },
+        {
+          "name": "Guillermo Rauch",
+          "title": "CEO Vercel / Creator Next.js",
+          "company": "Vercel",
+          "valuation": "$3.25B",
+          "products": ["Next.js (100K+ stars)", "Vercel Platform", "v0.dev"],
+          "philosophy": [
+            "Ship to edge — static is the new dynamic",
+            "Zero config deployment — it should just work",
+            "Preview deployments for every PR",
+            "Server Components are the future",
+            "AI-native development workflow"
+          ],
+          "key_contributions": [
+            "Next.js framework (most popular React framework)",
+            "Preview deployments concept",
+            "Edge runtime for serverless",
+            "v0.dev — AI UI generator"
+          ],
+          "what_to_copy": [
+            "Preview deployments (каждый PR = своя ссылка)",
+            "Edge-first thinking",
+            "Zero config defaults",
+            "Next.js App Router для любого фронта",
+            "AI-assisted UI generation (v0.dev pattern)"
+          ],
+          "twitter": "@rauchg"
+        },
+        {
+          "name": "Tobi Lütke",
+          "title": "CEO Shopify",
+          "company": "Shopify",
+          "valuation": "$60B+",
+          "philosophy": [
+            "Trust battery — relationship capital depletes and recharges",
+            "Bet on yourself early",
+            "Software is politics — who controls the infrastructure controls the future",
+            "Chaos is a gift — solve real problems",
+            "Context over control — give people context, not instructions"
+          ],
+          "what_to_copy": [
+            "Merchant-first thinking (who is your customer?)",
+            "Platform over product",
+            "Long-term thinking (10 year horizon)",
+            "Trust battery framework for team culture"
+          ],
+          "twitter": "@tobi"
+        },
+        {
+          "name": "DHH (David Heinemeier Hansson)",
+          "title": "Creator Rails / Co-founder Basecamp/HEY",
+          "products": ["Ruby on Rails (50K+ stars)", "Basecamp", "HEY Email"],
+          "philosophy": [
+            "Convention over configuration — less decisions = more speed",
+            "Majestic monolith over microservices для большинства случаев",
+            "No VC, profitability from day 1",
+            "Programmer happiness matters",
+            "ONCE — sell software, don't rent it"
+          ],
+          "key_contributions": [
+            "Ruby on Rails = web development revolution (2004)",
+            "Convention over Configuration pattern",
+            "Active Record ORM",
+            "REST as architectural style for web",
+            "Shape Up methodology"
+          ],
+          "quotes": [
+            "Optimize for happiness",
+            "The monolith is not the enemy",
+            "You don't need to grow fast to be great"
+          ],
+          "what_to_copy": [
+            "Convention over configuration (шаблон-проект = конвенция)",
+            "Start with monolith (не микросервисы с первого дня)",
+            "Charge for software, don't rent via SaaS only",
+            "Opinionated framework beats flexible library",
+            "Shape Up: 6-week cycles, no backlogs"
+          ],
+          "twitter": "@dhh"
+        },
+        {
+          "name": "Mitchell Hashimoto",
+          "title": "Co-founder HashiCorp",
+          "products": ["Terraform", "Vault", "Consul", "Vagrant", "Packer"],
+          "revenue_at_exit": "$6.4B (acquired by IBM)",
+          "philosophy": [
+            "Infrastructure as code — treat infra like software",
+            "Developer tools create lock-in through love, not force",
+            "Open core model = community + enterprise revenue",
+            "Single responsibility for each tool"
+          ],
+          "what_to_copy": [
+            "Terraform for all infrastructure (IaC standard)",
+            "Open source to enterprise upgrade path",
+            "DevTools as product strategy",
+            "One tool does one thing well"
+          ],
+          "twitter": "@mitchellh"
+        },
+        {
+          "name": "Dario Amodei",
+          "title": "CEO Anthropic",
+          "company": "Anthropic",
+          "valuation": "$61B",
+          "philosophy": [
+            "Constitutional AI — values baked into training",
+            "Responsible scaling policy",
+            "Safety as product feature, not constraint",
+            "Long context is the future of AI interaction"
+          ],
+          "what_to_copy": [
+            "Safety-first AI design",
+            "Constitutional AI for bias reduction",
+            "Long-context applications (100K+ tokens)",
+            "Claude Code pattern (AI in IDE)"
+          ]
+        },
+        {
+          "name": "Nat Friedman",
+          "title": "Ex-CEO GitHub / AI Investor",
+          "company": "GitHub (ex-CEO), NFDG investments",
+          "contributions": ["GitHub Copilot launch", "GitHub Actions", "npm acquisition"],
+          "philosophy": [
+            "AI pair programming is the biggest productivity jump in 30 years",
+            "Developer tools compound — invest in them early",
+            "Ship fast, iterate, listen to developers"
+          ],
+          "what_to_copy": [
+            "GitHub Copilot workflow (AI in every keystroke)",
+            "GitHub Actions for CI/CD (not Jenkins)",
+            "Developer experience obsession"
+          ],
+          "twitter": "@natfriedman"
+        },
+        {
+          "name": "Jason Warner",
+          "title": "Ex-CTO GitHub / Investor",
+          "contributions": ["GitHub Actions architecture", "GitHub scale to 100M+ users"],
+          "philosophy": [
+            "Platform thinking: build what others can build on top of",
+            "Reliability is a feature",
+            "The CTO job is 20% tech, 80% people and strategy"
+          ],
+          "what_to_copy": [
+            "Platform-first architecture",
+            "GitHub Actions pattern (event-driven CI)",
+            "Scale planning before you need it"
+          ]
+        }
+      ]
+    },
+    "software_architects": {
+      "description": "Архитекторы которые изменили как мы пишем код",
+      "creators": [
+        {
+          "name": "Martin Fowler",
+          "title": "Chief Scientist ThoughtWorks",
+          "contributions": ["Refactoring book", "Patterns of Enterprise Application Architecture", "ADR concept", "Microservices term"],
+          "philosophy": [
+            "Make implicit explicit — если что-то важно, задокументируй",
+            "Any fool can write code that a computer can understand. Good programmers write code that humans can understand.",
+            "Refactoring is not adding features — keep them separate",
+            "Design stamina hypothesis — good design pays off after 4-6 weeks"
+          ],
+          "key_patterns": [
+            "Repository Pattern",
+            "Domain Model",
+            "Service Layer",
+            "Event Sourcing (coined term)",
+            "Strangler Fig Pattern (legacy migration)",
+            "CQRS (Command Query Responsibility Segregation)"
+          ],
+          "what_to_copy": [
+            "ADR (Architecture Decision Records) — каждое решение документируется",
+            "Refactoring discipline — отдельные коммиты только для рефакторинга",
+            "Make it work → make it right → make it fast (порядок важен)",
+            "Strangler fig для legacy (постепенная замена)"
+          ],
+          "blog": "martinfowler.com",
+          "books": ["Refactoring", "Patterns of Enterprise Application Architecture", "NoSQL Distilled"]
+        },
+        {
+          "name": "Sam Newman",
+          "title": "Independent Architect / Speaker",
+          "contributions": ["Building Microservices (O'Reilly)", "Monolith to Microservices"],
+          "philosophy": [
+            "Start with monolith — migrate to microservices only when you have evidence",
+            "Decompose by business capability, not by layer",
+            "Services own their data — no shared databases",
+            "Design for failure — every service call can fail"
+          ],
+          "what_to_copy": [
+            "Monolith-first (не переусложнять с микросервисами до PMF)",
+            "API gateway pattern",
+            "Circuit breaker between services",
+            "Event-driven communication"
+          ]
+        },
+        {
+          "name": "Andrej Karpathy",
+          "title": "Ex-Tesla AI Director / Ex-OpenAI founding member",
+          "current": "Building Eureka Labs (AI education)",
+          "philosophy": [
+            "Software 2.0 — neural networks replace explicit code",
+            "The simplest solution is usually correct",
+            "Don't cargo cult — understand WHY before copying",
+            "Compile in your head first (understand before implementing)",
+            "Vibe coding + AI verification = future of development"
+          ],
+          "approach": {
+            "development": "Start simple, add complexity only when needed",
+            "ai_tools": "GitHub Copilot + Claude + ChatGPT = 10x developer",
+            "learning": "First principles over recipes",
+            "quality": "AI compiler: 99% pass rate on first attempt (Tesla)"
+          },
+          "quotes": [
+            "The hottest new programming language is English",
+            "Most of what LLMs do is vibes",
+            "Software is the scaffolding around intelligence"
+          ],
+          "what_to_copy": [
+            "First principles thinking before implementation",
+            "Simplest solution first (no premature optimization)",
+            "AI as pair programmer (not just code generator)",
+            "Write failing test first — then let AI pass it",
+            "Vibe code → verify → iterate"
+          ],
+          "twitter": "@karpathy",
+          "github": "https://github.com/karpathy"
+        },
+        {
+          "name": "Kelsey Hightower",
+          "title": "Principal Engineer Google Cloud (retired)",
+          "contributions": ["Kubernetes evangelism", "kubeadm", "Production Kubernetes patterns"],
+          "philosophy": [
+            "Don't start with Kubernetes — start with what you know",
+            "Run it in production to really understand it",
+            "Simplicity is a feature",
+            "Cloud native doesn't mean cloud only"
+          ],
+          "quotes": [
+            "Kubernetes is a platform for building platforms",
+            "If you can't explain it simply, you don't understand it well enough"
+          ],
+          "what_to_copy": [
+            "Container-first but not Kubernetes-first",
+            "Kubernetes only when you need it (>10 services)",
+            "Health probes everywhere",
+            "12-factor app principles"
+          ],
+          "twitter": "@kelseyhightower"
+        },
+        {
+          "name": "Gregor Hohpe",
+          "title": "Enterprise Strategist AWS",
+          "contributions": ["Enterprise Integration Patterns (book)", "Software Architect Elevator"],
+          "philosophy": [
+            "The software architect rides the elevator — moves between penthouse (strategy) and engine room (code)",
+            "Architect = change agent",
+            "Good architecture reduces future effort",
+            "Message queues solve most distributed systems problems"
+          ],
+          "what_to_copy": [
+            "Enterprise Integration Patterns (Message Queue, Pub/Sub, Saga)",
+            "Architecture as decision-making (not just design)",
+            "C4 model for documentation",
+            "Architect elevator: stay connected to both code and strategy"
+          ]
+        },
+        {
+          "name": "Uncle Bob (Robert C. Martin)",
+          "title": "Clean Code Author / Agile Manifesto Signatory",
+          "contributions": ["Clean Code", "Clean Architecture", "SOLID principles", "TDD advocacy"],
+          "philosophy": [
+            "Clean code reads like well-written prose",
+            "TDD is not optional — it's professional",
+            "SOLID principles are the foundation of maintainable software",
+            "Functions should do one thing and do it well"
+          ],
+          "key_patterns": [
+            "SOLID (Single Responsibility, Open/Closed, Liskov, Interface Segregation, Dependency Inversion)",
+            "Clean Architecture (ports and adapters)",
+            "Dependency Rule (inner circles don't know about outer circles)"
+          ],
+          "what_to_copy": [
+            "Single Responsibility Principle (one reason to change)",
+            "Dependency Inversion (depend on abstractions)",
+            "Clean Architecture layers (core, application, infrastructure)",
+            "TDD red-green-refactor cycle"
+          ],
+          "books": ["Clean Code", "Clean Architecture", "The Clean Coder"]
+        },
+        {
+          "name": "Kent Beck",
+          "title": "Creator TDD / XP / JUnit co-creator",
+          "contributions": ["Test-Driven Development", "Extreme Programming", "JUnit", "Agile Manifesto signatory"],
+          "philosophy": [
+            "Test-first programming changes how you think",
+            "Make it work → make it right → make it fast",
+            "Simple design: passes tests, no duplication, expresses intent",
+            "Courage is a core agile value"
+          ],
+          "key_contributions": [
+            "TDD (Test-Driven Development)",
+            "XP (Extreme Programming)",
+            "JUnit testing framework",
+            "Beck's design rules"
+          ],
+          "what_to_copy": [
+            "TDD: red → green → refactor",
+            "Beck's 4 rules of simple design",
+            "Pair programming for complex problems",
+            "Continuous integration (commit multiple times/day)"
+          ],
+          "twitter": "@KentBeck"
+        },
+        {
+          "name": "Rich Hickey",
+          "title": "Creator Clojure / Datomic",
+          "philosophy": [
+            "Simple made easy — simple and easy are not the same",
+            "Complect = interweave complexity. Avoid it.",
+            "Values are immutable. State is accidental complexity.",
+            "The database is not the boss — append-only is better"
+          ],
+          "quotes": [
+            "Simple ain't easy",
+            "Complecting things is the source of most software complexity",
+            "Don't use objects when a function and data will do"
+          ],
+          "what_to_copy": [
+            "Immutable data structures (reduce bugs)",
+            "Value semantics over object identity",
+            "Separate data, logic, and state explicitly",
+            "Event log / append-only patterns"
+          ]
+        },
+        {
+          "name": "Bryan Cantrill",
+          "title": "CTO Oxide Computer / DTrace creator",
+          "contributions": ["DTrace", "ZFS", "Node.js on production (Joyent era)"],
+          "philosophy": [
+            "The system call is the OS API — design it carefully",
+            "Debugging is the most important skill",
+            "Observability is not optional in production",
+            "Hardware and software must be designed together"
+          ],
+          "what_to_copy": [
+            "Observability-first (logs, metrics, traces from day 1)",
+            "DTrace/eBPF for production debugging",
+            "Never ship without understanding failure modes"
+          ],
+          "twitter": "@bcantrill"
+        }
+      ]
+    },
+    "seo_growth": {
+      "description": "Лучшие SEO и Growth инженеры мира",
+      "creators": [
+        {
+          "name": "Rand Fishkin",
+          "title": "Co-founder Moz / SparkToro",
+          "companies": ["Moz ($45M ARR)", "SparkToro"],
+          "philosophy": [
+            "10x content — not 10% better, but 10x more valuable",
+            "Transparency builds authority faster than perfection",
+            "SEO = brand + content + technical + links (all four)",
+            "Zero-click searches are the new reality — optimize for brand mentions"
+          ],
+          "key_concepts": [
+            "Domain Authority metric (invented)",
+            "Whiteboard Friday (content marketing gold standard)",
+            "Audience intelligence (who links to competitors)",
+            "Brand SERPs optimization"
+          ],
+          "what_to_copy": [
+            "10x content (not incrementally better)",
+            "Publish Whiteboard Friday equivalent (visual explainers)",
+            "Build DA through editorial links, not bought links",
+            "Audience overlap analysis (SparkToro method)"
+          ],
+          "twitter": "@randfish"
+        },
+        {
+          "name": "Eli Schwartz",
+          "title": "Author: Product-Led SEO",
+          "philosophy": [
+            "SEO should drive product decisions, not just content",
+            "Build the product users search for, then optimize",
+            "Programmatic SEO at scale = defensible moat",
+            "Core pages > 1000 thin pages"
+          ],
+          "books": ["Product-Led SEO"],
+          "what_to_copy": [
+            "Product-Led SEO approach",
+            "Programmatic SEO for long-tail",
+            "Core pages strategy (10 great > 1000 mediocre)",
+            "SEO as product requirement, not afterthought"
+          ],
+          "twitter": "@5le"
+        },
+        {
+          "name": "Glen Allsopp (Detailed.com)",
+          "title": "SEO Researcher / Agency Founder",
+          "philosophy": [
+            "Original research creates the best backlinks",
+            "Data-driven SEO beats intuition every time",
+            "Study who controls the SERPs, then reverse engineer them"
+          ],
+          "what_to_copy": [
+            "Link building via original research (surveys, data studies)",
+            "Detailed competitor analysis",
+            "Data-driven content marketing",
+            "Analyze SERP monopolies"
+          ],
+          "site": "detailed.com"
+        },
+        {
+          "name": "Ahrefs Team (Tim Soulo, Patrick Stox)",
+          "title": "SEO Tool Builders / Content Marketers",
+          "philosophy": [
+            "Traffic value over raw traffic",
+            "Keyword difficulty is relative to your DR",
+            "Content should rank, not just exist"
+          ],
+          "what_to_copy": [
+            "Keyword difficulty scoring",
+            "Traffic value metric (CPC × traffic)",
+            "Content audit (update > delete > create)",
+            "Ahrefs blog = gold standard for SEO content"
+          ]
+        },
+        {
+          "name": "Brian Dean (Backlinko)",
+          "title": "SEO Expert / Backlinko Founder",
+          "acquired_by": "Semrush",
+          "philosophy": [
+            "Skyscraper technique: find top content, make it better, promote",
+            "One great page beats 100 mediocre ones",
+            "Link building is about relationships, not automation"
+          ],
+          "key_concepts": [
+            "Skyscraper Technique (найди лучший контент, сделай 10x лучше)",
+            "Moving man method",
+            "Guestographic technique"
+          ],
+          "what_to_copy": [
+            "Skyscraper technique for content",
+            "Long-form ultimate guides",
+            "Email outreach for link building"
+          ]
+        },
+        {
+          "name": "Neil Patel",
+          "title": "Founder NP Digital / Crazy Egg / Ubersuggest",
+          "companies": ["NP Digital (agency)", "Ubersuggest"],
+          "philosophy": [
+            "Content consistency beats content quality in the long run",
+            "Data is the competitive advantage",
+            "SEO + Paid = full-funnel growth"
+          ],
+          "what_to_copy": [
+            "Content at scale (quantity + quality)",
+            "Ubersuggest-style free tool as lead magnet",
+            "Full-funnel approach (SEO → email → retargeting)"
+          ],
+          "twitter": "@neilpatel"
+        },
+        {
+          "name": "Kyle Roof",
+          "title": "On-Page SEO Expert / PageOptimizer Pro",
+          "philosophy": [
+            "On-page is the only thing you fully control",
+            "Test everything, assume nothing",
+            "TF*IDF and entity optimization beat keyword stuffing"
+          ],
+          "what_to_copy": [
+            "On-page optimization with NLP/entities",
+            "A/B testing for SEO",
+            "PageOptimizer Pro methodology"
+          ]
+        }
+      ]
+    },
+    "ai_pioneers": {
+      "description": "Пионеры AI-first разработки",
+      "creators": [
+        {
+          "name": "Sam Altman",
+          "title": "CEO OpenAI",
+          "company": "OpenAI",
+          "valuation": "$300B+",
+          "philosophy": [
+            "AGI is coming — build for it, not against it",
+            "AI will do the work, humans will direct",
+            "The most important skill: knowing what to build",
+            "Intelligence is going to be essentially free soon"
+          ],
+          "what_to_copy": [
+            "AI-first architecture (не AI как добавка)",
+            "Iterate fast on AI products",
+            "Prompt engineering as core competency",
+            "Evals before shipping AI features"
+          ],
+          "twitter": "@sama"
+        },
+        {
+          "name": "Harrison Chase",
+          "title": "Co-founder LangChain",
+          "companies": ["LangChain", "LangSmith"],
+          "philosophy": [
+            "LLMs need orchestration, not just prompting",
+            "Evals are the unit tests of AI",
+            "Agents are the future of AI application"
+          ],
+          "what_to_copy": [
+            "Chain of thought implementation",
+            "Agent tool use patterns",
+            "LLM evaluation frameworks",
+            "LangSmith tracing for AI debugging"
+          ],
+          "twitter": "@hwchase17"
+        },
+        {
+          "name": "Simon Willison (simonw)",
+          "title": "Creator Django / AI researcher / Datasette",
+          "contributions": ["Django web framework", "Datasette", "llm CLI tool"],
+          "philosophy": [
+            "Build tools that expose data simply",
+            "SQLite is underrated — it's the right tool more often than you think",
+            "LLM tool use is the most powerful feature yet"
+          ],
+          "what_to_copy": [
+            "LLM tool use patterns",
+            "Datasette (SQLite as API pattern)",
+            "Build in public blogging",
+            "llm CLI for quick AI experiments"
+          ],
+          "twitter": "@simonw",
+          "github": "https://github.com/simonw"
+        },
+        {
+          "name": "Greg Brockman",
+          "title": "Co-founder / Ex-President OpenAI",
+          "philosophy": [
+            "AI safety and capabilities can be pursued together",
+            "Talent density beats team size",
+            "Demo culture: show don't tell"
+          ],
+          "what_to_copy": [
+            "Demo-first culture (show working prototype)",
+            "Talent density over headcount",
+            "AI safety as engineering discipline"
+          ]
+        },
+        {
+          "name": "Emad Mostaque",
+          "title": "Founder Stability AI",
+          "contributions": ["Stable Diffusion (open source)", "AI for the people"],
+          "philosophy": [
+            "Open source AI = democratization",
+            "Multimodal AI is the future",
+            "Decentralized AI infrastructure"
+          ],
+          "what_to_copy": [
+            "Open source model strategy (community = marketing)",
+            "Stable Diffusion API integration",
+            "Multimodal AI products"
+          ]
+        },
+        {
+          "name": "Jeremy Howard",
+          "title": "Founder Fast.ai / Kaggle Grandmaster",
+          "contributions": ["Fast.ai (practical deep learning)", "ULMFiT (transfer learning)", "Kaggle"],
+          "philosophy": [
+            "Top-down learning beats bottom-up (run first, understand why later)",
+            "Deep learning is accessible to everyone",
+            "Practical beats theoretical in ML",
+            "Transfer learning changed everything"
+          ],
+          "what_to_copy": [
+            "Fast.ai methodology (practical ML without PhD)",
+            "Transfer learning for custom models",
+            "Jupyter notebooks as research medium",
+            "nbdev (notebooks as source of truth)"
+          ],
+          "twitter": "@jeremyphoward"
+        },
+        {
+          "name": "Yann LeCun",
+          "title": "Chief AI Scientist Meta",
+          "contributions": ["Convolutional Neural Networks", "Backpropagation", "MNIST dataset"],
+          "philosophy": [
+            "World models are the path to AGI",
+            "LLMs are not enough — need structured reasoning",
+            "Open source AI is safer than closed"
+          ],
+          "what_to_copy": [
+            "CNN for image processing tasks",
+            "Self-supervised learning approach",
+            "World model architecture thinking"
+          ]
+        }
+      ]
+    },
+    "open_source_legends": {
+      "description": "Создатели инструментов которыми пользуется весь мир",
+      "creators": [
+        {
+          "name": "Linus Torvalds",
+          "title": "Creator Linux / Git",
+          "contributions": ["Linux kernel", "Git version control"],
+          "philosophy": [
+            "Talk is cheap. Show me the code.",
+            "Bad programmers worry about the code. Good programmers worry about data structures.",
+            "Security people are often completely crazy",
+            "Git is the best version control system because I wrote it"
+          ],
+          "what_to_copy": [
+            "Git commit discipline (small, focused commits)",
+            "Code review culture (be direct about quality)",
+            "Open source governance",
+            "Patch-based development workflow"
+          ]
+        },
+        {
+          "name": "Evan You",
+          "title": "Creator Vue.js / Vite",
+          "contributions": ["Vue.js (200K+ stars)", "Vite (build tool)", "Vitest"],
+          "philosophy": [
+            "Progressive enhancement — adopt as much as you need",
+            "Developer experience is everything",
+            "Fast feedback loops = productive development",
+            "Composable over opinionated"
+          ],
+          "what_to_copy": [
+            "Vite for any frontend project (5x faster than Webpack)",
+            "Vitest for unit testing (same config as Vite)",
+            "Vue 3 Composition API patterns",
+            "Progressive adoption strategy"
+          ],
+          "twitter": "@youyuxi"
+        },
+        {
+          "name": "Theo Browne (t3dotgg)",
+          "title": "Founder Ping.gg / T3 Stack creator",
+          "contributions": ["T3 Stack (Next.js + TypeScript + Tailwind + tRPC)", "create-t3-app"],
+          "philosophy": [
+            "Type safety all the way down",
+            "tRPC: if you're using REST between frontend and backend you own, you're doing it wrong",
+            "Ship fast with TypeScript safety",
+            "Learn by doing, not by tutorial"
+          ],
+          "what_to_copy": [
+            "T3 Stack for full-stack TypeScript",
+            "tRPC for type-safe API calls",
+            "create-t3-app as boilerplate",
+            "TypeScript everywhere (no JavaScript gaps)"
+          ],
+          "twitter": "@t3dotgg"
+        },
+        {
+          "name": "TJ Holowaychuk",
+          "title": "Prolific Open Source Developer",
+          "contributions": ["Express.js", "Koa.js", "Mocha", "Stylus", "100+ npm packages"],
+          "philosophy": [
+            "Write code, lots of code — quality comes through volume",
+            "Simple > complex",
+            "One package, one purpose"
+          ],
+          "what_to_copy": [
+            "Express.js middleware pattern",
+            "Koa.js async/await server pattern",
+            "Publish small focused packages"
+          ]
+        },
+        {
+          "name": "Sindre Sorhus",
+          "title": "Open Source Maintainer",
+          "contributions": ["1000+ npm packages", "Chalk", "Ora", "Execa", "Got"],
+          "philosophy": [
+            "Do one thing well",
+            "Maintain what you create",
+            "Semantic versioning strictly"
+          ],
+          "what_to_copy": [
+            "Small focused packages",
+            "README-first development",
+            "Strict semver"
+          ],
+          "github": "https://github.com/sindresorhus"
+        },
+        {
+          "name": "Taylor Otwell",
+          "title": "Creator Laravel",
+          "contributions": ["Laravel (PHP framework)", "Forge", "Vapor", "Nova", "Livewire"],
+          "philosophy": [
+            "Expressive, elegant syntax",
+            "Convention with flexibility",
+            "Full-stack in one ecosystem"
+          ],
+          "what_to_copy": [
+            "Eloquent ORM pattern",
+            "Artisan CLI for code generation",
+            "Laravel ecosystem approach (framework + tools)"
+          ],
+          "twitter": "@taylorotwell"
+        }
+      ]
+    },
+    "startup_founders": {
+      "description": "Основатели, изменившие отрасль",
+      "creators": [
+        {
+          "name": "Paul Graham",
+          "title": "Co-founder Y Combinator",
+          "contributions": ["Y Combinator", "Hacker News", "Arc language", "Lisp essays"],
+          "philosophy": [
+            "Do things that don't scale — first 100 users by hand",
+            "Make something people want (not what they say they want)",
+            "Live in the future, then build what's missing",
+            "Startups = growth",
+            "Ramen profitable = default alive"
+          ],
+          "famous_essays": [
+            "How to Start a Startup",
+            "Hackers and Painters",
+            "Do Things That Don't Scale",
+            "Default Alive or Default Dead"
+          ],
+          "what_to_copy": [
+            "Talk to users before building",
+            "Do things that don't scale (first)",
+            "Default alive metric",
+            "Weekly growth as north star",
+            "Build something 100 people love, not 1000 people like"
+          ],
+          "twitter": "@paulg"
+        },
+        {
+          "name": "Aaron Levie",
+          "title": "CEO Box",
+          "philosophy": [
+            "Enterprise software should be as easy as consumer software",
+            "Timing is everything in startups",
+            "Culture is strategy"
+          ],
+          "what_to_copy": [
+            "Enterprise UX = consumer UX standards",
+            "Cloud-first enterprise thinking"
+          ]
+        },
+        {
+          "name": "Jason Fried",
+          "title": "Co-founder 37signals (Basecamp/HEY)",
+          "philosophy": [
+            "Work doesn't have to be crazy",
+            "Asynchronous first — don't interrupt",
+            "Calm company over hustle culture",
+            "Constraints are your friend"
+          ],
+          "books": ["Rework", "It Doesn't Have to Be Crazy at Work", "Getting Real"],
+          "what_to_copy": [
+            "Shape Up methodology (6-week cycles)",
+            "Async-first communication",
+            "No meetings default",
+            "Constraints generate creativity"
+          ],
+          "twitter": "@jasonfried"
+        },
+        {
+          "name": "Derek Sivers",
+          "title": "Founder CD Baby / Author",
+          "philosophy": [
+            "Hell yes or no — don't commit to anything less than excitement",
+            "Delegate, don't disappear (document systems)",
+            "Ideas are multiplied by execution",
+            "Small is beautiful — you don't need to grow"
+          ],
+          "books": ["Anything You Want", "How to Live"],
+          "what_to_copy": [
+            "Hell yes or no decision framework",
+            "Systematize everything (document for delegation)",
+            "Small profitable company over VC growth",
+            "Sell when you lose passion"
+          ],
+          "twitter": "@sivers"
+        }
+      ]
+    },
+    "devrel_educators": {
+      "description": "Лучшие технические educators мира",
+      "creators": [
+        {
+          "name": "Fireship (Jeff Delaney)",
+          "title": "YouTube Tech Educator",
+          "stats": {"youtube_subscribers": "2.5M+", "video_format": "100 seconds explainers"},
+          "philosophy": [
+            "100 seconds = optimal technical concept length",
+            "Humor + accuracy = engagement",
+            "Show the code, not just talk about it"
+          ],
+          "what_to_copy": [
+            "100-second format for technical concepts",
+            "Visual code walkthroughs",
+            "Comparison videos (X vs Y)",
+            "Trend-driven content calendar"
+          ],
+          "youtube": "Fireship"
+        },
+        {
+          "name": "Traversy Media (Brad Traversy)",
+          "title": "YouTube Web Dev Educator",
+          "stats": {"youtube_subscribers": "2M+"},
+          "what_to_copy": [
+            "Crash course format (2h complete guide)",
+            "Tutorial-to-project structure",
+            "Framework updates content"
+          ]
+        },
+        {
+          "name": "Primeagen (ThePrimeagen)",
+          "title": "Netflix Engineer / Content Creator",
+          "philosophy": [
+            "Neovim is the superior editor and I'll fight you",
+            "Performance matters in real systems",
+            "Read the source code"
+          ],
+          "what_to_copy": [
+            "Performance-first mindset",
+            "Reading source code as learning method",
+            "Opinionated takes drive engagement"
+          ],
+          "twitter": "@ThePrimeagen"
+        }
+      ]
+    }
+  },
+  "benchmarks_by_creator": {
+    "speed": {
+      "pieter_levels": {
+        "idea_to_deploy": "24h",
+        "products_per_year": 12,
+        "mvp_lines_of_code": "<500"
+      },
+      "marc_lou": {
+        "saas_to_1k_mrr": "1 month",
+        "deploy_frequency": "daily",
+        "tech_stack_decisions": "zero (use template)"
+      },
+      "stripe": {
+        "api_integration": "7 lines",
+        "docs_time_to_first_call": "5 min",
+        "backward_compat": "never break"
+      },
+      "guillermo_rauch": {
+        "deploy_command": "git push",
+        "preview_per_pr": true,
+        "time_to_production": "< 2 min"
+      }
+    },
+    "quality": {
+      "google": {
+        "test_coverage": "80% minimum",
+        "code_review": "mandatory",
+        "design_docs": "required for changes >1 week"
+      },
+      "stripe": {
+        "api_backward_compat": "never break",
+        "documentation": "before code",
+        "error_messages": "human-readable"
+      },
+      "anthropic": {
+        "ai_compiler_pass_rate": "99%",
+        "evals_before_ship": "required",
+        "constitutional_ai": "built-in"
+      },
+      "martin_fowler": {
+        "refactoring_frequency": "continuous",
+        "code_smell_tolerance": "zero",
+        "adr_coverage": "100%"
+      }
+    },
+    "architecture": {
+      "martin_fowler": {
+        "adr_coverage": "100%",
+        "refactoring_separate_commits": true,
+        "make_it_work_first": true
+      },
+      "sam_newman": {
+        "monolith_first": true,
+        "microservices_threshold": "pmf + scale",
+        "shared_db": false
+      },
+      "werner_vogels": {
+        "healthcheck_coverage": "100%",
+        "deploy_rollback_time": "< 5min",
+        "design_for_failure": true
+      },
+      "dhh": {
+        "monolith_default": true,
+        "convention_over_config": true,
+        "profitability_day_1": true
+      }
+    },
+    "seo": {
+      "rand_fishkin": {
+        "content_quality": "10x not 2x",
+        "link_strategy": "editorial only",
+        "brand_serp": "must own"
+      },
+      "eli_schwartz": {
+        "programmatic_threshold": "100+ similar pages",
+        "core_pages_first": true,
+        "seo_as_product": true
+      },
+      "brian_dean": {
+        "skyscraper_threshold": "top 3 result",
+        "page_depth": "ultimate guide",
+        "link_building": "relationship-based"
+      }
+    },
+    "solo_building": {
+      "pieter_levels": {
+        "launch_threshold": "24h",
+        "revenue_from_day": 1,
+        "team_size": 0,
+        "failure_rate_accepted": "85%"
+      },
+      "marc_lou": {
+        "launch_threshold": "1 week",
+        "boilerplate_reuse": true,
+        "tech_decisions_per_project": 0
+      },
+      "danny_postma": {
+        "ai_wrapper_first": true,
+        "seo_before_build": true,
+        "vercel_deploy": true
+      }
+    }
+  },
+  "learning_references": {
+    "books": [
+      {
+        "title": "Designing Data-Intensive Applications",
+        "author": "Martin Kleppmann",
+        "level": "architect",
+        "rating": 10,
+        "why": "Лучшая книга по distributed systems"
+      },
+      {
+        "title": "Building Microservices",
+        "author": "Sam Newman",
+        "level": "architect",
+        "rating": 9,
+        "why": "Когда и как разбивать монолит"
+      },
+      {
+        "title": "Refactoring",
+        "author": "Martin Fowler",
+        "level": "senior",
+        "rating": 10,
+        "why": "Как улучшать код без поломок"
+      },
+      {
+        "title": "The Lean Startup",
+        "author": "Eric Ries",
+        "level": "founder",
+        "rating": 9,
+        "why": "Build-Measure-Learn цикл"
+      },
+      {
+        "title": "Zero to One",
+        "author": "Peter Thiel",
+        "level": "founder",
+        "rating": 8,
+        "why": "Конкуренция = смерть, ищи монополию"
+      },
+      {
+        "title": "Product-Led SEO",
+        "author": "Eli Schwartz",
+        "level": "seo",
+        "rating": 9,
+        "why": "SEO встроенный в продукт"
+      },
+      {
+        "title": "The SRE Book",
+        "author": "Google",
+        "level": "devops",
+        "rating": 10,
+        "why": "Как Google управляет production"
+      },
+      {
+        "title": "Clean Architecture",
+        "author": "Robert C. Martin",
+        "level": "architect",
+        "rating": 9,
+        "why": "Независимость бизнес-логики от фреймворков"
+      },
+      {
+        "title": "Rework",
+        "author": "Jason Fried & DHH",
+        "level": "founder",
+        "rating": 9,
+        "why": "Как строить бизнес без безумия"
+      },
+      {
+        "title": "Shape Up",
+        "author": "Ryan Singer (Basecamp)",
+        "level": "founder",
+        "rating": 9,
+        "why": "6-недельные циклы без бэклогов",
+        "url": "https://basecamp.com/shapeup (free)"
+      },
+      {
+        "title": "The Bootstrapped Founder",
+        "author": "Arvid Kahl",
+        "level": "solo_builder",
+        "rating": 8,
+        "why": "Bootstrap от идеи до выхода"
+      },
+      {
+        "title": "Zero to Sold",
+        "author": "Arvid Kahl",
+        "level": "solo_builder",
+        "rating": 9,
+        "why": "Полный путь bootstrapped founder"
+      },
+      {
+        "title": "Anything You Want",
+        "author": "Derek Sivers",
+        "level": "founder",
+        "rating": 9,
+        "why": "Маленький = красивый"
+      },
+      {
+        "title": "Deep Work",
+        "author": "Cal Newport",
+        "level": "all",
+        "rating": 9,
+        "why": "Как программисту работать без отвлечений"
+      },
+      {
+        "title": "The Mom Test",
+        "author": "Rob Fitzpatrick",
+        "level": "founder",
+        "rating": 10,
+        "why": "Как валидировать идеи не слыша ложь"
+      }
+    ],
+    "blogs": [
+      {"name": "martinfowler.com", "focus": "architecture patterns", "rating": 10},
+      {"name": "highscalability.com", "focus": "scale case studies", "rating": 9},
+      {"name": "eng.uber.com", "focus": "engineering at scale", "rating": 9},
+      {"name": "netflixtechblog.com", "focus": "streaming + chaos", "rating": 10},
+      {"name": "stripe.com/blog/engineering", "focus": "API design + reliability", "rating": 10},
+      {"name": "vercel.com/blog", "focus": "edge + serverless", "rating": 8},
+      {"name": "simonwillison.net", "focus": "LLM tools + SQLite + web", "rating": 9},
+      {"name": "lethain.com", "focus": "engineering leadership", "rating": 9},
+      {"name": "indiehackers.com", "focus": "solo founders revenue stories", "rating": 8},
+      {"name": "newsletter.pragmaticengineer.com", "focus": "big tech engineering", "rating": 10}
+    ],
+    "github_repos": [
+      {
+        "repo": "karpathy/nanoGPT",
+        "why": "simplest LLM implementation",
+        "stars": "40K+"
+      },
+      {
+        "repo": "simonw/datasette",
+        "why": "SQLite as API pattern",
+        "stars": "10K+"
+      },
+      {
+        "repo": "public-apis/public-apis",
+        "why": "API integration ideas",
+        "stars": "300K+"
+      },
+      {
+        "repo": "practical-tutorials/project-based-learning",
+        "why": "learn by building",
+        "stars": "200K+"
+      },
+      {
+        "repo": "donnemartin/system-design-primer",
+        "why": "system design patterns",
+        "stars": "280K+"
+      },
+      {
+        "repo": "kamranahmedse/developer-roadmap",
+        "why": "learning paths for any stack",
+        "stars": "300K+"
+      },
+      {
+        "repo": "trimstray/the-book-of-secret-knowledge",
+        "why": "tools, cheatsheets, hacks",
+        "stars": "150K+"
+      },
+      {
+        "repo": "fastapi/fastapi",
+        "why": "best Python API framework",
+        "stars": "80K+"
+      },
+      {
+        "repo": "shadcn-ui/ui",
+        "why": "copy-paste UI components",
+        "stars": "70K+"
+      },
+      {
+        "repo": "t3-oss/create-t3-app",
+        "why": "TypeScript full-stack boilerplate",
+        "stars": "25K+"
+      }
+    ],
+    "youtube_channels": [
+      {"name": "Fireship", "why": "100s format, trends"},
+      {"name": "Theo (t3dotgg)", "why": "TypeScript + React opinions"},
+      {"name": "ThePrimeagen", "why": "performance + vim + rants"},
+      {"name": "Andrej Karpathy", "why": "AI from first principles"},
+      {"name": "Hussein Nasser", "why": "backend engineering deep dives"}
+    ],
+    "newsletters": [
+      {"name": "The Pragmatic Engineer", "author": "Gergely Orosz", "rating": 10},
+      {"name": "Lenny's Newsletter", "author": "Lenny Rachitsky", "rating": 9},
+      {"name": "TLDR Newsletter", "author": "Dan Ni", "rating": 8},
+      {"name": "Pointer.io", "author": "various", "rating": 9},
+      {"name": "Bytes.dev", "author": "Tyler McGinnis", "rating": 8}
+    ]
+  },
+  "creator_comparison": {
+    "for_solo_saas": {
+      "primary": "Pieter Levels",
+      "secondary": ["Marc Lou", "Danny Postma", "Tony Dinh"],
+      "principles": [
+        "Revenue from day 1",
+        "Ship in 24h-1 week",
+        "No team, just automation",
+        "Build in public"
+      ]
+    },
+    "for_enterprise_software": {
+      "primary": "Werner Vogels",
+      "secondary": ["Martin Fowler", "Sam Newman"],
+      "principles": [
+        "Design for failure",
+        "ADR for all decisions",
+        "Monolith first, microservices on evidence",
+        "You build it, you run it"
+      ]
+    },
+    "for_developer_tools": {
+      "primary": "Mitchell Hashimoto",
+      "secondary": ["Patrick Collison", "Guillermo Rauch"],
+      "principles": [
+        "Open core model",
+        "7-line integration",
+        "Zero config defaults",
+        "Developer experience obsession"
+      ]
+    },
+    "for_ai_products": {
+      "primary": "Andrej Karpathy",
+      "secondary": ["Sam Altman", "Harrison Chase"],
+      "principles": [
+        "Simplest solution first",
+        "Evals before ship",
+        "AI as amplifier, not replacement",
+        "Vibe code → verify → iterate"
+      ]
+    },
+    "for_seo_growth": {
+      "primary": "Eli Schwartz",
+      "secondary": ["Rand Fishkin", "Brian Dean"],
+      "principles": [
+        "Product-Led SEO",
+        "10x content",
+        "Core pages over thin pages",
+        "Editorial links only"
+      ]
+    },
+    "for_startup_culture": {
+      "primary": "DHH",
+      "secondary": ["Jason Fried", "Paul Graham"],
+      "principles": [
+        "Profitable from day 1",
+        "Calm company",
+        "Shape Up methodology",
+        "Talk to users"
+      ]
+    }
+  }
+}
