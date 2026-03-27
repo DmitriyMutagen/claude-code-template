@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code — Visual Architecture Atlas</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0A0E1A;
+    --surface: #111827;
+    --surface2: #1F2937;
+    --border: #2D3748;
+    --text: #F9FAFB;
+    --muted: #9CA3AF;
+    --accent-blue: #3B82F6;
+    --accent-green: #10B981;
+    --accent-purple: #8B5CF6;
+    --accent-gold: #F59E0B;
+    --accent-red: #EF4444;
+    --accent-cyan: #06B6D4;
+    --accent-pink: #EC4899;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  .hero {
+    background: linear-gradient(135deg, #0A0E1A 0%, #0F172A 50%, #0A0E1A 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 40px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -20%;
+    width: 60%;
+    height: 200%;
+    background: radial-gradient(ellipse, rgba(59,130,246,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-title { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.03em; }
+  .hero-title span { background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero-sub { color: var(--muted); margin-top: 8px; font-size: 1.05rem; }
+  .hero-meta { margin-top: 20px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .hero-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .hero-badge strong { color: var(--text); }
+
+  /* ── NAV ── */
+  .nav-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,14,26,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 60px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+  }
+  .nav-bar a {
+    color: var(--muted);
+    text-decoration: none;
+    padding: 14px 16px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .nav-bar a:hover { color: var(--text); border-bottom-color: var(--accent-blue); }
+
+  /* ── MAIN ── */
+  .container { max-width: 1400px; margin: 0 auto; padding: 0 60px 80px; }
+
+  /* ── DIAGRAM SECTION ── */
+  .diagram-section {
+    margin-top: 60px;
+    scroll-margin-top: 60px;
+  }
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+  .section-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+  .icon-blue { background: rgba(59,130,246,0.15); }
+  .icon-green { background: rgba(16,185,129,0.15); }
+  .icon-purple { background: rgba(139,92,246,0.15); }
+  .icon-gold { background: rgba(245,158,11,0.15); }
+  .icon-red { background: rgba(239,68,68,0.15); }
+  .icon-cyan { background: rgba(6,182,212,0.15); }
+  .icon-pink { background: rgba(236,72,153,0.15); }
+
+  .section-title h2 { font-size: 1.5rem; font-weight: 700; }
+  .section-desc { color: var(--muted); margin-bottom: 24px; font-size: 0.95rem; }
+
+  .diagram-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    overflow: auto;
+  }
+  .diagram-box .mermaid {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* ── MINDMAP CSS ── */
+  .mindmap {
+    position: relative;
+    padding: 20px;
+  }
+  .mm-center {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .mm-node-main {
+    display: inline-block;
+    background: linear-gradient(135deg, #1D4ED8, #7C3AED);
+    border-radius: 50px;
+    padding: 16px 32px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 0 30px rgba(59,130,246,0.3);
+  }
+  .mm-branches {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+  }
+  .mm-branch {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .mm-branch-title {
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+  }
+  .mm-items { list-style: none; }
+  .mm-items li {
+    padding: 4px 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .mm-items li::before { content: '→'; color: var(--accent-blue); font-size: 0.75rem; }
+  .mm-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  /* ── FLOW CARDS (custom flowchart) ── */
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin: 16px 0;
+  }
+  .flow-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .flow-card.blue { border-color: var(--accent-blue); color: var(--accent-blue); }
+  .flow-card.green { border-color: var(--accent-green); color: var(--accent-green); }
+  .flow-card.purple { border-color: var(--accent-purple); color: var(--accent-purple); }
+  .flow-card.gold { border-color: var(--accent-gold); color: var(--accent-gold); }
+  .flow-card.red { border-color: var(--accent-red); color: var(--accent-red); }
+  .flow-arrow {
+    padding: 0 8px;
+    color: var(--muted);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .flow-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(255,255,255,0.02);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .flow-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  /* ── VPS BLOCK DIAGRAM ── */
+  .vps-diagram {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .vps-server {
+    background: var(--surface2);
+    border: 2px solid var(--accent-blue);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .vps-server.vpn { border-color: var(--accent-green); }
+  .vps-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--accent-blue);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .vps-server.vpn .vps-title { color: var(--accent-green); }
+  .vps-service {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+  .vps-service:last-child { border-bottom: none; }
+  .vps-service-name { font-family: 'JetBrains Mono', monospace; color: var(--text); }
+  .port-badge {
+    background: rgba(59,130,246,0.1);
+    border: 1px solid rgba(59,130,246,0.3);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    color: var(--accent-blue);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    box-shadow: 0 0 6px var(--accent-green);
+  }
+
+  /* ── MCP GRID ── */
+  .mcp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .mcp-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .mcp-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--accent-cyan);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .mcp-desc { font-size: 0.8rem; color: var(--muted); }
+  .mcp-tools { font-size: 0.75rem; color: var(--accent-blue); margin-top: 6px; }
+  .mcp-status {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    margin-right: 4px;
+  }
+
+  /* ── HOOK TIMELINE ── */
+  .hook-timeline {
+    position: relative;
+    padding-left: 32px;
+  }
+  .hook-timeline::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, var(--accent-blue), var(--accent-purple), var(--accent-green));
+  }
+  .hook-event {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  .hook-event::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 12px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--accent-blue);
+    border: 2px solid var(--bg);
+  }
+  .hook-event.stop::before { background: var(--accent-purple); }
+  .hook-event.post::before { background: var(--accent-green); }
+  .hook-event.pre::before { background: var(--accent-red); }
+  .hook-event.submit::before { background: var(--accent-gold); }
+  .hook-event.compact::before { background: var(--accent-pink); }
+  .hook-event-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hook-badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .hook-badge.session { background: rgba(59,130,246,0.2); color: var(--accent-blue); }
+  .hook-badge.stop { background: rgba(139,92,246,0.2); color: var(--accent-purple); }
+  .hook-badge.post { background: rgba(16,185,129,0.2); color: var(--accent-green); }
+  .hook-badge.pre { background: rgba(239,68,68,0.2); color: var(--accent-red); }
+  .hook-badge.submit { background: rgba(245,158,11,0.2); color: var(--accent-gold); }
+  .hook-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .hook-action {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── DATA FLOW ── */
+  .data-flow {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .df-column {
+    flex-shrink: 0;
+    min-width: 160px;
+  }
+  .df-header {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .df-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    margin-bottom: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+  }
+  .df-item.active { border-color: var(--accent-blue); color: var(--text); }
+  .df-arrow-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 32px;
+    color: var(--muted);
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  /* ── TWO COL ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 900px) {
+    .two-col, .mm-branches, .vps-diagram { grid-template-columns: 1fr; }
+    .container, .hero, .nav-bar { padding-left: 20px; padding-right: 20px; }
+  }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  /* ── NIGHT MODE ── */
+  .night-flow {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .night-timeline {
+    background: #0F172A;
+    border-right: 1px solid var(--border);
+    padding: 0;
+  }
+  .night-time {
+    padding: 12px 16px;
+    font-size: 0.82rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent-purple);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .night-events { padding: 0; }
+  .night-event {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+  .night-event:last-child { border-bottom: none; }
+  .night-event-title { font-weight: 600; margin-bottom: 4px; }
+  .night-event-detail { color: var(--muted); font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; }
+
+  /* ── MERMAID THEME ── */
+  .mermaid svg { max-width: 100%; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ HERO -->
+<div class="hero">
+  <div class="hero-title">🗺️ Claude Code — <span>Visual Architecture Atlas</span></div>
+  <div class="hero-sub">Полная визуальная карта инфраструктуры разработки · Aragant.group / Дмитрий Гагауз</div>
+  <div class="hero-meta">
+    <span class="hero-badge"><strong>8</strong> диаграмм</span>
+    <span class="hero-badge"><strong>18</strong> Rules</span>
+    <span class="hero-badge"><strong>20</strong> Агентов</span>
+    <span class="hero-badge"><strong>13</strong> MCP серверов</span>
+    <span class="hero-badge"><strong>7</strong> Хук-событий</span>
+    <span class="hero-badge"><strong>7</strong> Проектов</span>
+    <span class="hero-badge">VPS 94.198.219.232</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ NAV -->
+<nav class="nav-bar">
+  <a href="#map">🗺️ Карта</a>
+  <a href="#session">⚡ Сессия</a>
+  <a href="#hooks">🪝 Хуки</a>
+  <a href="#memory">🧠 Память</a>
+  <a href="#deploy">🚀 Деплой</a>
+  <a href="#vps">🖥️ VPS</a>
+  <a href="#mcp">🔌 MCP</a>
+  <a href="#night">🌙 Ночной</a>
+  <a href="#guide-auto">📄 Auto-Guide</a>
+</nav>
+
+<div class="container">
+
+
+<!-- ═══════════════════════════════════════════════════════ 1. КАРТА -->
+<section class="diagram-section" id="map">
+  <div class="section-title">
+    <div class="section-icon icon-blue">🗺️</div>
+    <h2>Полная карта инфраструктуры</h2>
+  </div>
+  <p class="section-desc">Всё что существует вокруг разработки — единая экосистема Claude Code</p>
+
+  <div class="diagram-box">
+    <div class="mm-center">
+      <div class="mm-node-main">🧠 Claude Code Infrastructure<br><small style="font-weight:400;font-size:0.8rem;">Aragant.group / Дмитрий Гагауз</small></div>
+    </div>
+    <div class="mm-branches">
+
+      <div class="mm-branch">
+        <div class="mm-branch-title"><span style="color:#3B82F6">⚙️</span> Конфигурация</div>
+        <ul class="mm-items">
+          <li><span class="mm-dot" style="background:#3B82F6"></span>CLAUDE.md — глобальные инструкции</li>
+          <li><span class="mm-dot" style="background:#3B82F6"></span>settings.json — хуки + MCP + env</li>
+          <li><span class="mm-dot" style="background:#3B82F6"></span>18 Rules файлов (auto-apply)</li>
+          <li><span class="mm-dot" style="background:#3B82F6"></span>CLAUDE.md в каждом проекте</li>
+        </ul>
+      </div>
+
+      <div class="mm-branch">
+        <div class="mm-branch-title"><span style="color:#10B981">🪝</span> Хуки (7 типов)</div>
+        <ul class="mm-items">
+          <li><span class="mm-dot" style="background:#10B981"></span>SessionStart (5 хуков)</li>
+          <li><span class="mm-dot" style="background:#10B981"></span>PreToolUse (4 хука)</li>
+          <li><span class="mm-dot" style="background:#10B981"></span>PostToolUse (6 хуков)</li>
+          <li><span class="mm-dot" style="background:#10B981"></span>Stop (5 хуков)</li>
+          <li><span class="mm-dot" style="background:#10B981"></span>UserPromptSubmit</li>
+          <li><span class="mm-dot" style="background:#10B981"></span>PreCompact</li>
+        </ul>
+      </div>
+
+      <div class="mm-branch">
+        <div class="mm-branch-title"><span style="color:#8B5CF6">🎮</span> Skills / Команды</div>
+        <ul class="mm-items">
+          <li><span class="mm-dot" style="background:#8B5CF6"></span>/continue /checkpoint /new-project</li>
+          <li><span class="mm-dot" style="background:#8B5CF6"></span>/good-morning /daily-review</li>
+          <li><span class="mm-dot" style="background:#8B5CF6"></span>/growth-coach /org-structure</li>
+          <li><span class="mm-dot" style="background:#8B5CF6"></span>/spec /review /audit /deploy-check</li>
+          <li><span class="mm-dot" style="background:#8B5CF6"></span>/parallel /wb-enrich /wb-qa</li>
+          <li><span class="mm-dot" style="background:#8B5CF6"></span>3158 скиллов в библиотеке</li>
+        </ul>
+      </div>
+
+      <div class="mm-branch">
+        <div class="mm-branch-title"><span style="color:#F59E0B">🤖</span> Агенты (20)</div>
+        <ul class="mm-items">
+          <li><span class="mm-dot" style="background:#F59E0B"></span>coder, tester, reviewer</li>
+          <li><span class="mm-dot" style="background:#F59E0B"></span>architect, security-auditor</li>
+          <li><span class="mm-dot" style="background:#F59E0B"></span>wb-enrichment, ozon-specialist</li>
+          <li><span class="mm-dot" style="background:#F59E0B"></span>researcher, data-analyst</li>
+          <li><span class="mm-dot" style="background:#F59E0B"></span>devops-engineer, n8n-automator</li>
+          <li><span class="mm-dot" style="background:#F59E0B"></span>browser-automation, content-factory</li>
+        </ul>
+      </div>
+
+      <div class="mm-branch">
+        <div class="mm-branch-title"><span style="color:#06B6D4">🔌</span> MCP (13 активных)</div>
+        <ul class="mm-items">
+          <li><span class="mm-dot" style="background:#06B6D4"></span>exa + brave-search (поиск)</li>
+          <li><span class="mm-dot" style="background:#06B6D4"></span>context7 (документация)</li>
+          <li><span class="mm-dot" style="background:#06B6D4"></span>playwright + puppeteer (браузер)</li>
+          <li><span class="mm-dot" style="background:#06B6D4"></span>filesystem + git + github</li>
+          <li><span class="mm-dot" style="background:#06B6D4"></span>postgres + sqlite (БД)</li>
+          <li><span class="mm-dot" style="background:#06B6D4"></span>telegram-notify, wildberries</li>
+        </ul>
+      </div>
+
+      <div class="mm-branch">
+        <div class="mm-branch-title"><span style="color:#EF4444">🧠</span> Память (∞)</div>
+        <ul class="mm-items">
+          <li><span class="mm-dot" style="background:#EF4444"></span>GLOBAL_MEMORY.md (все проекты)</li>
+          <li><span class="mm-dot" style="background:#EF4444"></span>MEMORY.md в каждом проекте</li>
+          <li><span class="mm-dot" style="background:#EF4444"></span>decay-7d (123 сессии)</li>
+          <li><span class="mm-dot" style="background:#EF4444"></span>permanent/ (5 файлов)</li>
+          <li><span class="mm-dot" style="background:#EF4444"></span>CL v2.1 (1569 наблюдений)</li>
+          <li><span class="mm-dot" style="background:#EF4444"></span>session-handoff.md</li>
+        </ul>
+      </div>
+
+      <div class="mm-branch">
+        <div class="mm-branch-title"><span style="color:#10B981">🏆</span> Геймификация</div>
+        <ul class="mm-items">
+          <li><span class="mm-dot" style="background:#10B981"></span>engine.py (SQLite WAL)</li>
+          <li><span class="mm-dot" style="background:#10B981"></span>12 уровней (0 → 350K XP)</li>
+          <li><span class="mm-dot" style="background:#10B981"></span>26 ачивок</li>
+          <li><span class="mm-dot" style="background:#10B981"></span>metrics_collector.py (09:00/21:00)</li>
+          <li><span class="mm-dot" style="background:#10B981"></span>learning_coach.py</li>
+          <li><span class="mm-dot" style="background:#10B981"></span>Telegram уведомления</li>
+        </ul>
+      </div>
+
+      <div class="mm-branch">
+        <div class="mm-branch-title"><span style="color:#EC4899">🖥️</span> Инфраструктура</div>
+        <ul class="mm-items">
+          <li><span class="mm-dot" style="background:#EC4899"></span>VPS 94.198.219.232 (4CPU/8GB)</li>
+          <li><span class="mm-dot" style="background:#EC4899"></span>VPN 72.56.121.84 (DE)</li>
+          <li><span class="mm-dot" style="background:#EC4899"></span>Docker + nginx + SSL</li>
+          <li><span class="mm-dot" style="background:#EC4899"></span>GitHub Actions CI/CD</li>
+          <li><span class="mm-dot" style="background:#EC4899"></span>PostgreSQL + Redis</li>
+          <li><span class="mm-dot" style="background:#EC4899"></span>Sentry (org: aragant)</li>
+        </ul>
+      </div>
+
+      <div class="mm-branch">
+        <div class="mm-branch-title"><span style="color:#F59E0B">📁</span> Проекты (7)</div>
+        <ul class="mm-items">
+          <li><span class="mm-dot" style="background:#F59E0B"></span>Aragant → aragant.pro ✅</li>
+          <li><span class="mm-dot" style="background:#F59E0B"></span>Bionovacia → :8002 ✅</li>
+          <li><span class="mm-dot" style="background:#F59E0B"></span>SoulWay B2B → Netlify ✅</li>
+          <li><span class="mm-dot" style="background:#F59E0B"></span>B2B Outreach 🚧</li>
+          <li><span class="mm-dot" style="background:#F59E0B"></span>WB Content Factory 🚧</li>
+          <li><span class="mm-dot" style="background:#F59E0B"></span>Content Factory ✅</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════ 2. СЕССИЯ -->
+<section class="diagram-section" id="session">
+  <div class="section-title">
+    <div class="section-icon icon-green">⚡</div>
+    <h2>Жизненный цикл сессии Claude Code</h2>
+  </div>
+  <p class="section-desc">Что происходит автоматически от старта до завершения каждой сессии</p>
+
+  <div class="diagram-box">
+    <div class="mermaid">
+flowchart TD
+    A([🚀 Запуск Claude Code]) --> B[SessionStart hooks ×5]
+
+    B --> C[🧠 memory-restore\nЧитает GLOBAL_MEMORY.md\n+ MEMORY.md проекта\n+ git log последние 5]
+    B --> D[🎮 gamification-boot\nПоказывает XP, уровень,\nстрик, challenge дня]
+    B --> E[🔌 mcp-health-check\nПроверяет 13/14 MCP\nотмечает недоступные]
+    B --> F[🤖 cl-v2.1-boot\nЗагружает инстинкты,\npre-activates patterns]
+    B --> G[📋 preflight-check\nContext7 reminder\nExa reminder\nTier classification]
+
+    C & D & E & F & G --> H([💬 Пользователь пишет промпт])
+
+    H --> I[UserPromptSubmit hook\nUniversal Preflight:\nContext7 + Exa + Tier]
+
+    I --> J{Тип задачи?}
+    J -->|Tier 1 мелочь| K[Сразу выполнить]
+    J -->|Tier 2 фича| L[Research → Design → Code]
+    J -->|Tier 3 архитектура| M[All CTO phases]
+
+    K & L & M --> N[PreToolUse hook\n🛡️ Блокировка:\n• push force to main\n• запись в .env/.pem\n• деструктивные ops]
+
+    N --> O[Выполнение инструментов\nRead/Write/Edit/Bash/Task]
+
+    O --> P[PostToolUse hook ×6\n⚡ +XP за операции\n🔬 CL v2.1 наблюдение\n📊 Метрики трекинг\n🚫 Quality sentinel]
+
+    P --> Q{Задача завершена?}
+    Q -->|Нет| H
+    Q -->|Да| R([Дмитрий закрывает сессию])
+
+    R --> S[Stop hooks ×5]
+    S --> T[📝 session-summarizer\nСохраняет в decay-7d/\nPopulates permanent/]
+    S --> U[🎮 gamification-stop\nXP итоги сессии\nLevel-up check\nTelegram уведомление]
+    S --> V[💾 auto-checkpoint\nОбновляет session-handoff.md\nGit status snapshot]
+    S --> W[📄 generate_guide.py\nОбновляет HTML гайд\nBumps version + changelog]
+    S --> X[🎯 quality-sentinel\nСканирует bare except\nraw SQL, TODO/FIXME]
+
+    style A fill:#1D4ED8,color:#fff,stroke:none
+    style R fill:#7C3AED,color:#fff,stroke:none
+    style N fill:#991B1B,color:#fff,stroke:none
+    style S fill:#065F46,color:#fff,stroke:none
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════ 3. ХУКИ -->
+<section class="diagram-section" id="hooks">
+  <div class="section-title">
+    <div class="section-icon icon-red">🪝</div>
+    <h2>Система хуков — детальная карта</h2>
+  </div>
+  <p class="section-desc">Все 7 типов хуков, что они делают и в каком порядке срабатывают</p>
+
+  <div class="diagram-box">
+    <div class="hook-timeline">
+
+      <div class="hook-event">
+        <div class="hook-event-title">
+          <span class="hook-badge session">SessionStart</span>
+          5 хуков · при каждом запуске
+        </div>
+        <div class="hook-actions">
+          <span class="hook-action">memory-restore.sh → GLOBAL_MEMORY + MEMORY.md</span>
+          <span class="hook-action">gamification-boot → XP banner + уровень</span>
+          <span class="hook-action">mcp-health-check → 13/14 статус</span>
+          <span class="hook-action">cl-v2.1-boot → instincts load</span>
+          <span class="hook-action">process-watchdog → zombie kill</span>
+        </div>
+      </div>
+
+      <div class="hook-event submit">
+        <div class="hook-event-title">
+          <span class="hook-badge submit">UserPromptSubmit</span>
+          1 хук · на каждое сообщение
+        </div>
+        <div class="hook-actions">
+          <span class="hook-action">universal-preflight → Context7 reminder + Exa + Tier classify</span>
+        </div>
+      </div>
+
+      <div class="hook-event pre">
+        <div class="hook-event-title">
+          <span class="hook-badge pre">PreToolUse</span>
+          4 хука · перед каждым инструментом
+        </div>
+        <div class="hook-actions">
+          <span class="hook-action">[Edit|Write] block-secrets → .env/.pem/.key ЗАПРЕЩЕНО</span>
+          <span class="hook-action">[Bash] block-force-push → main/master force ЗАПРЕЩЕНО</span>
+          <span class="hook-action">[Edit|Write] anti-pattern → bare except + raw SQL</span>
+          <span class="hook-action">[*] serena-reminder → activate_project reminder</span>
+        </div>
+      </div>
+
+      <div class="hook-event post">
+        <div class="hook-event-title">
+          <span class="hook-badge post">PostToolUse</span>
+          6 хуков · после каждого инструмента
+        </div>
+        <div class="hook-actions">
+          <span class="hook-action">[Write|Edit] xp-tracker → +10 XP за файл</span>
+          <span class="hook-action">[Write|Edit] cl-observation → новое наблюдение в JSON</span>
+          <span class="hook-action">[Write|Edit|Bash|Task] metrics-update → commits/files counter</span>
+          <span class="hook-action">[*] auto-doc-memory → MEMORY.md auto-populate</span>
+          <span class="hook-action">[Bash] sentry-check → новые ошибки после деплоя</span>
+          <span class="hook-action">[Bash] auto-xp → git commit message → +XP</span>
+        </div>
+      </div>
+
+      <div class="hook-event stop">
+        <div class="hook-event-title">
+          <span class="hook-badge stop">Stop</span>
+          5 хуков · при завершении сессии
+        </div>
+        <div class="hook-actions">
+          <span class="hook-action">quality-sentinel → TODO/FIXME + code quality scan</span>
+          <span class="hook-action">session-summarizer → decay-7d/session-YYYY-MM-DD.md</span>
+          <span class="hook-action">gamification-stop → XP итоги + Telegram</span>
+          <span class="hook-action">auto-checkpoint → session-handoff.md snapshot</span>
+          <span class="hook-action">generate_guide.py → HTML atlas v bump</span>
+        </div>
+      </div>
+
+      <div class="hook-event compact">
+        <div class="hook-event-title">
+          <span class="hook-badge" style="background:rgba(236,72,153,0.2);color:#EC4899">PreCompact</span>
+          1 хук · перед сжатием контекста
+        </div>
+        <div class="hook-actions">
+          <span class="hook-action">auto-checkpoint → сохранить прогресс ДО потери контекста</span>
+        </div>
+      </div>
+
+      <div class="hook-event">
+        <div class="hook-event-title">
+          <span class="hook-badge session">Notification</span>
+          1 хук · при долгих операциях
+        </div>
+        <div class="hook-actions">
+          <span class="hook-action">notify-long-op → Telegram если операция &gt;30s</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════ 4. ПАМЯТЬ -->
+<section class="diagram-section" id="memory">
+  <div class="section-title">
+    <div class="section-icon icon-purple">🧠</div>
+    <h2>Система памяти — поток данных</h2>
+  </div>
+  <p class="section-desc">Как информация создаётся, перемещается и становится постоянной памятью</p>
+
+  <div class="diagram-box">
+    <div class="mermaid">
+flowchart LR
+    subgraph INPUT["📥 Входящие данные"]
+        A[Действия Claude\nWrite/Edit/Bash/Task]
+        B[Git коммиты\n+ git log]
+        C[Дмитрий пишет\nговорит в FlowWhisper]
+    end
+
+    subgraph CAPTURE["🔬 Захват (автоматический)"]
+        D[PostToolUse hook\nCL v2.1 observation\n→ observations.json]
+        E[Stop hook\nsession-summarizer\n→ session-YYYY-MM-DD.md]
+        F[GLOBAL_MEMORY.md\nручное + auto-snapshot]
+    end
+
+    subgraph DECAY["⏳ Временная память"]
+        G[decay-7d/\n123 сессии\nАвто-удаление через 7д]
+        H[decay-30d/\ndaily-reviews\nАвто-удаление через 30д]
+    end
+
+    subgraph PERMANENT["💾 Постоянная память"]
+        I[permanent/\nreflexion.md\ngotchas.md\ndecisions.md\nskill-tree.md\nflowwhisper-analysis.md]
+    end
+
+    subgraph PROJECT["📁 Проектная память"]
+        J[MEMORY.md\nв каждом проекте]
+        K[docs/adr/\nАрхитектурные решения]
+        L[session-handoff.md\n.claude/ в проекте]
+    end
+
+    subgraph LEARNING["🤖 Самообучение"]
+        M[CL v2.1\nInstincts Engine\n1569 observations]
+        N[learning_coach.py\nElite benchmarks]
+        O[auto_evolution.py\nВоскресенье 20:00]
+    end
+
+    A --> D
+    B --> E
+    C --> F
+    D --> G
+    D --> M
+    E --> G
+    G -->|Промоушен если важно| I
+    H -->|Промоушен если важно| I
+    F --> PROJECT
+    M --> N
+    N --> O
+    O --> F
+
+    style INPUT fill:#0F172A,stroke:#374151
+    style CAPTURE fill:#0F172A,stroke:#374151
+    style DECAY fill:#0F172A,stroke:#374151
+    style PERMANENT fill:#0F172A,stroke:#1D4ED8
+    style PROJECT fill:#0F172A,stroke:#374151
+    style LEARNING fill:#0F172A,stroke:#374151
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════ 5. DEPLOY -->
+<section class="diagram-section" id="deploy">
+  <div class="section-title">
+    <div class="section-icon icon-gold">🚀</div>
+    <h2>Deploy Pipeline — от коммита до продакшна</h2>
+  </div>
+  <p class="section-desc">Полный путь кода от локальной разработки до живого сервиса</p>
+
+  <div class="diagram-box">
+    <div class="mermaid">
+sequenceDiagram
+    participant D as 👤 Дмитрий
+    participant CC as 🤖 Claude Code
+    participant PRE as 🛡️ Pre-commit
+    participant GH as 🐙 GitHub
+    participant CI as ⚙️ GitHub Actions
+    participant VPS as 🖥️ VPS 94.198.219.232
+    participant TG as 📱 Telegram
+
+    D->>CC: "задеплой Aragant"
+    CC->>CC: /deploy-check (pre-deploy checklist)
+    CC->>CC: pytest tests/ → ✅
+    CC->>CC: ruff check . → ✅
+    CC->>PRE: git commit -m "feat: ..."
+    PRE->>PRE: detect-secrets scan
+    PRE->>PRE: ruff format + check
+    PRE->>PRE: trailing-whitespace
+    PRE-->>CC: ✅ Hooks passed
+    CC->>GH: git push origin main
+    GH->>CI: Trigger workflow deploy.yml
+    CI->>CI: checkout@v4
+    CI->>CI: Setup Python 3.11
+    CI->>CI: pip install requirements
+    CI->>CI: ruff check (lint)
+    CI->>CI: pytest tests/ (unit)
+    CI->>VPS: appleboy/ssh-action
+    VPS->>VPS: cd /opt/aragant
+    VPS->>VPS: git pull origin main
+    VPS->>VPS: docker compose build
+    VPS->>VPS: docker compose up -d
+    VPS->>VPS: sleep 10
+    VPS->>VPS: curl /health → {"status":"ok"}
+    alt Health check passed
+        VPS-->>CI: ✅ Deploy successful
+        CI-->>TG: 🚀 Deployed aragant.pro v1.8.1
+    else Health check failed
+        VPS->>VPS: docker compose rollback
+        VPS-->>CI: ❌ Rollback triggered
+        CI-->>TG: 🔴 Deploy failed — rolled back
+    end
+    CI-->>CC: Deploy status
+    CC-->>D: "задеплоено, проверь aragant.pro 🔥"
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════ 6. VPS -->
+<section class="diagram-section" id="vps">
+  <div class="section-title">
+    <div class="section-icon icon-cyan">🖥️</div>
+    <h2>VPS Архитектура</h2>
+  </div>
+  <p class="section-desc">Что крутится на серверах, порты, сети, защита</p>
+
+  <div class="diagram-box">
+    <div class="vps-diagram">
+
+      <!-- Production VPS -->
+      <div class="vps-server">
+        <div class="vps-title">🖥️ Production VPS — 94.198.219.232</div>
+        <div style="font-size:0.78rem;color:#6B7280;margin-bottom:12px;">SPB, Russia · 4 CPU / 8 GB / 80 GB NVMe · Ubuntu 24.04</div>
+
+        <div style="font-size:0.75rem;text-transform:uppercase;color:#6B7280;margin-bottom:8px;">Nginx (reverse proxy)</div>
+        <div class="vps-service">
+          <span class="vps-service-name">nginx :80/:443</span>
+          <span style="display:flex;gap:6px;align-items:center">
+            <span class="status-dot"></span>
+            <span class="port-badge">SSL/TLS</span>
+          </span>
+        </div>
+
+        <div style="font-size:0.75rem;text-transform:uppercase;color:#6B7280;margin:12px 0 8px;">Приложения (Docker)</div>
+        <div class="vps-service">
+          <span class="vps-service-name">Aragant (FastAPI)</span>
+          <span style="display:flex;gap:6px;align-items:center">
+            <span class="status-dot"></span>
+            <span class="port-badge">:8000</span>
+          </span>
+        </div>
+        <div class="vps-service">
+          <span class="vps-service-name">Bionovacia (FastAPI)</span>
+          <span style="display:flex;gap:6px;align-items:center">
+            <span class="status-dot"></span>
+            <span class="port-badge">:8002</span>
+          </span>
+        </div>
+
+        <div style="font-size:0.75rem;text-transform:uppercase;color:#6B7280;margin:12px 0 8px;">Базы данных</div>
+        <div class="vps-service">
+          <span class="vps-service-name">PostgreSQL</span>
+          <span class="port-badge">:5432</span>
+        </div>
+        <div class="vps-service">
+          <span class="vps-service-name">Redis</span>
+          <span class="port-badge">:6379</span>
+        </div>
+
+        <div style="font-size:0.75rem;text-transform:uppercase;color:#6B7280;margin:12px 0 8px;">Защита</div>
+        <div class="vps-service">
+          <span class="vps-service-name">UFW Firewall</span>
+          <span style="font-size:0.78rem;color:#10B981;">22,80,443,8000,8002</span>
+        </div>
+        <div class="vps-service">
+          <span class="vps-service-name">fail2ban</span>
+          <span style="font-size:0.78rem;color:#10B981;">SSH protection</span>
+        </div>
+        <div class="vps-service">
+          <span class="vps-service-name">Certbot (Let's Encrypt)</span>
+          <span style="font-size:0.78rem;color:#10B981;">auto-renew SSL</span>
+        </div>
+        <div class="vps-service">
+          <span class="vps-service-name">SSH Watchdog</span>
+          <span style="font-size:0.78rem;color:#10B981;">restart каждые 5 мин</span>
+        </div>
+        <div class="vps-service">
+          <span class="vps-service-name">Swap 4 GB</span>
+          <span style="font-size:0.78rem;color:#6B7280;">OOM protection</span>
+        </div>
+      </div>
+
+      <!-- VPN VPS + Local -->
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div class="vps-server vpn">
+          <div class="vps-title" style="color:#10B981;">🛡️ VPN VPS — 72.56.121.84</div>
+          <div style="font-size:0.78rem;color:#6B7280;margin-bottom:12px;">Frankfurt, DE · Amnezia VPN only</div>
+          <div class="vps-service">
+            <span class="vps-service-name">Amnezia VPN</span>
+            <span style="display:flex;gap:6px;align-items:center">
+              <span class="status-dot"></span>
+              <span class="port-badge" style="border-color:#10B981;color:#10B981;">WireGuard</span>
+            </span>
+          </div>
+          <div class="vps-service">
+            <span class="vps-service-name">SOCKS5 Proxy</span>
+            <span class="port-badge" style="border-color:#10B981;color:#10B981;">:9074</span>
+          </div>
+          <div style="font-size:0.78rem;color:#6B7280;margin-top:8px;">Используется: WB API, парсинг, обход гео-ограничений</div>
+        </div>
+
+        <div class="vps-server" style="border-color:#8B5CF6;">
+          <div class="vps-title" style="color:#8B5CF6;">💻 Локальная машина (MacBook Pro)</div>
+          <div style="font-size:0.78rem;color:#6B7280;margin-bottom:12px;">Claude Code v2.1.83 · 128 GB RAM</div>
+          <div class="vps-service">
+            <span class="vps-service-name">Content Factory (FastAPI)</span>
+            <span class="port-badge" style="border-color:#8B5CF6;color:#8B5CF6;">:8100</span>
+          </div>
+          <div class="vps-service">
+            <span class="vps-service-name">LM Studio (Qwen 2.5)</span>
+            <span class="port-badge" style="border-color:#8B5CF6;color:#8B5CF6;">:1234</span>
+          </div>
+          <div class="vps-service">
+            <span class="vps-service-name">PostgreSQL (local dev)</span>
+            <span class="port-badge" style="border-color:#8B5CF6;color:#8B5CF6;">:5432</span>
+          </div>
+          <div class="vps-service">
+            <span class="vps-service-name">MCP серверов</span>
+            <span style="font-size:0.78rem;color:#8B5CF6;">13/14 active</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:20px;">
+      <div class="mermaid">
+flowchart LR
+    DNS[🌐 DNS reg.ru\nA record → 94.198.219.232]
+    CF[☁️ Cloudflare\noptional CDN]
+    NGINX[nginx :443\nSSL termination]
+    A[Aragant\n:8000]
+    B[Bionovacia\n:8002]
+    PG[(PostgreSQL\n:5432)]
+    RD[(Redis\n:6379)]
+
+    DNS --> NGINX
+    CF -.-> NGINX
+    NGINX -->|aragant.pro| A
+    NGINX -->|bionovacia.ru| B
+    A --> PG
+    A --> RD
+    B --> PG
+
+    style DNS fill:#1F2937,stroke:#374151,color:#9CA3AF
+    style NGINX fill:#1F2937,stroke:#374151,color:#9CA3AF
+    style A fill:#1D4ED8,stroke:none,color:#fff
+    style B fill:#065F46,stroke:none,color:#fff
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════ 7. MCP -->
+<section class="diagram-section" id="mcp">
+  <div class="section-title">
+    <div class="section-icon icon-cyan">🔌</div>
+    <h2>MCP Экосистема — кто что делает</h2>
+  </div>
+  <p class="section-desc">13 активных MCP серверов, их назначение и направление потоков данных</p>
+
+  <div class="diagram-box">
+    <div class="mermaid">
+flowchart TB
+    CC([🤖 Claude Code])
+
+    subgraph SEARCH["🔍 Поиск и исследование"]
+        EXA[exa\n8 инструментов\nweb_search, company_research\ndeep_researcher, crawling]
+        BRAVE[brave-search\nвеб поиск с API ключом]
+        CTX7[context7\nАктуальная документация\nбиблиотек]
+    end
+
+    subgraph BROWSER["🌐 Браузер автоматизация"]
+        PW[playwright\nheadless/headed/Firefox\nbrowser automation]
+        PPTR[puppeteer\nChrome DevTools\nProtocol]
+    end
+
+    subgraph FS["💾 Файлы и код"]
+        FSYS[filesystem\n~/Documents + ~/.claude\nполный доступ]
+        GIT[git\ngit операции\nlocal repos]
+        GH[github-mcp\nGitHub API\nPRs, issues, repos]
+    end
+
+    subgraph DB["🗄️ Базы данных"]
+        PG[postgres\nSQL к b2b_intelligence\nread-only analytics]
+        SQLITE[sqlite\nлокальная БД\ngamification.db]
+    end
+
+    subgraph COMM["📡 Коммуникации"]
+        TG[telegram-notify\nHuman-in-the-loop\nуведомления + alerts]
+        WB[wildberries\nWB API MCP\nseller 544455]
+    end
+
+    subgraph INFRA["⚙️ Инфраструктура"]
+        DOCKER[docker\nуправление\nконтейнерами]
+        TIME[time\nтекущее время/дата]
+        FETCH[fetch\nHTTP запросы\nлюбые API]
+    end
+
+    CC --> SEARCH
+    CC --> BROWSER
+    CC --> FS
+    CC --> DB
+    CC --> COMM
+    CC --> INFRA
+
+    style SEARCH fill:#0F172A,stroke:#1D4ED8
+    style BROWSER fill:#0F172A,stroke:#065F46
+    style FS fill:#0F172A,stroke:#7C3AED
+    style DB fill:#0F172A,stroke:#92400E
+    style COMM fill:#0F172A,stroke:#BE185D
+    style INFRA fill:#0F172A,stroke:#374151
+    style CC fill:#1D4ED8,stroke:none,color:#fff
+    </div>
+
+    <div style="margin-top:24px;">
+      <div class="legend">
+        <div class="legend-item"><span class="legend-dot" style="background:#3B82F6"></span>Исследование и поиск</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#10B981"></span>Браузер автоматизация</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#8B5CF6"></span>Файловая система</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#F59E0B"></span>Базы данных</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#EC4899"></span>Коммуникации</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#6B7280"></span>Инфраструктура</div>
+      </div>
+
+      <div class="mcp-grid" style="margin-top:12px;">
+        <div class="mcp-card">
+          <div class="mcp-name"><span class="mcp-status"></span>exa</div>
+          <div class="mcp-desc">Веб-поиск с глубоким понимием</div>
+          <div class="mcp-tools">8 инструментов · HTTP MCP</div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-name"><span class="mcp-status"></span>context7</div>
+          <div class="mcp-desc">Актуальная документация любых библиотек</div>
+          <div class="mcp-tools">2 инструмента · resolve + query</div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-name"><span class="mcp-status"></span>playwright</div>
+          <div class="mcp-desc">E2E тесты и browser automation</div>
+          <div class="mcp-tools">headed/headless/Firefox</div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-name"><span class="mcp-status"></span>filesystem</div>
+          <div class="mcp-desc">Полный доступ к ~/Documents</div>
+          <div class="mcp-tools">read/write/search/list</div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-name"><span class="mcp-status"></span>github-mcp</div>
+          <div class="mcp-desc">GitHub API — PRs, issues, repos</div>
+          <div class="mcp-tools">token настроен</div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-name"><span class="mcp-status"></span>postgres</div>
+          <div class="mcp-desc">SQL к b2b_intelligence (read-only)</div>
+          <div class="mcp-tools">marketai / marketai</div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-name"><span class="mcp-status"></span>wildberries</div>
+          <div class="mcp-desc">WB Seller API</div>
+          <div class="mcp-tools">seller 544455 · токен активен</div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-name"><span class="mcp-status"></span>telegram-notify</div>
+          <div class="mcp-desc">Human-in-the-loop уведомления</div>
+          <div class="mcp-tools">→ @Dimavertut</div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-name"><span class="mcp-status"></span>docker</div>
+          <div class="mcp-desc">Управление контейнерами</div>
+          <div class="mcp-tools">build/up/down/logs</div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-name"><span class="mcp-status"></span>git</div>
+          <div class="mcp-desc">Git операции в local repos</div>
+          <div class="mcp-tools">commit/diff/log/branch</div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-name"><span class="mcp-status"></span>sqlite</div>
+          <div class="mcp-desc">Локальная БД (gamification)</div>
+          <div class="mcp-tools">gamification.db</div>
+        </div>
+        <div class="mcp-card">
+          <div class="mcp-name"><span class="mcp-status"></span>fetch</div>
+          <div class="mcp-desc">HTTP запросы к любым API</div>
+          <div class="mcp-tools">GET/POST/PUT/DELETE</div>
+        </div>
+        <div class="mcp-card" style="border-color:#4B5563;opacity:0.6">
+          <div class="mcp-name" style="color:#6B7280">⚠️ n8n</div>
+          <div class="mcp-desc">N8N workflow manager</div>
+          <div class="mcp-tools" style="color:#EF4444;">connection failed (timed out)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════ 8. НОЧНОЙ РЕЖИМ -->
+<section class="diagram-section" id="night">
+  <div class="section-title">
+    <div class="section-icon icon-purple">🌙</div>
+    <h2>Sleepless — Ночной режим разработки</h2>
+  </div>
+  <p class="section-desc">Автономная разработка 24/7 пока Дмитрий спит</p>
+
+  <div class="diagram-box">
+    <div class="mermaid">
+flowchart TD
+    D([👤 Дмитрий перед сном])
+    D --> Q[sleepy add "задача" -p aragant]
+    D --> Q2[sleepy add "задача2" -p bionovacia]
+    D --> START[sleepy start]
+
+    START --> DAEMON[🌙 Daemon запущен\n~/.claude/sleepless/daemon.py\nRedis queue + tmux workers]
+
+    DAEMON --> W1[tmux: sleepless-aragant\nClaude Code агент #1]
+    DAEMON --> W2[tmux: sleepless-bionovacia\nClaude Code агент #2]
+
+    W1 --> R1[📖 Research: читает MEMORY.md\ngit log, файлы проекта]
+    W1 --> P1[📝 Plan: составляет TodoList\nразбивает на шаги]
+    W1 --> I1[⚡ Implement: пишет код\nв feature/* branch]
+    W1 --> T1[🧪 Tests: pytest перед\nи после изменений]
+    W1 --> C1[💾 Commit: каждый шаг\nописательное сообщение]
+
+    W2 --> R2[📖 Research]
+    W2 --> P2[📝 Plan]
+    W2 --> I2[⚡ Implement]
+    W2 --> T2[🧪 Tests]
+    W2 --> C2[💾 Commit]
+
+    C1 & C2 --> GUARD{🛡️ Правила\nночного режима}
+    GUARD -->|НЕТ push в main| FEAT[Только feature/*\nили fix/* ветки]
+    GUARD -->|2 раза фейл → СТОП| BLOCK[Пометить blocked\nперейти к след задаче]
+    GUARD -->|.env НИКОГДА| SAFE[Безопасность\nсекретов]
+
+    FEAT --> TG[📱 Telegram digest\nутром 08:00:\n✅ Что сделано\n❌ Что заблокировано\n📋 PR готовы к ревью]
+
+    GUARD2[⏰ Завтра утром]
+    TG --> GUARD2
+    GUARD2 --> REVIEW[Дмитрий читает digest]
+    REVIEW -->|ок| MERGE[git merge feature → main]
+    REVIEW -->|не то| CLOSE[git branch -D feature/...]
+
+    style D fill:#7C3AED,color:#fff,stroke:none
+    style DAEMON fill:#1D4ED8,color:#fff,stroke:none
+    style TG fill:#065F46,color:#fff,stroke:none
+    style GUARD fill:#991B1B,color:#fff,stroke:none
+    </div>
+
+    <div style="margin-top:20px;background:#0F172A;border:1px solid #1F2937;border-radius:8px;padding:16px;">
+      <div style="font-size:0.8rem;color:#6B7280;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.1em;">Правила ночного агента (ОБЯЗАТЕЛЬНО)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="background:#1F2937;border-radius:6px;padding:10px;font-size:0.82rem;">
+          <div style="color:#F59E0B;font-weight:600;margin-bottom:4px;">MERGE CONTRACT</div>
+          <div style="color:#9CA3AF;">Только feature/* и fix/* ветки. НИКОГДА не мерджи в main автоматически</div>
+        </div>
+        <div style="background:#1F2937;border-radius:6px;padding:10px;font-size:0.82rem;">
+          <div style="color:#F59E0B;font-weight:600;margin-bottom:4px;">TWO STRIKES</div>
+          <div style="color:#9CA3AF;">Если тест фейлится 2 раза подряд — СТОП, пометить blocked, перейти к след задаче</div>
+        </div>
+        <div style="background:#1F2937;border-radius:6px;padding:10px;font-size:0.82rem;">
+          <div style="color:#F59E0B;font-weight:600;margin-bottom:4px;">RPI Protocol</div>
+          <div style="color:#9CA3AF;">Research → Plan → Implement. Не кодить вслепую. Читать файлы сначала</div>
+        </div>
+        <div style="background:#1F2937;border-radius:6px;padding:10px;font-size:0.82rem;">
+          <div style="color:#F59E0B;font-weight:600;margin-bottom:4px;">NO .env</div>
+          <div style="color:#9CA3AF;">Никогда не редактировать .env, credentials, секреты. Абсолютный запрет</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════ 9. AUTO-GUIDE -->
+<section class="diagram-section" id="guide-auto">
+  <div class="section-title">
+    <div class="section-icon icon-blue">📄</div>
+    <h2>Auto-Guide Update System</h2>
+  </div>
+  <p class="section-desc">Как HTML гайд обновляется автоматически при каждом изменении инфраструктуры</p>
+
+  <div class="diagram-box">
+    <div class="mermaid">
+flowchart LR
+    subgraph SOURCES["📂 Источники данных"]
+        R[~/.claude/rules/*.md\n18 файлов]
+        A[~/.claude/agents/*.md\n20 агентов]
+        SK[~/.claude/skills/*/SKILL.md\nкастомные скиллы]
+        ST[settings.json\nхуки и конфиг]
+        GM[memory/GLOBAL_MEMORY.md\nстатус проектов]
+        GE[gamification/engine.py\nXP + Level + Streak]
+    end
+
+    subgraph SCRIPT["⚙️ generate_guide.py"]
+        COLLECT[collect_data\nСобрать всё]
+        DIFF[detect_changes\nЧто изменилось?]
+        INJECT[inject_sections\nAUTO маркеры]
+        VERSION[bump_version\n3.0 → 3.1 → 3.2]
+    end
+
+    subgraph OUTPUT["📄 Результат"]
+        HTML[Claude-Code-Infrastructure-Guide.html\nv3.1 · 109KB]
+        BACKUP[guide_versions/\nguide-v3.1-20260327.html\nпоследние 10 версий]
+        CHLOG[CHANGELOG.md\nИстория изменений]
+    end
+
+    TRIGGER[🪝 Stop hook\nконец сессии]
+
+    TRIGGER --> COLLECT
+    R & A & SK & ST & GM & GE --> COLLECT
+    COLLECT --> DIFF
+    DIFF --> INJECT
+    INJECT --> VERSION
+    VERSION --> HTML
+    VERSION --> BACKUP
+    VERSION --> CHLOG
+
+    style TRIGGER fill:#7C3AED,color:#fff,stroke:none
+    style SOURCES fill:#0F172A,stroke:#374151
+    style SCRIPT fill:#0F172A,stroke:#1D4ED8
+    style OUTPUT fill:#0F172A,stroke:#065F46
+    </div>
+  </div>
+</section>
+
+
+</div><!-- /container -->
+
+<footer style="border-top:1px solid #1F2937;padding:24px 60px;text-align:center;color:#4B5563;font-size:0.85rem;">
+  Claude Code Visual Architecture Atlas · Aragant.group · Дмитрий Гагауз · gagauzdmitriy@gmail.com
+  &nbsp;·&nbsp; <a href="Claude-Code-Infrastructure-Guide.html" style="color:#3B82F6;text-decoration:none;">→ Полный гайд</a>
+</footer>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      primaryColor: '#1D4ED8',
+      primaryTextColor: '#F9FAFB',
+      primaryBorderColor: '#374151',
+      lineColor: '#4B5563',
+      secondaryColor: '#1F2937',
+      tertiaryColor: '#111827',
+      background: '#0A0E1A',
+      mainBkg: '#1F2937',
+      nodeBorder: '#374151',
+      clusterBkg: '#0F172A',
+      titleColor: '#F9FAFB',
+      edgeLabelBackground: '#1F2937',
+      activeTaskBkgColor: '#1D4ED8',
+      fontFamily: 'Inter, sans-serif',
+      fontSize: '13px'
+    }
+  });
+
+  // Active nav on scroll
+  const sections = document.querySelectorAll('.diagram-section');
+  const navLinks = document.querySelectorAll('.nav-bar a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(l => l.style.borderBottomColor = 'transparent');
+        const active = document.querySelector(`.nav-bar a[href="#${entry.target.id}"]`);
+        if (active) active.style.borderBottomColor = '#3B82F6';
+      }
+    });
+  }, { threshold: 0.3, rootMargin: '-60px 0px -40% 0px' });
+  sections.forEach(s => observer.observe(s));
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+</script>
+</body>
+</html>
