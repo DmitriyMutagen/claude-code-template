@@ -35,12 +35,12 @@ DEFAULT_BENCHMARKS: dict[str, tuple[float, float, float, float, float]] = {
 }
 
 RANK_LABELS: list[tuple[int, str, str]] = [
-    (99, "God Tier", "\U0001f451"),   # crown
-    (90, "Elite",    "\u26a1"),       # lightning
-    (75, "Senior",   "\U0001f4aa"),   # flexed bicep
-    (50, "Mid",      "\U0001f527"),   # wrench
-    (25, "Junior",   "\u26a0\ufe0f"), # warning
-    (0,  "Newbie",   "\u26a0\ufe0f"),
+    (99, "\u0411\u043e\u0433 \u041a\u043e\u0434\u0438\u043d\u0433\u0430", "\U0001f451"),   # crown
+    (90, "\u042d\u043b\u0438\u0442\u0430",    "\u26a1"),       # lightning
+    (75, "\u0421\u0435\u043d\u044c\u043e\u0440",   "\U0001f4aa"),   # flexed bicep
+    (50, "\u041c\u0438\u0434\u043b",      "\U0001f527"),   # wrench
+    (25, "\u0414\u0436\u0443\u043d\u0438\u043e\u0440",   "\u26a0\ufe0f"), # warning
+    (0,  "\u041d\u043e\u0432\u0438\u0447\u043e\u043a",   "\u26a0\ufe0f"),
 ]
 
 
@@ -94,7 +94,7 @@ def rank_for_percentile(pct: int) -> tuple[str, str]:
     for threshold, label, emoji in RANK_LABELS:
         if pct >= threshold:
             return label, emoji
-    return "Newbie", "\u26a0\ufe0f"
+    return "\u041d\u043e\u0432\u0438\u0447\u043e\u043a", "\u26a0\ufe0f"
 
 
 def get_today_metrics(conn: sqlite3.Connection) -> dict[str, float]:
@@ -254,22 +254,22 @@ def identify_strengths_weaknesses(
 def generate_challenge(weaknesses: list[tuple[str, int]]) -> str:
     """Generate a challenge based on weakest metric."""
     if not weaknesses:
-        return "Keep it up!"
+        return "\u041f\u0440\u043e\u0434\u043e\u043b\u0436\u0430\u0439 \u0436\u0435\u0447\u044c!"
     metric_name, pct = min(weaknesses, key=lambda x: x[1])
     challenges = {
-        "deploys": "Make 1 deploy to reach Mid!",
-        "sentry": "Fix 1 Sentry issue to level up!",
-        "commits": "Push 5 commits today!",
-        "tests": "Run 5 tests to level up!",
-        "files": "Touch 10 files today!",
-        "agents": "Spawn 2 agents to level up!",
-        "xp": "Earn 200 XP today!",
-        "streak": "Code 3 days in a row to level up!",
+        "deploys": "\u0421\u0434\u0435\u043b\u0430\u0439 1 \u0434\u0435\u043f\u043b\u043e\u0439 \u0434\u043e \u041c\u0438\u0434\u043b\u0430!",
+        "sentry": "\u041f\u043e\u0447\u0438\u043d\u0438 1 Sentry issue \u0434\u043b\u044f \u0430\u043f\u0430!",
+        "commits": "\u0417\u0430\u043f\u0443\u0448\u0438 5 \u043a\u043e\u043c\u043c\u0438\u0442\u043e\u0432 \u0441\u0435\u0433\u043e\u0434\u043d\u044f!",
+        "tests": "\u0417\u0430\u043f\u0443\u0441\u0442\u0438 5 \u0442\u0435\u0441\u0442\u043e\u0432 \u0434\u043b\u044f \u0430\u043f\u0430!",
+        "files": "\u0417\u0430\u0442\u0440\u043e\u043d\u044c 10 \u0444\u0430\u0439\u043b\u043e\u0432 \u0441\u0435\u0433\u043e\u0434\u043d\u044f!",
+        "agents": "\u0417\u0430\u043f\u0443\u0441\u0442\u0438 2 \u0430\u0433\u0435\u043d\u0442\u043e\u0432 \u0434\u043b\u044f \u0430\u043f\u0430!",
+        "xp": "\u0417\u0430\u0440\u0430\u0431\u043e\u0442\u0430\u0439 200 XP \u0441\u0435\u0433\u043e\u0434\u043d\u044f!",
+        "streak": "\u041a\u043e\u0434\u044c 3 \u0434\u043d\u044f \u043f\u043e\u0434\u0440\u044f\u0434 \u0434\u043b\u044f \u0430\u043f\u0430!",
     }
     for key, challenge in challenges.items():
         if key in metric_name.lower():
             return challenge
-    return f"Improve {metric_name} to reach the next rank!"
+    return f"\u041f\u0440\u043e\u043a\u0430\u0447\u0430\u0439 {metric_name} \u0434\u043e \u0441\u043b\u0435\u0434\u0443\u044e\u0449\u0435\u0433\u043e \u0440\u0430\u043d\u0433\u0430!"
 
 
 def build_daily_message() -> str:
@@ -331,23 +331,23 @@ def build_daily_message() -> str:
     weak_tuples = [(n, p) for n, p in named_metrics if p < 50]
     challenge = generate_challenge(weak_tuples)
 
-    strengths_str = ", ".join(s.lower() for s in strengths) if strengths else "warming up"
-    weaknesses_str = ", ".join(w.lower() for w in weaknesses_list) if weaknesses_list else "none!"
+    strengths_str = ", ".join(s.lower() for s in strengths) if strengths else "\u0440\u0430\u0437\u043e\u0433\u0440\u0435\u0432\u0430\u0435\u043c\u0441\u044f"
+    weaknesses_str = ", ".join(w.lower() for w in weaknesses_list) if weaknesses_list else "\u043d\u0435\u0442!"
 
-    msg = f"""*Rating -- {today_str}*
+    msg = f"""*\u0420\u0435\u0439\u0442\u0438\u043d\u0433 -- {today_str}*
 
-*OVERALL RANK: {rank_str}*
+*\u041e\u0411\u0429\u0418\u0419 \u0420\u0410\u041d\u0413: {rank_str}*
 
-_Today:_
+_\u0421\u0435\u0433\u043e\u0434\u043d\u044f:_
 {chr(10).join(lines_today)}
 
-_Week:_
+_\u041d\u0435\u0434\u0435\u043b\u044f:_
 {chr(10).join(lines_week)}
 
-*Strengths:* {strengths_str}
-*Growth areas:* {weaknesses_str}
+*\u0421\u0438\u043b\u044c\u043d\u044b\u0435 \u0441\u0442\u043e\u0440\u043e\u043d\u044b:* {strengths_str}
+*\u0417\u043e\u043d\u0430 \u0440\u043e\u0441\u0442\u0430:* {weaknesses_str}
 
-*Challenge:* {challenge}"""
+*\u0427\u0435\u043b\u043b\u0435\u043d\u0434\u0436 \u0434\u043d\u044f:* {challenge}"""
 
     return msg
 

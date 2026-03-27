@@ -20,6 +20,26 @@ if not prompt:
         prompt = ""
 
 prompt_lower = prompt.lower()
+prompt_word_count = len(prompt.split())
+
+# ============================================================
+# TIER 0: UNIVERSAL INJECTIONS (always fire for non-trivial prompts)
+# ============================================================
+
+UNIVERSAL_THRESHOLD = 20  # words
+
+if prompt_word_count > UNIVERSAL_THRESHOLD:
+    universal_instructions = [
+        "Context7 MCP: check library docs before using any API",
+        "Exa/Brave: check existing solutions before writing from scratch",
+        "Classify task by /do router (Tier 1-4) and announce tier + time estimate",
+    ]
+
+# ============================================================
+# TIER 0.5: AUTO /do ROUTER CLASSIFICATION
+# ============================================================
+
+DO_ROUTER_PATTERN = r"(сделай|создай|добавь|реализуй|implement|build|create|fix|почини|поправь|настрой|подключи|разработай|напиши|спроектируй)"
 
 # ============================================================
 # TIER 1: MANDATORY INSTRUCTIONS (large tasks — forced workflow)
@@ -37,6 +57,9 @@ MANDATORY_PATTERNS = {
             "4. Break into tasks of 2-5 min each, get sign-off",
             "5. TDD: write failing test FIRST, then minimal code, then refactor",
             "6. Verify: /superpowers:verification-before-completion before claiming done",
+            "7. Pre-check: is there a ready-made solution? (Context7, Exa, npm/pip search)",
+            "8. Pre-check: edge cases? (empty data, 100K records, special characters)",
+            "9. Pre-check: API backward compatibility preserved?",
         ]
     },
     # Architecture / design / project structure
@@ -154,6 +177,20 @@ SKILL_MAP = {
 # ============================================================
 
 output_parts = []
+
+# TIER 0: Universal injections for non-trivial prompts
+if prompt_word_count > UNIVERSAL_THRESHOLD:
+    block = "UNIVERSAL PRE-FLIGHT:\n"
+    for instr in universal_instructions:
+        block += f"  -> {instr}\n"
+    output_parts.append(block)
+
+# TIER 0.5: Auto /do router classification
+if re.search(DO_ROUTER_PATTERN, prompt_lower):
+    block = "TASK DETECTED — /do ROUTER:\n"
+    block += "  -> Classify: Tier 1 (quick fix) / Tier 2 (feature) / Tier 3 (architecture) / Tier 4 (campaign)\n"
+    block += "  -> Announce tier + time estimate BEFORE starting work\n"
+    output_parts.append(block)
 
 # Check MANDATORY patterns first (Tier 1)
 mandatory_matched = False
