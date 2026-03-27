@@ -682,6 +682,39 @@
     .cards-grid-3 { grid-template-columns: 1fr 1fr; }
     .cards-grid-2 { grid-template-columns: 1fr; }
   }
+/* ── Auto-generated sections ── */
+.auto-placeholder { color: #6B7280; font-style: italic; padding: 8px; border: 1px dashed #374151; border-radius: 4px; }
+.agents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin: 12px 0; }
+.agent-card { background: #1F2937; border: 1px solid #374151; border-radius: 6px; padding: 12px; }
+.agent-name { font-weight: 600; color: #60A5FA; font-family: 'JetBrains Mono', monospace; margin-bottom: 4px; }
+.agent-desc { font-size: 0.85rem; color: #9CA3AF; }
+.projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; margin: 12px 0; }
+.project-card { background: #1F2937; border: 1px solid #374151; border-left: 3px solid #10B981; border-radius: 6px; padding: 12px; }
+.project-name { font-weight: 700; color: #F9FAFB; margin-bottom: 4px; }
+.project-path { font-size: 0.8rem; color: #60A5FA; font-family: 'JetBrains Mono', monospace; margin-bottom: 4px; }
+.project-status { font-size: 0.8rem; margin-bottom: 4px; }
+.project-last { font-size: 0.8rem; color: #6B7280; }
+.gm-stats { background: linear-gradient(135deg, #1F2937, #111827); border: 1px solid #374151; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+.gm-level { font-size: 1.3rem; font-weight: 700; color: #F59E0B; }
+.gm-xp { color: #9CA3AF; margin: 4px 0; }
+.progress-bar { background: #374151; border-radius: 4px; height: 8px; margin: 8px 0; }
+.progress-fill { background: linear-gradient(90deg, #3B82F6, #8B5CF6); height: 100%; border-radius: 4px; transition: width 0.5s; }
+.progress-label { font-size: 0.8rem; color: #6B7280; }
+.achievements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin: 12px 0; }
+.achievement { background: #1F2937; border: 1px solid #374151; border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
+.hidden-ach { opacity: 0.4; }
+.xp-badge { background: #78350F; color: #FCD34D; border-radius: 4px; padding: 2px 6px; font-size: 0.75rem; }
+.memory-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.stat-item { background: #1F2937; border: 1px solid #374151; border-radius: 6px; padding: 8px 16px; }
+.perm-list { list-style: none; padding: 0; display: flex; gap: 8px; flex-wrap: wrap; }
+.perm-list li { background: #1F2937; border: 1px solid #374151; border-radius: 4px; padding: 4px 10px; font-size: 0.85rem; }
+.changelog-entry { background: #1F2937; border: 1px solid #374151; border-radius: 6px; padding: 12px; margin-bottom: 8px; }
+.version-badge { background: #1D4ED8; color: #BFDBFE; border-radius: 4px; padding: 2px 8px; font-size: 0.85rem; font-weight: 600; margin-right: 8px; }
+.date { color: #6B7280; font-size: 0.85rem; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.data-table th { background: #1F2937; padding: 8px 12px; text-align: left; color: #9CA3AF; font-weight: 600; border-bottom: 1px solid #374151; }
+.data-table td { padding: 8px 12px; border-bottom: 1px solid #1F2937; vertical-align: top; }
+.data-table tr:hover td { background: #1F2937; }
 </style>
 </head>
 <body>
@@ -690,7 +723,8 @@
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-title">Claude Code Infra</div>
-    <div class="logo-version">v3.0 — 27 марта 2026</div>
+    <div class="logo-version">v<span id="guide-version">v3.2</span> — <span id="guide-updated">2026-03-27 13:31</span></div>
+    <meta name="guide-version" content="3.2">
   </div>
   <nav>
     <div class="section-divider">Основы</div>
@@ -1052,6 +1086,105 @@ DoD:           [конкретные критерии готовности]</pre
       </tbody>
     </table>
   </div>
+
+  <h3>📊 Актуальный список (авто)</h3>
+  <!-- AUTO:rules START -->
+<table class="data-table">
+      <thead><tr><th>Файл</th><th>Название</th><th>Описание</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>~/.claude/rules/auto-coaching</code></td>
+          <td>Auto-Coaching — AI дотягивает до Elite уровня (ОБЯЗАТЕЛЬНО)</td>
+          <td>- В /good-morning и /daily-review — секция коучинга</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/ci-cd-templates</code></td>
+          <td>CI/CD Templates — Global Standards</td>
+          <td>name: CI</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/data-correctness</code></td>
+          <td>Data Correctness (ОБЯЗАТЕЛЬНО)</td>
+          <td>Конечный результат = то что видит ПОЛЬЗОВАТЕЛЬ. Не код, не тесты — реальные данные на экране.</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/marketplace-ops</code></td>
+          <td>Marketplace Operations Rules (WB / Ozon / YM)</td>
+          <td>- **Ozon**: Client ID 2003894</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/outreach-automation</code></td>
+          <td>B2B Outreach Automation Rules</td>
+          <td>Полностью автоматический аутрич для селлеров маркетплейсов.</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/project-bootstrap</code></td>
+          <td>Project Bootstrap — Standards for NEW Projects</td>
+          <td>project-root/</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/quality-gates</code></td>
+          <td>Quality Gates — Global Rules (ALL Projects)</td>
+          <td>1. Read MEMORY.md — understand project context and past decisions</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/research-before-code</code></td>
+          <td>Research Before Code (ОБЯЗАТЕЛЬНО)</td>
+          <td>Любая нетривиальная задача (>1 файла, новая фича, новая интеграция).</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/safe-ops</code></td>
+          <td>Safe Operations — Backup Before Critical Changes (ОБЯЗАТЕЛЬН</td>
+          <td>Перед ЛЮБЫМ из следующих действий — СНАЧАЛА бэкап:</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/security-baseline</code></td>
+          <td>Security Baseline — Автоматический security на каждом шаге (</td>
+          <td>- [ ] Секреты в .env, не в коде (detect-secrets в pre-commit)</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/self-healing</code></td>
+          <td>Self-Healing Infrastructure Rules</td>
+          <td>Every deployed service MUST have:</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/seo-automation</code></td>
+          <td>SEO Automation Rules</td>
+          <td>Автоматизация SEO для 3-4 сайтов: bio-stm.ru (WordPress), SoulWay (Tilda), самописные.</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/skolkovo-product</code></td>
+          <td>Skolkovo IT Product Rules</td>
+          <td>Резидентство в Сколково. Нужен IT-продукт уровня Сколково:</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/spec-first</code></td>
+          <td>Spec-First — Спецификация ДО кода (ОБЯЗАТЕЛЬНО для задач >3 </td>
+          <td>Любая задача затрагивающая >3 файлов ИЛИ новая фича ИЛИ новый API.</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/think-ahead</code></td>
+          <td>Think Ahead — 10 шагов вперёд (ОБЯЗАТЕЛЬНО)</td>
+          <td>- Что будет при ×10 нагрузке? ×100?</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/time-estimation</code></td>
+          <td>Time Estimation — AI-Speed (ОБЯЗАТЕЛЬНО)</td>
+          <td>AI с параллельными агентами работает в 10-20× быстрее человека.</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/virtual-company</code></td>
+          <td>Virtual Elite IT Company — Auto-Routing Rules</td>
+          <td>Claude = CTO. Думаешь как Werner Vogels / Patrick Collison:</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/vps-deploy</code></td>
+          <td>VPS Deploy & CI/CD — Global Rules (ALL Projects)</td>
+          <td>- **IP**: 94.198.219.232</td>
+        </tr>
+      </tbody>
+    </table>
+<!-- AUTO:rules END -->
 </section>
 
 <!-- РАЗДЕЛ 3: Hooks -->
@@ -1152,6 +1285,50 @@ DoD:           [конкретные критерии готовности]</pre
       </tbody>
     </table>
   </div>
+
+  <h3>📊 Актуальный статус хуков (авто)</h3>
+  <!-- AUTO:hooks START -->
+<table class="data-table">
+      <thead><tr><th>Событие</th><th>Кол-во</th><th>Назначение</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>PreToolUse</code></td>
+          <td class="badge">4 хуков</td>
+          <td>Блокировка опасных операций (push main, .env запись)</td>
+        </tr>
+        <tr>
+          <td><code>PostToolUse</code></td>
+          <td class="badge">6 хуков</td>
+          <td>Трекинг XP, CL v2.1 наблюдения, auto-commit</td>
+        </tr>
+        <tr>
+          <td><code>Notification</code></td>
+          <td class="badge">1 хуков</td>
+          <td>Уведомления о долгих операциях</td>
+        </tr>
+        <tr>
+          <td><code>Stop</code></td>
+          <td class="badge">5 хуков</td>
+          <td>Сохранение сессии, геймификация итоги, Telegram уведомление</td>
+        </tr>
+        <tr>
+          <td><code>UserPromptSubmit</code></td>
+          <td class="badge">1 хуков</td>
+          <td>Preflight check: Context7, Exa, tier classification</td>
+        </tr>
+        <tr>
+          <td><code>SessionStart</code></td>
+          <td class="badge">5 хуков</td>
+          <td>Инициализация сессии: баннер, XP снапшот, CL v2.1</td>
+        </tr>
+        <tr>
+          <td><code>PreCompact</code></td>
+          <td class="badge">1 хуков</td>
+          <td>Auto-checkpoint перед сжатием контекста</td>
+        </tr>
+      </tbody>
+    </table>
+<!-- AUTO:hooks END -->
 </section>
 
 <!-- РАЗДЕЛ 4: Skills -->
@@ -1259,6 +1436,31 @@ DoD:           [конкретные критерии готовности]</pre
       <div class="cmd-desc">Показать 12 ролей + Auto-Routing Matrix + текущего активного агента</div>
     </div>
   </div>
+
+  <h3>📊 Кастомные скиллы — актуальный список (авто)</h3>
+  <!-- AUTO:skills START -->
+<table class="data-table">
+      <thead><tr><th>Команда</th><th>Описание</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>/daily-review</code></td>
+          <td>Analyze today's work across all projects, identify patterns, generate improvement suggestions. Use a</td>
+        </tr>
+        <tr>
+          <td><code>/good-morning</code></td>
+          <td>Morning briefing — priorities, errors, alerts, plan for the day. Use at start of day or via schedule</td>
+        </tr>
+        <tr>
+          <td><code>/growth-coach</code></td>
+          <td>Elite CTO наставник. Оценивает уровень, учит паттернам топ-разработчиков, предлагает конкретные инст</td>
+        </tr>
+        <tr>
+          <td><code>/org-structure</code></td>
+          <td>Virtual Elite IT Company — автоматический роутинг задач по ролям уровня Top-100 мировых IT компаний.</td>
+        </tr>
+      </tbody>
+    </table>
+<!-- AUTO:skills END -->
 </section>
 
 <!-- РАЗДЕЛ 5: Virtual Company -->
@@ -1460,6 +1662,69 @@ N файлов создано/изменено
 N тестов (если запускались)
 N коммитов (если были)
 N агентов (если запускались)</pre>
+
+  <h3>📊 Текущий прогресс (авто)</h3>
+  <!-- AUTO:gamification START -->
+<div class="gm-stats">
+      <div class="gm-level">💎 Лид</div>
+      <div class="gm-xp">⚡ 5,121 XP | Streak: 🔥2д</div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-label">0% до Level 6 (20,000 XP)</div>
+    </div>
+    <h3>Ачивки (топ-12)</h3>
+    <div class="achievements-grid">
+<div class="achievement" title="Первый файл создан">
+          <span>🎯 First Blood</span>
+          <span class="xp-badge">+50 XP</span>
+        </div>
+<div class="achievement" title="3 дня подряд в коде">
+          <span>🔥 Hot Streak ×3</span>
+          <span class="xp-badge">+30 XP</span>
+        </div>
+<div class="achievement" title="7 дней подряд — ты машина!">
+          <span>🔥 Hot Streak ×7</span>
+          <span class="xp-badge">+100 XP</span>
+        </div>
+<div class="achievement" title="30 дней подряд. Ты Бог.">
+          <span>🌋 Unstoppable</span>
+          <span class="xp-badge">+500 XP</span>
+        </div>
+<div class="achievement" title="Коммит после 23:00">
+          <span>🌙 Night Owl</span>
+          <span class="xp-badge">+20 XP</span>
+        </div>
+<div class="achievement" title="Коммит до 07:00">
+          <span>🌅 Early Bird</span>
+          <span class="xp-badge">+20 XP</span>
+        </div>
+<div class="achievement" title="100+ тестов в сессии">
+          <span>🧪 Test Master</span>
+          <span class="xp-badge">+100 XP</span>
+        </div>
+<div class="achievement" title="Первый деплой в production">
+          <span>🚀 Ship It</span>
+          <span class="xp-badge">+200 XP</span>
+        </div>
+<div class="achievement" title="Починил 10 Sentry issues">
+          <span>🐛 Bug Slayer</span>
+          <span class="xp-badge">+150 XP</span>
+        </div>
+<div class="achievement" title="1000+ строк за сессию">
+          <span>⚡ Speed Demon</span>
+          <span class="xp-badge">+100 XP</span>
+        </div>
+<div class="achievement" title="Удалил 500+ строк за раз">
+          <span>🧹 Refactor King</span>
+          <span class="xp-badge">+75 XP</span>
+        </div>
+<div class="achievement" title="Запустил 10+ параллельных агентов">
+          <span>🤖 Agent Master</span>
+          <span class="xp-badge">+75 XP</span>
+        </div>
+    </div>
+<!-- AUTO:gamification END -->
 </section>
 
 <!-- РАЗДЕЛ 7: Elite Benchmarks -->
@@ -1904,6 +2169,60 @@ N агентов (если запускались)</pre>
       </tbody>
     </table>
   </div>
+
+  <h3>📊 Статус проектов (авто из GLOBAL_MEMORY)</h3>
+  <!-- AUTO:projects START -->
+<div class="projects-grid">
+      <div class="project-card" style="border-left-color:#10B981">
+        <div class="project-name">MCP Servers</div>
+        <div class="project-path">~/Documents/mcp servers</div>
+        <div class="project-status">🟢 ACTIVE</div>
+        <div class="project-last">2026-03-24 — WB Oracle KB 16 JSON 276KB, 4 unpushed</div>
+      </div>
+      <div class="project-card" style="border-left-color:#10B981">
+        <div class="project-name">SoulWay B2B Hub</div>
+        <div class="project-path">~/Documents/soulway-b2b</div>
+        <div class="project-status">🟢 ACTIVE</div>
+        <div class="project-last">2026-03-19 — 3D сайт, деплой Netlify</div>
+      </div>
+      <div class="project-card" style="border-left-color:#10B981">
+        <div class="project-name">Aragant (ex-MarketAI)</div>
+        <div class="project-path">~/Documents/marketai/marketai</div>
+        <div class="project-status">🟢 READY TO DEPLOY</div>
+        <div class="project-last">v1.8.0, rebrand done, 462K reviews, 102 tests, domains bought</div>
+      </div>
+      <div class="project-card" style="border-left-color:#F59E0B">
+        <div class="project-name">B2B Outreach</div>
+        <div class="project-path">~/Documents/Orchestrator/b2b_outreach</div>
+        <div class="project-status">🟡 IN PROGRESS</div>
+        <div class="project-last">frontend b2b-dashboard team</div>
+      </div>
+      <div class="project-card" style="border-left-color:#F59E0B">
+        <div class="project-name">WB Content Factory</div>
+        <div class="project-path">~/Documents/агенты/wb_content_factory</div>
+        <div class="project-status">🟡 ACTIVE</div>
+        <div class="project-last">генерация карточек WB</div>
+      </div>
+      <div class="project-card" style="border-left-color:#F59E0B">
+        <div class="project-name">Bionovacia (Skolkovo)</div>
+        <div class="project-path">~/Documents/skolkovo</div>
+        <div class="project-status">🟡 IN PROGRESS</div>
+        <div class="project-last">FastAPI+React+Neo4j, 68 тестов фиксятся</div>
+      </div>
+      <div class="project-card" style="border-left-color:#F59E0B">
+        <div class="project-name">Bio-STM</div>
+        <div class="project-path">bio-stm.ru</div>
+        <div class="project-status">🟡 ACTIVE</div>
+        <div class="project-last">WP сайт, научные БАДы</div>
+      </div>
+      <div class="project-card" style="border-left-color:#10B981">
+        <div class="project-name">Content Factory</div>
+        <div class="project-path">~/Documents/content_factory</div>
+        <div class="project-status">🟢 BUILT</div>
+        <div class="project-last">Python, FastAPI :8100, LM Studio, WP+TG publishers</div>
+      </div>
+    </div>
+<!-- AUTO:projects END -->
 </section>
 
 <!-- РАЗДЕЛ 12: Auto-Evolution -->
@@ -2267,6 +2586,24 @@ git push origin main  # github.com/DmitriyMutagen/claude-memory
     });
   });
 </script>
+
+<!-- РАЗДЕЛ 16: Changelog -->
+<section class="section" id="section-16">
+  <div class="section-header">
+    <div class="section-icon icon-blue">📜</div>
+    <div><h2>История изменений (Changelog)</h2></div>
+    <span class="section-num">§16</span>
+  </div>
+  <p>Автоматически обновляется при каждом запуске <code>python3 ~/.claude/generate_guide.py</code></p>
+  <!-- AUTO:changelog START -->
+<div class="changelog-entry">
+      <span class="version-badge">v3.1</span>
+      <span class="date">2026-03-27 13:30</span>
+      <ul><li>Новые правила: think-ahead, time-estimation, project-bootstrap, vps-deploy, marketplace-ops, spec-first, research-before-code, quality-gates, security-baseline, outreach-automation, self-healing, auto-coaching, safe-ops, ci-cd-templates, skolkovo-product, virtual-company, seo-automation, data-correctness</li><li>Новые агенты: browser-automation, wb-enrichment, security-auditor, coder, tester, qa-reviewer, researcher, solution-architect, api-debugger, content-factory, qa-engineer, data-analyst, reviewer, fullstack-developer, devops-engineer, ozon-specialist, code-reviewer, n8n-automator, security-reviewer, architect</li><li>Новые скиллы: org-structure, good-morning, daily-review, growth-coach</li><li>XP: 0 → 5,121 (+5,121)</li></ul>
+    </div>
+
+<!-- AUTO:changelog END -->
+</section>
 
 </body>
 </html>
