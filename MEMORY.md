@@ -14,3 +14,6 @@
 ## Lessons Learned
 <!-- Updated automatically by session-summarizer hook -->
 <!-- Format: YYYY-MM-DD | What happened | What we learned -->
+
+## Changelog
+- 2026-03-27: feat: add new dashboard
