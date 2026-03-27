@@ -740,8 +740,8 @@
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-title">Claude Code Infra</div>
-    <div class="logo-version">v<span id="guide-version">v3.60</span> — <span id="guide-updated">2026-03-27 20:03</span></div>
-    <meta name="guide-version" content="3.60">
+    <div class="logo-version">v<span id="guide-version">v3.78</span> — <span id="guide-updated">2026-03-27 20:32</span></div>
+    <meta name="guide-version" content="3.78">
   </div>
   <nav>
     <div class="section-divider">Основы</div>
@@ -1196,6 +1196,16 @@ DoD:           [конкретные критерии готовности]</pre
           <td><code>~/.claude/rules/spec-first</code></td>
           <td>Spec-First — Спецификация ДО кода (ОБЯЗАТЕЛЬНО для задач >3 </td>
           <td>Любая задача затрагивающая >3 файлов ИЛИ новая фича ИЛИ новый API.</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/testing-always</code></td>
+          <td>Testing Always — ОБЯЗАТЕЛЬНЫЕ тесты на КАЖДОЕ изменение (Qua</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/testing-mandatory</code></td>
+          <td>Testing Mandatory — ВСЕГДА настраивай тесты (ОБЯЗАТЕЛЬНО)</td>
+          <td>ДЛЯ КАЖДОГО проекта — тесты по ТЗ из ~/Documents/PROMPT_TESTING_TZ.md</td>
         </tr>
         <tr>
           <td><code>~/.claude/rules/think-ahead</code></td>
@@ -1707,7 +1717,7 @@ N агентов (если запускались)</pre>
   <!-- AUTO:gamification START -->
 <div class="gm-stats">
       <div class="gm-level">🏆 Принципал</div>
-      <div class="gm-xp">⚡ 8,873 XP | Streak: 🔥2д</div>
+      <div class="gm-xp">⚡ 11,447 XP | Streak: 🔥2д</div>
       <div class="progress-bar">
         <div class="progress-fill" style="width:0%"></div>
       </div>
@@ -2596,54 +2606,54 @@ git push origin main  # github.com/DmitriyMutagen/claude-memory
   <p>Автоматически обновляется при каждом запуске <code>python3 ~/.claude/generate_guide.py</code></p>
   <!-- AUTO:changelog START -->
 <div class="changelog-entry">
-      <span class="version-badge">v3.59</span>
-      <span class="date">2026-03-27 20:00</span>
-      <ul><li>XP: 7,936 → 8,858 (+922)</li></ul>
+      <span class="version-badge">v3.77</span>
+      <span class="date">2026-03-27 20:32</span>
+      <ul><li>XP: 11,104 → 11,401 (+297)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.58</span>
-      <span class="date">2026-03-27 19:52</span>
+      <span class="version-badge">v3.76</span>
+      <span class="date">2026-03-27 20:27</span>
       <ul><li>Автообновление статистики</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.57</span>
-      <span class="date">2026-03-27 19:51</span>
-      <ul><li>XP: 7,931 → 7,936 (+5)</li></ul>
-    </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.56</span>
-      <span class="date">2026-03-27 19:51</span>
-      <ul><li>XP: 7,903 → 7,931 (+28)</li></ul>
-    </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.55</span>
-      <span class="date">2026-03-27 19:48</span>
+      <span class="version-badge">v3.75</span>
+      <span class="date">2026-03-27 20:26</span>
       <ul><li>Автообновление статистики</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.54</span>
-      <span class="date">2026-03-27 19:46</span>
-      <ul><li>XP: 7,843 → 7,903 (+60)</li></ul>
+      <span class="version-badge">v3.74</span>
+      <span class="date">2026-03-27 20:26</span>
+      <ul><li>XP: 11,094 → 11,104 (+10)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.53</span>
-      <span class="date">2026-03-27 19:43</span>
-      <ul><li>XP: 7,804 → 7,843 (+39)</li></ul>
+      <span class="version-badge">v3.73</span>
+      <span class="date">2026-03-27 20:26</span>
+      <ul><li>XP: 11,074 → 11,094 (+20)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.52</span>
-      <span class="date">2026-03-27 19:41</span>
-      <ul><li>Новые правила: chain-thinking</li><li>XP: 7,779 → 7,804 (+25)</li></ul>
+      <span class="version-badge">v3.72</span>
+      <span class="date">2026-03-27 20:26</span>
+      <ul><li>XP: 11,061 → 11,074 (+13)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.51</span>
-      <span class="date">2026-03-27 19:38</span>
-      <ul><li>Автообновление статистики</li></ul>
+      <span class="version-badge">v3.71</span>
+      <span class="date">2026-03-27 20:26</span>
+      <ul><li>Новые правила: testing-mandatory</li><li>XP: 11,016 → 11,061 (+45)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.50</span>
-      <span class="date">2026-03-27 19:37</span>
-      <ul><li>XP: 7,749 → 7,779 (+30)</li></ul>
+      <span class="version-badge">v3.70</span>
+      <span class="date">2026-03-27 20:25</span>
+      <ul><li>XP: 10,929 → 11,016 (+87)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.69</span>
+      <span class="date">2026-03-27 20:24</span>
+      <ul><li>XP: 10,596 → 10,929 (+333)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.68</span>
+      <span class="date">2026-03-27 20:21</span>
+      <ul><li>XP: 10,578 → 10,596 (+18)</li></ul>
     </div>
 
 <!-- AUTO:changelog END -->
