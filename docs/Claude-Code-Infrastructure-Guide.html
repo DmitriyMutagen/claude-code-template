@@ -740,8 +740,8 @@
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-title">Claude Code Infra</div>
-    <div class="logo-version">v<span id="guide-version">v3.17</span> — <span id="guide-updated">2026-03-27 14:09</span></div>
-    <meta name="guide-version" content="3.17">
+    <div class="logo-version">v<span id="guide-version">v3.60</span> — <span id="guide-updated">2026-03-27 20:03</span></div>
+    <meta name="guide-version" content="3.60">
   </div>
   <nav>
     <div class="section-divider">Основы</div>
@@ -1116,6 +1116,11 @@ DoD:           [конкретные критерии готовности]</pre
           <td><code>~/.claude/rules/auto-coaching</code></td>
           <td>Auto-Coaching — AI дотягивает до Elite уровня (ОБЯЗАТЕЛЬНО)</td>
           <td>- В /good-morning и /daily-review — секция коучинга</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/chain-thinking</code></td>
+          <td>Chain Thinking — Думай по цепочке, не по файлу (ОБЯЗАТЕЛЬНО)</td>
+          <td>НИКОГДА не говори "код правильный" если не проверил ВЕСЬ pipeline:</td>
         </tr>
         <tr>
           <td><code>~/.claude/rules/ci-cd-templates</code></td>
@@ -1701,12 +1706,12 @@ N агентов (если запускались)</pre>
   <h3>📊 Текущий прогресс (авто)</h3>
   <!-- AUTO:gamification START -->
 <div class="gm-stats">
-      <div class="gm-level">💎 Лид</div>
-      <div class="gm-xp">⚡ 5,676 XP | Streak: 🔥2д</div>
+      <div class="gm-level">🏆 Принципал</div>
+      <div class="gm-xp">⚡ 8,873 XP | Streak: 🔥2д</div>
       <div class="progress-bar">
         <div class="progress-fill" style="width:0%"></div>
       </div>
-      <div class="progress-label">0% до Level 6 (20,000 XP)</div>
+      <div class="progress-label">0% до Level 7 (40,000 XP)</div>
     </div>
     <h3>Ачивки (топ-12)</h3>
     <div class="achievements-grid">
@@ -2218,31 +2223,31 @@ N агентов (если запускались)</pre>
         <div class="project-name">SoulWay B2B Hub</div>
         <div class="project-path">~/Documents/soulway-b2b</div>
         <div class="project-status">🟢 ACTIVE</div>
-        <div class="project-last">2026-03-19 — 3D сайт, деплой Netlify</div>
+        <div class="project-last">2026-03-19 — 3D сайт, Netlify, CTO rules + testing deployed</div>
       </div>
       <div class="project-card" style="border-left-color:#10B981">
         <div class="project-name">Aragant (ex-MarketAI)</div>
         <div class="project-path">~/Documents/marketai/marketai</div>
-        <div class="project-status">🟢 READY TO DEPLOY</div>
-        <div class="project-last">v1.8.0, rebrand done, 462K reviews, 102 tests, domains bought</div>
+        <div class="project-status">🟢 LIVE ✅</div>
+        <div class="project-last">v1.8.0, 4 infra bugs fixed, testing stack deployed, WB rate limit fixed, 131 pro</div>
       </div>
       <div class="project-card" style="border-left-color:#F59E0B">
         <div class="project-name">B2B Outreach</div>
         <div class="project-path">~/Documents/Orchestrator/b2b_outreach</div>
         <div class="project-status">🟡 IN PROGRESS</div>
-        <div class="project-last">frontend b2b-dashboard team</div>
+        <div class="project-last">CTO rules + testing stack deployed</div>
       </div>
       <div class="project-card" style="border-left-color:#F59E0B">
         <div class="project-name">WB Content Factory</div>
         <div class="project-path">~/Documents/агенты/wb_content_factory</div>
         <div class="project-status">🟡 ACTIVE</div>
-        <div class="project-last">генерация карточек WB</div>
+        <div class="project-last">CTO rules + testing stack deployed</div>
       </div>
       <div class="project-card" style="border-left-color:#F59E0B">
         <div class="project-name">Bionovacia (Skolkovo)</div>
         <div class="project-path">~/Documents/skolkovo</div>
         <div class="project-status">🟡 IN PROGRESS</div>
-        <div class="project-last">FastAPI+React+Neo4j, 68 тестов фиксятся</div>
+        <div class="project-last">FastAPI+React+Neo4j, CTO rules + testing deployed</div>
       </div>
       <div class="project-card" style="border-left-color:#F59E0B">
         <div class="project-name">Bio-STM</div>
@@ -2581,47 +2586,6 @@ git push origin main  # github.com/DmitriyMutagen/claude-memory
 # - .claude/session-handoff.md (проекты)</pre>
 </section>
 
-</div><!-- end content -->
-
-<!-- FOOTER -->
-<footer class="footer">
-  <div>
-    <strong>Claude Code Infrastructure v3.0</strong> &nbsp;·&nbsp; Дмитрий Гагауз, Aragant.group &nbsp;·&nbsp; gagauzdmitriy@gmail.com
-  </div>
-  <div>
-    27 марта 2026 &nbsp;·&nbsp; <code>github.com/DmitriyMutagen/claude-code-template</code>
-  </div>
-</footer>
-
-</main><!-- end main -->
-
-<script>
-  // Highlight active section in sidebar
-  const sections = document.querySelectorAll('.section[id]');
-  const navLinks = document.querySelectorAll('.sidebar nav a');
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        navLinks.forEach(link => link.classList.remove('active'));
-        const activeLink = document.querySelector(`.sidebar nav a[href="#${entry.target.id}"]`);
-        if (activeLink) activeLink.classList.add('active');
-      }
-    });
-  }, { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' });
-
-  sections.forEach(section => observer.observe(section));
-
-  // Smooth scroll
-  navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault();
-      const target = document.querySelector(link.getAttribute('href'));
-      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-  });
-</script>
-
 <!-- РАЗДЕЛ 16: Changelog -->
 <section class="section" id="section-16">
   <div class="section-header">
@@ -2632,54 +2596,54 @@ git push origin main  # github.com/DmitriyMutagen/claude-memory
   <p>Автоматически обновляется при каждом запуске <code>python3 ~/.claude/generate_guide.py</code></p>
   <!-- AUTO:changelog START -->
 <div class="changelog-entry">
-      <span class="version-badge">v3.16</span>
-      <span class="date">2026-03-27 14:03</span>
-      <ul><li>XP: 5,531 → 5,546 (+15)</li></ul>
+      <span class="version-badge">v3.59</span>
+      <span class="date">2026-03-27 20:00</span>
+      <ul><li>XP: 7,936 → 8,858 (+922)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.15</span>
-      <span class="date">2026-03-27 14:00</span>
-      <ul><li>XP: 5,431 → 5,531 (+100)</li></ul>
-    </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.14</span>
-      <span class="date">2026-03-27 13:59</span>
-      <ul><li>XP: 5,411 → 5,431 (+20)</li></ul>
-    </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.13</span>
-      <span class="date">2026-03-27 13:58</span>
-      <ul><li>XP: 5,406 → 5,411 (+5)</li></ul>
-    </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.12</span>
-      <span class="date">2026-03-27 13:56</span>
-      <ul><li>XP: 5,401 → 5,406 (+5)</li></ul>
-    </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.11</span>
-      <span class="date">2026-03-27 13:54</span>
-      <ul><li>XP: 5,361 → 5,401 (+40)</li></ul>
-    </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.10</span>
-      <span class="date">2026-03-27 13:51</span>
-      <ul><li>XP: 5,261 → 5,361 (+100)</li></ul>
-    </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.9</span>
-      <span class="date">2026-03-27 13:48</span>
-      <ul><li>XP: 5,221 → 5,261 (+40)</li></ul>
-    </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.8</span>
-      <span class="date">2026-03-27 13:46</span>
-      <ul><li>XP: 5,211 → 5,221 (+10)</li></ul>
-    </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.7</span>
-      <span class="date">2026-03-27 13:45</span>
+      <span class="version-badge">v3.58</span>
+      <span class="date">2026-03-27 19:52</span>
       <ul><li>Автообновление статистики</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.57</span>
+      <span class="date">2026-03-27 19:51</span>
+      <ul><li>XP: 7,931 → 7,936 (+5)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.56</span>
+      <span class="date">2026-03-27 19:51</span>
+      <ul><li>XP: 7,903 → 7,931 (+28)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.55</span>
+      <span class="date">2026-03-27 19:48</span>
+      <ul><li>Автообновление статистики</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.54</span>
+      <span class="date">2026-03-27 19:46</span>
+      <ul><li>XP: 7,843 → 7,903 (+60)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.53</span>
+      <span class="date">2026-03-27 19:43</span>
+      <ul><li>XP: 7,804 → 7,843 (+39)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.52</span>
+      <span class="date">2026-03-27 19:41</span>
+      <ul><li>Новые правила: chain-thinking</li><li>XP: 7,779 → 7,804 (+25)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.51</span>
+      <span class="date">2026-03-27 19:38</span>
+      <ul><li>Автообновление статистики</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.50</span>
+      <span class="date">2026-03-27 19:37</span>
+      <ul><li>XP: 7,749 → 7,779 (+30)</li></ul>
     </div>
 
 <!-- AUTO:changelog END -->
@@ -2832,5 +2796,47 @@ git push origin main  # github.com/DmitriyMutagen/claude-memory
   </div>
 </section>
 
+
+</div><!-- end content -->
+
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div>
+    <strong>Claude Code Infrastructure v3.0</strong> &nbsp;·&nbsp; Дмитрий Гагауз, Aragant.group &nbsp;·&nbsp; gagauzdmitriy@gmail.com
+  </div>
+  <div>
+    27 марта 2026 &nbsp;·&nbsp; <code>github.com/DmitriyMutagen/claude-code-template</code>
+  </div>
+</footer>
+
+</main><!-- end main -->
+
+<script>
+  // Highlight active section in sidebar
+  const sections = document.querySelectorAll('.section[id]');
+  const navLinks = document.querySelectorAll('.sidebar nav a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector(`.sidebar nav a[href="#${entry.target.id}"]`);
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' });
+
+  sections.forEach(section => observer.observe(section));
+
+  // Smooth scroll
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+</script>
 </body>
 </html>
