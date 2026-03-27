@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Claude Code Infrastructure — Полное руководство</title>
+<style>
+  @page { margin: 2cm; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 900px; margin: 0 auto; padding: 40px; color: #1a1a2e; line-height: 1.6; }
+  h1 { color: #7B2FBE; border-bottom: 3px solid #7B2FBE; padding-bottom: 10px; font-size: 28px; }
+  h2 { color: #E63946; margin-top: 30px; font-size: 22px; border-left: 4px solid #E63946; padding-left: 12px; }
+  h3 { color: #457B9D; font-size: 18px; }
+  table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+  th { background: #1a1a2e; color: white; padding: 10px; text-align: left; }
+  td { border: 1px solid #ddd; padding: 8px; }
+  tr:nth-child(even) { background: #f8f9fa; }
+  code { background: #f1f3f5; padding: 2px 6px; border-radius: 3px; font-size: 14px; }
+  pre { background: #1a1a2e; color: #a5d6ff; padding: 15px; border-radius: 8px; overflow-x: auto; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; color: white; }
+  .done { background: #2d6a4f; }
+  .info { background: #457B9D; }
+  .warn { background: #E63946; }
+  .section { background: #f8f9fa; border-radius: 12px; padding: 20px; margin: 20px 0; }
+  .stat { font-size: 36px; font-weight: bold; color: #7B2FBE; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+  .card { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; }
+  @media print { body { padding: 0; } pre { font-size: 11px; } }
+</style>
+</head>
+<body>
+
+<h1>🧠 Claude Code Infrastructure — Полное руководство</h1>
+<p><strong>Автор:</strong> Дмитрий Гагауз (Aragant.group) + Claude CTO<br>
+<strong>Дата:</strong> 27 марта 2026<br>
+<strong>Версия:</strong> 2.0<br>
+<strong>GitHub:</strong> github.com/DmitriyMutagen/claude-code-template</p>
+
+<div class="section">
+<div class="grid">
+<div class="card"><div class="stat">420+</div>файлов в template</div>
+<div class="card"><div class="stat">22</div>hook groups</div>
+<div class="card"><div class="stat">16</div>rules</div>
+<div class="card"><div class="stat">10</div>skills</div>
+<div class="card"><div class="stat">10</div>instincts</div>
+<div class="card"><div class="stat">13,500+</div>XP</div>
+</div>
+</div>
+
+<h2>📋 Что внедрено (26-27 марта 2026)</h2>
+
+<h3>Самообучающаяся система (CL v2.1)</h3>
+<table>
+<tr><th>Компонент</th><th>Файл</th><th>Статус</th></tr>
+<tr><td>Continuous Learning v2.1</td><td>~/.claude/skills/continuous-learning-v2/</td><td><span class="badge done">ACTIVE</span></td></tr>
+<tr><td>Observer (фоновый анализ)</td><td>config.json → observer.enabled: true</td><td><span class="badge done">ON</span></td></tr>
+<tr><td>10 FlowWhisper instincts</td><td>~/.claude/homunculus/instincts/personal/*.yaml</td><td><span class="badge done">LOADED</span></td></tr>
+<tr><td>Session Summarizer</td><td>~/.claude/hooks/session-summarizer.py</td><td><span class="badge done">ACTIVE</span></td></tr>
+<tr><td>Memory Decay Manager</td><td>~/.claude/hooks/memory-decay.py</td><td><span class="badge done">ACTIVE</span></td></tr>
+<tr><td>Auto-Checkpoint</td><td>~/.claude/hooks/auto-checkpoint.py</td><td><span class="badge done">ACTIVE</span></td></tr>
+</table>
+
+<h3>Качество и верификация</h3>
+<table>
+<tr><th>Компонент</th><th>Файл</th><th>Что делает</th></tr>
+<tr><td>Result Verifier</td><td>~/.claude/hooks/result-verifier.sh</td><td>Блокирует "готово" без тестов/E2E</td></tr>
+<tr><td>E2E on Deploy</td><td>~/.claude/hooks/e2e-on-deploy.py</td><td>Health check после docker compose up</td></tr>
+<tr><td>Auto-Doc</td><td>~/.claude/hooks/auto-doc.py</td><td>Changelog в MEMORY.md при feat:/refactor:</td></tr>
+<tr><td>MCP Health Check</td><td>~/.claude/hooks/mcp-health-check.py</td><td>Проверка 14 MCP серверов при старте</td></tr>
+<tr><td>Process Watchdog</td><td>~/.claude/hooks/process-watchdog.py</td><td>Находит zombie процессы</td></tr>
+<tr><td>Quality Sentinel</td><td>~/.claude/hooks/quality-sentinel.sh</td><td>Проверяет bare except, raw SQL</td></tr>
+</table>
+
+<h3>Rules (16 файлов)</h3>
+<table>
+<tr><th>Rule</th><th>Что делает</th></tr>
+<tr><td>research-before-code</td><td>Context7 + Exa ПЕРЕД кодом</td></tr>
+<tr><td>data-correctness</td><td>Ориентация на конечный результат</td></tr>
+<tr><td>think-ahead</td><td>Думать на 10 шагов вперёд</td></tr>
+<tr><td>spec-first</td><td>Спецификация ДО кода для задач >3 файлов</td></tr>
+<tr><td>security-baseline</td><td>OWASP, secrets, CORS, rate limiting</td></tr>
+<tr><td>auto-coaching</td><td>AI дотягивает до Elite уровня</td></tr>
+<tr><td>time-estimation</td><td>Часы с AI агентами, не дни</td></tr>
+<tr><td>quality-gates</td><td>Pre-code checklist, commit standards</td></tr>
+<tr><td>ci-cd-templates</td><td>GitHub Actions шаблоны</td></tr>
+<tr><td>vps-deploy</td><td>SSH deploy на 94.198.219.232</td></tr>
+<tr><td>self-healing</td><td>Health endpoints, auto-restart</td></tr>
+<tr><td>marketplace-ops</td><td>WB/Ozon API правила</td></tr>
+<tr><td>project-bootstrap</td><td>Стандарт новых проектов</td></tr>
+<tr><td>outreach-automation</td><td>B2B pipeline</td></tr>
+<tr><td>seo-automation</td><td>SEO pipeline</td></tr>
+<tr><td>skolkovo-product</td><td>Требования Сколково</td></tr>
+</table>
+
+<h3>Skills (10 custom)</h3>
+<table>
+<tr><th>Skill</th><th>Команда</th><th>Что делает</th></tr>
+<tr><td>Do Router</td><td>/do-router</td><td>Автоклассификация задач по 4 тирам</td></tr>
+<tr><td>Daily Review</td><td>/daily-review</td><td>Вечерний анализ дня</td></tr>
+<tr><td>Good Morning</td><td>/good-morning</td><td>Утренний брифинг</td></tr>
+<tr><td>Growth Coach</td><td>/growth-coach</td><td>Board of Mentors, прокачка до Top-0.1%</td></tr>
+<tr><td>Improver</td><td>/improver</td><td>Мета-агент самоулучшения системы</td></tr>
+<tr><td>RFC</td><td>/rfc</td><td>Request for Comments для крупных решений</td></tr>
+<tr><td>Tech Radar</td><td>/tech-radar</td><td>Квартальный обзор стека</td></tr>
+<tr><td>QA Verifier</td><td>/qa-verify</td><td>4-step quality scoring (1-10)</td></tr>
+<tr><td>Mega Research</td><td>/mega-research</td><td>Deep research, 100+ источников</td></tr>
+<tr><td>CL v2.1</td><td>/instinct-status</td><td>Continuous Learning engine</td></tr>
+</table>
+
+<h3>Геймификация</h3>
+<table>
+<tr><th>Компонент</th><th>Описание</th></tr>
+<tr><td>XP Engine</td><td>30+ действий дают XP (коммиты, тесты, деплои, агенты)</td></tr>
+<tr><td>Competitive Rankings</td><td>Percentile vs DORA/GitHub benchmarks</td></tr>
+<tr><td>Growth Engine</td><td>Skill Tree 1-5, план прокачки, Board of Mentors</td></tr>
+<tr><td>Daily Challenge</td><td>Ежедневная задача на слабую метрику</td></tr>
+<tr><td>23 Achievements</td><td>От "First Blood" до "Empire Builder"</td></tr>
+<tr><td>9 Weekly Quests</td><td>Ship It, Bug Hunter, E2E Warrior...</td></tr>
+<tr><td>Telegram Dashboard</td><td>Ранг + прогресс + challenge на русском</td></tr>
+</table>
+
+<h3>Расписание (автоматическое)</h3>
+<table>
+<tr><th>Задача</th><th>Время</th><th>Что делает</th></tr>
+<tr><td>Good Morning</td><td>09:00 ежедневно</td><td>Приоритеты, ошибки, алерты</td></tr>
+<tr><td>Daily Review</td><td>23:00 ежедневно</td><td>Анализ дня, предложения</td></tr>
+<tr><td>Improver</td><td>ВС 20:00</td><td>Самоулучшение системы</td></tr>
+</table>
+
+<h2>🏢 Оргструктура виртуальной IT компании</h2>
+<table>
+<tr><th>Роль</th><th>Реализация</th><th>Автоматически?</th></tr>
+<tr><td>🧠 CTO</td><td>CLAUDE.md + CTO workflow</td><td>✅ Да</td></tr>
+<tr><td>🏗️ Architect</td><td>think-ahead + /rfc + /plan</td><td>✅ Да (rule)</td></tr>
+<tr><td>🔬 Researcher</td><td>/mega-research + research rule</td><td>✅ Да (rule)</td></tr>
+<tr><td>📐 Designer</td><td>spec-first + mind maps</td><td>✅ Да (rule)</td></tr>
+<tr><td>🛡️ Security</td><td>security-baseline + hooks</td><td>✅ Да</td></tr>
+<tr><td>⚡ Dev Lead</td><td>/do router + Agent Teams</td><td>✅ Да (hook)</td></tr>
+<tr><td>💻 Coders</td><td>Sonnet agents (parallel)</td><td>По запросу</td></tr>
+<tr><td>🧪 QA</td><td>result-verifier + /qa-verify</td><td>✅ Да (hook)</td></tr>
+<tr><td>🚀 DevOps</td><td>CI/CD + deploy hooks</td><td>✅ Да</td></tr>
+<tr><td>📊 Analytics</td><td>Gamification + rankings</td><td>✅ Да</td></tr>
+<tr><td>🎓 Coach</td><td>/growth-coach + CL v2.1</td><td>По расписанию</td></tr>
+<tr><td>🌙 Night Worker</td><td>Sleepless daemon</td><td>По запросу</td></tr>
+</table>
+
+<h2>🚀 Как развернуть на новом компе</h2>
+<pre>
+git clone https://github.com/DmitriyMutagen/claude-code-template.git
+cd claude-code-template
+bash .claude-setup/install.sh
+# Добавить API ключи в ~/.claude/settings.json
+# Перезапустить Claude Code
+# Готово — 420+ файлов, всё работает
+</pre>
+
+<h2>📊 Ежедневные команды</h2>
+<pre>
+/do-router           — автоклассификация задачи
+/growth-coach        — что прокачать + план
+/daily-review        — анализ дня
+/good-morning        — утренний брифинг
+/mega-research       — глубокое исследование (100+ источников)
+/qa-verify           — верификация результата (скор 1-10)
+/rfc                 — structured decision making
+/tech-radar          — обзор стека
+/checkpoint          — сохранить прогресс
+/evolve              — кластеризация instincts в skills
+
+python3 ~/.claude/gamification/engine.py            — rankings
+python3 ~/.claude/gamification/growth-engine.py      — skill tree
+python3 ~/.claude/gamification/dashboard/competitive.py --telegram
+</pre>
+
+<p style="text-align:center; margin-top:40px; color:#999;">
+<em>Документ будет дополняться по мере развития инфраструктуры.<br>
+Автор: Claude CTO для Дмитрия Гагауза (Aragant.group)<br>
+GitHub: github.com/DmitriyMutagen/claude-code-template</em>
+</p>
+
+</body>
+</html>
