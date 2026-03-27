@@ -723,8 +723,8 @@
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-title">Claude Code Infra</div>
-    <div class="logo-version">v<span id="guide-version">v3.8</span> — <span id="guide-updated">2026-03-27 13:46</span></div>
-    <meta name="guide-version" content="3.8">
+    <div class="logo-version">v<span id="guide-version">v3.13</span> — <span id="guide-updated">2026-03-27 13:58</span></div>
+    <meta name="guide-version" content="3.13">
   </div>
   <nav>
     <div class="section-divider">Основы</div>
@@ -748,6 +748,9 @@
     <a href="#section-13">💾 Smart Backup</a>
     <a href="#section-14">⌨️ Quick Reference</a>
     <a href="#section-15">🚀 Установка</a>
+    <a href="#section-16">📜 Changelog</a>
+    <div class="section-divider">Карта команд</div>
+    <a href="#section-17">🗺️ Когда что использовать</a>
   </nav>
 </aside>
 
@@ -1667,7 +1670,7 @@ N агентов (если запускались)</pre>
   <!-- AUTO:gamification START -->
 <div class="gm-stats">
       <div class="gm-level">💎 Лид</div>
-      <div class="gm-xp">⚡ 5,221 XP | Streak: 🔥2д</div>
+      <div class="gm-xp">⚡ 5,411 XP | Streak: 🔥2д</div>
       <div class="progress-bar">
         <div class="progress-fill" style="width:0%"></div>
       </div>
@@ -2597,6 +2600,31 @@ git push origin main  # github.com/DmitriyMutagen/claude-memory
   <p>Автоматически обновляется при каждом запуске <code>python3 ~/.claude/generate_guide.py</code></p>
   <!-- AUTO:changelog START -->
 <div class="changelog-entry">
+      <span class="version-badge">v3.12</span>
+      <span class="date">2026-03-27 13:56</span>
+      <ul><li>XP: 5,401 → 5,406 (+5)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.11</span>
+      <span class="date">2026-03-27 13:54</span>
+      <ul><li>XP: 5,361 → 5,401 (+40)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.10</span>
+      <span class="date">2026-03-27 13:51</span>
+      <ul><li>XP: 5,261 → 5,361 (+100)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.9</span>
+      <span class="date">2026-03-27 13:48</span>
+      <ul><li>XP: 5,221 → 5,261 (+40)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.8</span>
+      <span class="date">2026-03-27 13:46</span>
+      <ul><li>XP: 5,211 → 5,221 (+10)</li></ul>
+    </div>
+<div class="changelog-entry">
       <span class="version-badge">v3.7</span>
       <span class="date">2026-03-27 13:45</span>
       <ul><li>Автообновление статистики</li></ul>
@@ -2621,18 +2649,155 @@ git push origin main  # github.com/DmitriyMutagen/claude-memory
       <span class="date">2026-03-27 13:32</span>
       <ul><li>XP: 5,121 → 5,141 (+20)</li></ul>
     </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.2</span>
-      <span class="date">2026-03-27 13:31</span>
-      <ul><li>Автообновление статистики</li></ul>
-    </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.1</span>
-      <span class="date">2026-03-27 13:30</span>
-      <ul><li>Новые правила: think-ahead, time-estimation, project-bootstrap, vps-deploy, marketplace-ops, spec-first, research-before-code, quality-gates, security-baseline, outreach-automation, self-healing, auto-coaching, safe-ops, ci-cd-templates, skolkovo-product, virtual-company, seo-automation, data-correctness</li><li>Новые агенты: browser-automation, wb-enrichment, security-auditor, coder, tester, qa-reviewer, researcher, solution-architect, api-debugger, content-factory, qa-engineer, data-analyst, reviewer, fullstack-developer, devops-engineer, ozon-specialist, code-reviewer, n8n-automator, security-reviewer, architect</li><li>Новые скиллы: org-structure, good-morning, daily-review, growth-coach</li><li>XP: 0 → 5,121 (+5,121)</li></ul>
-    </div>
 
 <!-- AUTO:changelog END -->
+</section>
+
+<!-- РАЗДЕЛ 17: Полная карта команд -->
+<section class="section" id="section-17">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🗺️</div>
+    <div><h2>Полная карта команд — Когда что использовать</h2></div>
+    <span class="section-num">§17</span>
+  </div>
+
+  <h3>🏢 Virtual Elite IT Company — 12 ролей (авто-активация)</h3>
+  <p style="margin-bottom:16px;color:var(--text-muted)">Каждая роль активируется автоматически по типу задачи. Можно вызвать явно через команды ниже.</p>
+
+  <div style="overflow-x:auto;margin-bottom:24px">
+  <table class="data-table">
+    <thead><tr>
+      <th>Роль</th>
+      <th>Автоактивация — ключевые слова</th>
+      <th>Явный вызов</th>
+      <th>Что делает</th>
+    </tr></thead>
+    <tbody>
+      <tr><td><strong>🧠 AI CTO</strong></td><td>Каждый промпт</td><td><code>/cto</code></td><td>Понимает намерение, классифицирует Tier 1-4, стратегия → архитектура</td></tr>
+      <tr><td><strong>🏗️ Chief Architect</strong></td><td>"архитектура", "дизайн", задача &gt;1 дня, новый модуль</td><td><code>/rfc</code> <code>/adr</code> <code>/diagram</code></td><td>3 варианта решения, ADR документ, trade-off анализ</td></tr>
+      <tr><td><strong>🔬 Research Lead</strong></td><td>"что лучше", "как делают", новая интеграция</td><td><code>/mega-research</code></td><td>50+ источников, таблица сравнения, "купить vs построить"</td></tr>
+      <tr><td><strong>📐 Product Designer</strong></td><td>Задача &gt;3 файлов, новый эндпоинт, изменение модели</td><td><code>/spec</code> <code>/plan</code></td><td>Spec в docs/plans/, user stories, API контракт, edge cases</td></tr>
+      <tr><td><strong>🛡️ Security Officer</strong></td><td>Деплой, новый публичный API, user input</td><td><code>/security-audit</code> <code>/hardening</code></td><td>OWASP Top 10, secrets scan, rate limiting — БЛОКИРУЕТ деплой</td></tr>
+      <tr><td><strong>📈 SEO/Growth Engineer</strong></td><td>bio-stm.ru, SoulWay сайт, публичные страницы</td><td><code>/seo-automation</code> <code>/seo-audit</code></td><td>Core Web Vitals, Schema markup, keyword research</td></tr>
+      <tr><td><strong>⚡ Dev Lead</strong></td><td>Архитектура согласована, пора кодить</td><td><code>/parallel</code></td><td>Разбивает на задачи 2-5 мин, параллельные агенты</td></tr>
+      <tr><td><strong>💻 Senior Engineers</strong></td><td>Запускаются Dev Lead</td><td>Task tool субагенты</td><td>Конкретный код по spec, каждый коммит = working code + тест</td></tr>
+      <tr><td><strong>🧪 QA Lead</strong></td><td>Код написан</td><td><code>/qa-verify</code> <code>/e2e</code></td><td>pytest + Playwright, E2E — БЛОКИРУЕТ "готово" без тестов</td></tr>
+      <tr><td><strong>🐛 Debugger</strong></td><td>"баг", "ошибка", "не работает"</td><td><code>/systematic-debugging</code></td><td>Sentry MCP → root cause → regression test</td></tr>
+      <tr><td><strong>🚀 DevOps</strong></td><td>"задеплой", Docker, CI/CD</td><td><code>/deploy</code> <code>/ci-pipeline</code> <code>/dockerfile</code></td><td>GitHub Actions, healthcheck, Telegram notify</td></tr>
+      <tr><td><strong>🎓 Coach</strong></td><td>Еженедельно, при старте задачи</td><td><code>/growth-coach</code> <code>/daily-review</code></td><td>Skill tree, Elite gap analysis, топ-3 шаги роста</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>⌨️ Slash-команды по ситуации</h3>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// НАЧАЛО РАБОТЫ</div>
+    <div class="cmd-item"><div class="cmd-name">/continue</div><div class="cmd-desc">▶ Первая команда сессии. Читает GLOBAL_MEMORY + MEMORY.md + git → что делали, что дальше</div></div>
+    <div class="cmd-item"><div class="cmd-name">/good-morning</div><div class="cmd-desc">▶ Утренний брифинг: приоритеты дня + Sentry errors + Elite coaching + XP streak</div></div>
+    <div class="cmd-item"><div class="cmd-name">/onboard</div><div class="cmd-desc">▶ Первое открытие нового проекта: анализ структуры, MEMORY.md, Serena activate</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// ПЛАНИРОВАНИЕ (перед кодом)</div>
+    <div class="cmd-item"><div class="cmd-name">/spec "фича"</div><div class="cmd-desc">▶ Обязательно для &gt;3 файлов. docs/plans/YYYY-MM-DD-*.md + user stories + API контракт</div></div>
+    <div class="cmd-item"><div class="cmd-name">/rfc "вопрос"</div><div class="cmd-desc">▶ 3 варианта решения с pros/cons. Для выбора стека/паттерна/архитектуры</div></div>
+    <div class="cmd-item"><div class="cmd-name">/adr "решение"</div><div class="cmd-desc">▶ Architecture Decision Record в docs/adr/ — фиксирует "почему выбрали X а не Y"</div></div>
+    <div class="cmd-item"><div class="cmd-name">/diagram "что"</div><div class="cmd-desc">▶ Mermaid диаграмма: flowchart, sequence, C4, ERD → сохраняет в docs/maps/</div></div>
+    <div class="cmd-item"><div class="cmd-name">/mega-research "тема"</div><div class="cmd-desc">▶ Context7 + Exa + Brave → 50+ источников → таблица сравнения → рекомендация</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// РАЗРАБОТКА</div>
+    <div class="cmd-item"><div class="cmd-name">/parallel "задача"</div><div class="cmd-desc">▶ Architect + Coder(s) + Tester параллельно через Agent Teams + tmux</div></div>
+    <div class="cmd-item"><div class="cmd-name">/ci-pipeline</div><div class="cmd-desc">▶ Создаёт .github/workflows/ci.yml: lint + tests + security scan + AI review на PR</div></div>
+    <div class="cmd-item"><div class="cmd-name">/tdd "фича"</div><div class="cmd-desc">▶ Red (тест) → Green (код) → Refactor. Test-Driven Development</div></div>
+    <div class="cmd-item"><div class="cmd-name">/checkpoint</div><div class="cmd-desc">▶ MEMORY.md + git commit + GitHub sync. После каждой крупной задачи!</div></div>
+    <div class="cmd-item"><div class="cmd-name">/review</div><div class="cmd-desc">▶ Code review перед merge: security + logic + quality + performance</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// ОТЛАДКА</div>
+    <div class="cmd-item"><div class="cmd-name">/systematic-debugging</div><div class="cmd-desc">▶ Sentry → root cause → минимальный fix → regression test → verify</div></div>
+    <div class="cmd-item"><div class="cmd-name">/fix-issue "описание"</div><div class="cmd-desc">▶ GitHub Issue → Sentry → фикс → тест → PR. Полный цикл починки</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// КАЧЕСТВО И ДЕПЛОЙ</div>
+    <div class="cmd-item"><div class="cmd-name">/e2e</div><div class="cmd-desc">▶ End-to-end тесты Playwright: все критические user flows + скриншоты + видео</div></div>
+    <div class="cmd-item"><div class="cmd-name">/qa-verify</div><div class="cmd-desc">▶ QA скоринг 1-10. Блокирует "готово" если &lt;7</div></div>
+    <div class="cmd-item"><div class="cmd-name">/deploy-check</div><div class="cmd-desc">▶ Pre-deploy: тесты ✅ lint ✅ env ✅ health endpoint ✅ secrets scan ✅</div></div>
+    <div class="cmd-item"><div class="cmd-name">/deploy</div><div class="cmd-desc">▶ Полный деплой: Security check → docker build → SSH → healthcheck → Telegram notify</div></div>
+    <div class="cmd-item"><div class="cmd-name">/security-audit</div><div class="cmd-desc">▶ OWASP Top 10 + detect-secrets + semgrep SAST + JWT/CORS check</div></div>
+    <div class="cmd-item"><div class="cmd-name">/hardening</div><div class="cmd-desc">▶ Security hardening: fail2ban, UFW, SSH keys, no-root Docker, SSL headers</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// РОСТ И ПРОГРЕСС</div>
+    <div class="cmd-item"><div class="cmd-name">/xp</div><div class="cmd-desc">▶ XP дашборд: уровень, достижения, стрик, прогресс до следующего уровня</div></div>
+    <div class="cmd-item"><div class="cmd-name">/growth-coach</div><div class="cmd-desc">▶ Elite gap analysis vs Anthropic/Google/Stripe/Pieter + RPG Skill Tree + топ-3 действия</div></div>
+    <div class="cmd-item"><div class="cmd-name">/daily-review</div><div class="cmd-desc">▶ Итоги дня: коммиты + instincts + паттерны + coaching → отчёт в Telegram</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// МАРКЕТПЛЕЙСЫ</div>
+    <div class="cmd-item"><div class="cmd-name">/wb-enrich</div><div class="cmd-desc">▶ WB Content Factory: артикулы → AI enrichment → SEO-оптимизация → XLSX</div></div>
+    <div class="cmd-item"><div class="cmd-name">/wb-qa</div><div class="cmd-desc">▶ QA-скоринг карточек WB/Ozon (0-10): заголовок + описание + характеристики</div></div>
+    <div class="cmd-item"><div class="cmd-name">/market-analytics</div><div class="cmd-desc">▶ Аналитика WB + Ozon + YM из PostgreSQL: выручка, отзывы, рейтинг</div></div>
+    <div class="cmd-item"><div class="cmd-name">/n8n-status</div><div class="cmd-desc">▶ Статус N8N workflows и текущие ошибки</div></div>
+  </div>
+
+  <h3>🔌 MCP — какой и когда использовать</h3>
+  <div style="overflow-x:auto;margin-bottom:24px">
+  <table class="data-table">
+    <thead><tr><th>Задача</th><th>MCP</th><th>Ключевые инструменты</th></tr></thead>
+    <tbody>
+      <tr><td>Навигация по коду, рефакторинг</td><td><strong>Serena</strong></td><td><code>find_symbol</code>, <code>find_referencing_symbols</code>, <code>replace_symbol_body</code></td></tr>
+      <tr><td>Ошибки в продакшене</td><td><strong>Sentry</strong></td><td><code>list_issues</code>, <code>get_issue_details</code>, <code>analyze_issue_with_seer</code></td></tr>
+      <tr><td>Документация библиотек (ВСЕГДА)</td><td><strong>Context7</strong></td><td><code>resolve-library-id</code> → <code>query-docs</code></td></tr>
+      <tr><td>Веб-поиск, исследование</td><td><strong>Exa / Brave</strong></td><td><code>web_search</code>, <code>deep_researcher</code></td></tr>
+      <tr><td>Скрапинг, парсинг сайтов</td><td><strong>Firecrawl</strong></td><td><code>firecrawl_scrape</code>, <code>firecrawl_search</code></td></tr>
+      <tr><td>Браузер с anti-bot защитой</td><td><strong>Playwright / BrowserMCP</strong></td><td><code>browser_navigate</code>, <code>browser_take_screenshot</code></td></tr>
+      <tr><td>SQL к PostgreSQL b2b_intelligence</td><td><strong>postgres MCP</strong></td><td>Прямой SQL запрос</td></tr>
+      <tr><td>WB API (товары, отзывы, остатки)</td><td><strong>wildberries MCP</strong></td><td>Все WB API tools (токен активен)</td></tr>
+      <tr><td>GitHub (PR, issues, repo)</td><td><strong>github-mcp</strong></td><td><code>create_pull_request</code>, <code>create_issue</code>, <code>list_issues</code></td></tr>
+      <tr><td>N8N workflows управление</td><td><strong>n8n MCP</strong></td><td><code>list_workflows</code>, <code>execute_workflow</code></td></tr>
+      <tr><td>Notion база знаний</td><td><strong>claude_ai_Notion</strong></td><td><code>notion-search</code>, <code>notion-create-pages</code></td></tr>
+      <tr><td>Telegram уведомления</td><td><strong>telegram-notify</strong></td><td><code>send_message</code></td></tr>
+      <tr><td>Docker управление контейнерами</td><td><strong>docker MCP</strong></td><td><code>list_containers</code>, <code>run_container</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>⚡ Матрица: Ситуация → Что делать</h3>
+  <div style="overflow-x:auto;margin-bottom:24px">
+  <table class="data-table">
+    <thead><tr><th>Если хочешь...</th><th>Активируй роль</th><th>Команда</th><th>⏱️</th></tr></thead>
+    <tbody>
+      <tr><td>Разобраться что делать сегодня</td><td>🎓 Coach</td><td><code>/good-morning</code> / <code>/continue</code></td><td>2 мин</td></tr>
+      <tr><td>Создать новую фичу правильно</td><td>🧠 CTO → 📐 Designer → ⚡ DevLead</td><td><code>/spec</code> → <code>/parallel</code></td><td>30m + 2-4ч</td></tr>
+      <tr><td>Выбрать технологию/библиотеку</td><td>🔬 Research</td><td><code>/mega-research</code> + Context7</td><td>20 мин</td></tr>
+      <tr><td>Задокументировать решение</td><td>🏗️ Architect</td><td><code>/adr</code> + <code>/diagram</code></td><td>10 мин</td></tr>
+      <tr><td>Починить баг в продакшене</td><td>🐛 Debugger</td><td>Sentry → <code>/systematic-debugging</code></td><td>15-30 мин</td></tr>
+      <tr><td>Задеплоить в продакшен</td><td>🛡️ Security → 🚀 DevOps</td><td><code>/deploy-check</code> → <code>/deploy</code></td><td>30-60 мин</td></tr>
+      <tr><td>Проверить качество кода</td><td>🧪 QA</td><td><code>/e2e</code> → <code>/qa-verify</code></td><td>20-40 мин</td></tr>
+      <tr><td>Ночная разработка (sleep mode)</td><td>🌙 Night Worker</td><td><code>sleepy add "задача"</code> → <code>sleepy start</code></td><td>Overnight</td></tr>
+      <tr><td>Прокачаться / Elite gap</td><td>🎓 Coach</td><td><code>/growth-coach</code></td><td>5 мин</td></tr>
+      <tr><td>Генерировать контент WB</td><td>📈 SEO/Growth</td><td><code>/wb-enrich</code> → <code>/wb-qa</code></td><td>5-10 мин/батч</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>⌨️ Keyboard Shortcuts Claude Code</h3>
+  <div class="cmd-group">
+    <div class="cmd-group-title">// РЕЖИМЫ И КОНТЕКСТ</div>
+    <div class="cmd-item"><div class="cmd-name">Shift+Tab × 2</div><div class="cmd-desc">Plan Mode — только читает, не пишет. Для анализа перед multi-file изменениями</div></div>
+    <div class="cmd-item"><div class="cmd-name">Ctrl+C (2×)</div><div class="cmd-desc">Прервать выполнение агента</div></div>
+    <div class="cmd-item"><div class="cmd-name">/compact</div><div class="cmd-desc">Сжать контекст при 60%+ использовании (сохраняет суть)</div></div>
+    <div class="cmd-item"><div class="cmd-name">/clear</div><div class="cmd-desc">Очистить контекст между задачами → потом /continue для восстановления</div></div>
+    <div class="cmd-item"><div class="cmd-name">~/.claude/backup.sh "label"</div><div class="cmd-desc">🔒 ПЕРЕД изменением settings.json / CLAUDE.md / rules/ (авто-ротация 10 бэкапов)</div></div>
+    <div class="cmd-item"><div class="cmd-name">python3 ~/.claude/generate_guide.py</div><div class="cmd-desc">📄 Обновить этот HTML-гайд вручную (авто — при каждом закрытии сессии)</div></div>
+  </div>
 </section>
 
 </body>
