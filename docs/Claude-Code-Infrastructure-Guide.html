@@ -105,6 +105,8 @@
     margin-left: 260px;
     flex: 1;
     max-width: calc(100% - 260px);
+    overflow-x: hidden;
+    min-width: 0;
   }
 
   /* HEADER */
@@ -276,12 +278,16 @@
   /* CONTENT */
   .content {
     padding: 40px 48px;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   /* SECTION */
   .section {
     margin-bottom: 56px;
     scroll-margin-top: 20px;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   .section-header {
@@ -387,9 +393,20 @@
   /* TABLES */
   table {
     width: 100%;
+    max-width: 100%;
     border-collapse: collapse;
     margin: 16px 0;
     font-size: 13px;
+    table-layout: auto;
+    word-break: break-word;
+  }
+
+  .data-table td,
+  .data-table th {
+    word-break: normal;
+    white-space: normal;
+    overflow-wrap: break-word;
+    max-width: 300px;
   }
 
   th {
@@ -723,8 +740,8 @@
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-title">Claude Code Infra</div>
-    <div class="logo-version">v<span id="guide-version">v3.13</span> — <span id="guide-updated">2026-03-27 13:58</span></div>
-    <meta name="guide-version" content="3.13">
+    <div class="logo-version">v<span id="guide-version">v3.17</span> — <span id="guide-updated">2026-03-27 14:09</span></div>
+    <meta name="guide-version" content="3.17">
   </div>
   <nav>
     <div class="section-divider">Основы</div>
@@ -1106,6 +1123,11 @@ DoD:           [конкретные критерии готовности]</pre
           <td>name: CI</td>
         </tr>
         <tr>
+          <td><code>~/.claude/rules/context7-mandatory</code></td>
+          <td>Context7 Mandatory — ВСЕГДА перед новой библиотекой</td>
+          <td>ЗАПРЕЩЕНО писать код с любой библиотекой без Context7:</td>
+        </tr>
+        <tr>
           <td><code>~/.claude/rules/data-correctness</code></td>
           <td>Data Correctness (ОБЯЗАТЕЛЬНО)</td>
           <td>Конечный результат = то что видит ПОЛЬЗОВАТЕЛЬ. Не код, не тесты — реальные данные на экране.</td>
@@ -1151,6 +1173,11 @@ DoD:           [конкретные критерии готовности]</pre
           <td>Every deployed service MUST have:</td>
         </tr>
         <tr>
+          <td><code>~/.claude/rules/sentry-first</code></td>
+          <td>Sentry First — ВСЕГДА смотри Sentry перед фиксом</td>
+          <td>ЗАПРЕЩЕНО фиксить баг без:</td>
+        </tr>
+        <tr>
           <td><code>~/.claude/rules/seo-automation</code></td>
           <td>SEO Automation Rules</td>
           <td>Автоматизация SEO для 3-4 сайтов: bio-stm.ru (WordPress), SoulWay (Tilda), самописные.</td>
@@ -1174,6 +1201,11 @@ DoD:           [конкретные критерии готовности]</pre
           <td><code>~/.claude/rules/time-estimation</code></td>
           <td>Time Estimation — AI-Speed (ОБЯЗАТЕЛЬНО)</td>
           <td>AI с параллельными агентами работает в 10-20× быстрее человека.</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/verify-before-done</code></td>
+          <td>Verify Before Done — ОБЯЗАТЕЛЬНАЯ верификация (БЛОКИРУЮЩЕЕ)</td>
+          <td>- Код написан = НЕ готово</td>
         </tr>
         <tr>
           <td><code>~/.claude/rules/virtual-company</code></td>
@@ -1311,7 +1343,7 @@ DoD:           [конкретные критерии готовности]</pre
         </tr>
         <tr>
           <td><code>Stop</code></td>
-          <td class="badge">5 хуков</td>
+          <td class="badge">6 хуков</td>
           <td>Сохранение сессии, геймификация итоги, Telegram уведомление</td>
         </tr>
         <tr>
@@ -1670,7 +1702,7 @@ N агентов (если запускались)</pre>
   <!-- AUTO:gamification START -->
 <div class="gm-stats">
       <div class="gm-level">💎 Лид</div>
-      <div class="gm-xp">⚡ 5,411 XP | Streak: 🔥2д</div>
+      <div class="gm-xp">⚡ 5,676 XP | Streak: 🔥2д</div>
       <div class="progress-bar">
         <div class="progress-fill" style="width:0%"></div>
       </div>
@@ -2600,6 +2632,26 @@ git push origin main  # github.com/DmitriyMutagen/claude-memory
   <p>Автоматически обновляется при каждом запуске <code>python3 ~/.claude/generate_guide.py</code></p>
   <!-- AUTO:changelog START -->
 <div class="changelog-entry">
+      <span class="version-badge">v3.16</span>
+      <span class="date">2026-03-27 14:03</span>
+      <ul><li>XP: 5,531 → 5,546 (+15)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.15</span>
+      <span class="date">2026-03-27 14:00</span>
+      <ul><li>XP: 5,431 → 5,531 (+100)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.14</span>
+      <span class="date">2026-03-27 13:59</span>
+      <ul><li>XP: 5,411 → 5,431 (+20)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.13</span>
+      <span class="date">2026-03-27 13:58</span>
+      <ul><li>XP: 5,406 → 5,411 (+5)</li></ul>
+    </div>
+<div class="changelog-entry">
       <span class="version-badge">v3.12</span>
       <span class="date">2026-03-27 13:56</span>
       <ul><li>XP: 5,401 → 5,406 (+5)</li></ul>
@@ -2629,26 +2681,6 @@ git push origin main  # github.com/DmitriyMutagen/claude-memory
       <span class="date">2026-03-27 13:45</span>
       <ul><li>Автообновление статистики</li></ul>
     </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.6</span>
-      <span class="date">2026-03-27 13:43</span>
-      <ul><li>XP: 5,191 → 5,211 (+20)</li></ul>
-    </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.5</span>
-      <span class="date">2026-03-27 13:43</span>
-      <ul><li>XP: 5,141 → 5,191 (+50)</li></ul>
-    </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.4</span>
-      <span class="date">2026-03-27 13:32</span>
-      <ul><li>Автообновление статистики</li></ul>
-    </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.3</span>
-      <span class="date">2026-03-27 13:32</span>
-      <ul><li>XP: 5,121 → 5,141 (+20)</li></ul>
-    </div>
 
 <!-- AUTO:changelog END -->
 </section>
@@ -2664,7 +2696,7 @@ git push origin main  # github.com/DmitriyMutagen/claude-memory
   <h3>🏢 Virtual Elite IT Company — 12 ролей (авто-активация)</h3>
   <p style="margin-bottom:16px;color:var(--text-muted)">Каждая роль активируется автоматически по типу задачи. Можно вызвать явно через команды ниже.</p>
 
-  <div style="overflow-x:auto;margin-bottom:24px">
+  <div style="overflow-x:auto;margin-bottom:24px;max-width:100%;">
   <table class="data-table">
     <thead><tr>
       <th>Роль</th>
@@ -2748,7 +2780,7 @@ git push origin main  # github.com/DmitriyMutagen/claude-memory
   </div>
 
   <h3>🔌 MCP — какой и когда использовать</h3>
-  <div style="overflow-x:auto;margin-bottom:24px">
+  <div style="overflow-x:auto;margin-bottom:24px;max-width:100%;">
   <table class="data-table">
     <thead><tr><th>Задача</th><th>MCP</th><th>Ключевые инструменты</th></tr></thead>
     <tbody>
@@ -2770,7 +2802,7 @@ git push origin main  # github.com/DmitriyMutagen/claude-memory
   </div>
 
   <h3>⚡ Матрица: Ситуация → Что делать</h3>
-  <div style="overflow-x:auto;margin-bottom:24px">
+  <div style="overflow-x:auto;margin-bottom:24px;max-width:100%;">
   <table class="data-table">
     <thead><tr><th>Если хочешь...</th><th>Активируй роль</th><th>Команда</th><th>⏱️</th></tr></thead>
     <tbody>
