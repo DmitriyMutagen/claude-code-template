@@ -61,6 +61,16 @@
 - 2026-03-27: Mega session — infra bugs fixed, testing strategy deployed
 - 2026-03-28: Deep research платных MCP + build Security Scanner MCP + VPS Monitor MCP
 
+## Skolkovo Deep Audit (2026-03-28)
+- 10 агентов параллельно: backend, frontend, tests, production, product, live walkthrough, business logic, CTO 7-zone, infra doctor, SEO
+- 150 запланированных фич найдено, сверено с реальностью
+- Scoreboard: 24/35 (69%) — продвинутый прототип
+- 15 ночных задач настроены в night-queue.json
+- Skolkovo добавлен в sleepless config
+- Full audit: ~/Documents/skolkovo/docs/FULL_AUDIT_2026-03-28.md
+
 ## Changelog
 - 2026-03-27: feat: elite-prompts v2 + infra-doctor v2 + cheatsheet HTML + checkpoint
 - 2026-03-28: feat: 2 custom MCP servers (security-scanner + vps-monitor) built and connected
+- 2026-03-28: audit: Skolkovo 360° audit (10 agents) + 15 night tasks configured
+- 2026-03-28: MEGA NIGHT: 16 modules built for Skolkovo — auth, 6 science DBs, MCP server, labels, billing, compliance checker, reverse engineering, real company data import. 16 branches ready to merge.
