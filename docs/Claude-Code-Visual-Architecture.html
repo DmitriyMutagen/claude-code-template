@@ -1,1400 +1,2562 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Claude Code — Visual Architecture Atlas</title>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<title>Claude Code AI Infrastructure — Visual Architecture</title>
+<meta name="description" content="Enterprise-grade AI development framework documentation. 28 rules, 31 hooks, 15 MCP servers, 9 custom skills, 53 commands, 23 agents.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0A0E1A;
-    --surface: #111827;
-    --surface2: #1F2937;
-    --border: #2D3748;
-    --text: #F9FAFB;
-    --muted: #9CA3AF;
-    --accent-blue: #3B82F6;
-    --accent-green: #10B981;
-    --accent-purple: #8B5CF6;
-    --accent-gold: #F59E0B;
-    --accent-red: #EF4444;
-    --accent-cyan: #06B6D4;
-    --accent-pink: #EC4899;
-  }
+/* ================================================================
+   DESIGN TOKENS
+   ================================================================ */
+:root {
+  --bg-deep: #06080f;
+  --bg: #0a0e1a;
+  --bg-surface: #111827;
+  --bg-surface-2: #1a2235;
+  --bg-surface-3: #222d42;
+  --border: rgba(255,255,255,0.06);
+  --border-light: rgba(255,255,255,0.1);
+  --border-accent: rgba(99,102,241,0.3);
+  --text: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent: #6366f1;
+  --accent-light: #818cf8;
+  --accent-glow: rgba(99,102,241,0.15);
+  --blue: #3b82f6;
+  --cyan: #06b6d4;
+  --green: #10b981;
+  --emerald: #34d399;
+  --yellow: #f59e0b;
+  --amber: #fbbf24;
+  --orange: #f97316;
+  --red: #ef4444;
+  --rose: #f43f5e;
+  --pink: #ec4899;
+  --purple: #a855f7;
+  --violet: #8b5cf6;
+  --sidebar-w: 280px;
+  --header-h: 3px;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+  --shadow-lg: 0 4px 24px rgba(0,0,0,0.4), 0 12px 48px rgba(0,0,0,0.3);
+  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* ================================================================
+   RESET & BASE
+   ================================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-deep);
+  color: var(--text);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+a { color: var(--accent-light); text-decoration: none; transition: color var(--transition); }
+a:hover { color: var(--cyan); }
+::selection { background: var(--accent); color: #fff; }
 
-  body {
-    font-family: 'Inter', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.6;
-  }
+/* ================================================================
+   SCROLL PROGRESS BAR
+   ================================================================ */
+#progress-bar {
+  position: fixed; top: 0; left: 0; height: var(--header-h);
+  background: linear-gradient(90deg, var(--accent), var(--cyan), var(--emerald));
+  z-index: 9999; width: 0; transition: width 0.1s linear;
+}
 
-  /* ── HEADER ── */
-  .hero {
-    background: linear-gradient(135deg, #0A0E1A 0%, #0F172A 50%, #0A0E1A 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 40px 60px;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -20%;
-    width: 60%;
-    height: 200%;
-    background: radial-gradient(ellipse, rgba(59,130,246,0.08) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .hero-title { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.03em; }
-  .hero-title span { background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .hero-sub { color: var(--muted); margin-top: 8px; font-size: 1.05rem; }
-  .hero-meta { margin-top: 20px; display: flex; gap: 16px; flex-wrap: wrap; }
-  .hero-badge {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 0.85rem;
-    color: var(--muted);
-  }
-  .hero-badge strong { color: var(--text); }
+/* ================================================================
+   SIDEBAR NAVIGATION
+   ================================================================ */
+.sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0;
+  width: var(--sidebar-w); background: var(--bg);
+  border-right: 1px solid var(--border);
+  z-index: 1000; overflow-y: auto; overflow-x: hidden;
+  padding: 24px 0 40px;
+  transition: transform 0.3s ease;
+  scrollbar-width: thin; scrollbar-color: var(--bg-surface-3) transparent;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--bg-surface-3); border-radius: 2px; }
+.sidebar-logo {
+  padding: 0 20px 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.sidebar-logo h2 {
+  font-size: 15px; font-weight: 700; letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--accent-light), var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.sidebar-logo span { font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px; }
+.sidebar-search {
+  margin: 0 12px 16px; position: relative;
+}
+.sidebar-search input {
+  width: 100%; padding: 8px 12px 8px 34px;
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-xs); color: var(--text);
+  font-size: 13px; font-family: var(--font-sans);
+  outline: none; transition: border-color var(--transition);
+}
+.sidebar-search input::placeholder { color: var(--text-muted); }
+.sidebar-search input:focus { border-color: var(--accent); }
+.sidebar-search svg {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px; color: var(--text-muted);
+}
+.nav-group { margin-bottom: 8px; }
+.nav-group-title {
+  padding: 6px 20px; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+.nav-link {
+  display: block; padding: 6px 20px 6px 28px;
+  font-size: 13px; color: var(--text-secondary);
+  transition: all var(--transition); border-left: 2px solid transparent;
+  cursor: pointer;
+}
+.nav-link:hover { color: var(--text); background: var(--accent-glow); }
+.nav-link.active {
+  color: var(--accent-light); border-left-color: var(--accent);
+  background: var(--accent-glow);
+}
 
-  /* ── NAV ── */
-  .nav-bar {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(10,14,26,0.95);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 0 60px;
-    display: flex;
-    gap: 4px;
-    overflow-x: auto;
-  }
-  .nav-bar a {
-    color: var(--muted);
-    text-decoration: none;
-    padding: 14px 16px;
-    font-size: 0.85rem;
-    white-space: nowrap;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-  }
-  .nav-bar a:hover { color: var(--text); border-bottom-color: var(--accent-blue); }
+/* Mobile sidebar toggle */
+.sidebar-toggle {
+  display: none; position: fixed; top: 12px; left: 12px;
+  z-index: 1100; background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-xs); padding: 8px 10px;
+  color: var(--text); cursor: pointer; font-size: 18px;
+}
 
-  /* ── MAIN ── */
-  .container { max-width: 1400px; margin: 0 auto; padding: 0 60px 80px; }
+/* ================================================================
+   MAIN CONTENT
+   ================================================================ */
+.main {
+  margin-left: var(--sidebar-w);
+  min-height: 100vh;
+}
 
-  /* ── DIAGRAM SECTION ── */
-  .diagram-section {
-    margin-top: 60px;
-    scroll-margin-top: 60px;
-  }
-  .section-title {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 8px;
-  }
-  .section-icon {
-    width: 44px; height: 44px;
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.3rem;
-    flex-shrink: 0;
-  }
-  .icon-blue { background: rgba(59,130,246,0.15); }
-  .icon-green { background: rgba(16,185,129,0.15); }
-  .icon-purple { background: rgba(139,92,246,0.15); }
-  .icon-gold { background: rgba(245,158,11,0.15); }
-  .icon-red { background: rgba(239,68,68,0.15); }
-  .icon-cyan { background: rgba(6,182,212,0.15); }
-  .icon-pink { background: rgba(236,72,153,0.15); }
+/* ================================================================
+   HERO SECTION
+   ================================================================ */
+.hero {
+  position: relative; overflow: hidden;
+  padding: 100px 60px 80px;
+  background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(99,102,241,0.12), transparent),
+              radial-gradient(ellipse 60% 40% at 80% 100%, rgba(6,182,212,0.08), transparent),
+              var(--bg-deep);
+}
+.hero-grid {
+  position: absolute; inset: 0; opacity: 0.03;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.hero-glow {
+  position: absolute; width: 600px; height: 600px;
+  border-radius: 50%; filter: blur(120px); opacity: 0.12;
+  animation: pulse-glow 8s ease-in-out infinite alternate;
+}
+.hero-glow-1 { top: -200px; left: 20%; background: var(--accent); }
+.hero-glow-2 { bottom: -200px; right: 10%; background: var(--cyan); animation-delay: -4s; }
+@keyframes pulse-glow { 0% { opacity: 0.08; transform: scale(1); } 100% { opacity: 0.16; transform: scale(1.1); } }
+.hero-content { position: relative; z-index: 1; max-width: 900px; }
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px; border-radius: 20px;
+  background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2);
+  font-size: 12px; font-weight: 600; color: var(--accent-light);
+  margin-bottom: 24px;
+}
+.hero-badge-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--emerald);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+.hero h1 {
+  font-size: clamp(36px, 5vw, 64px); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  margin-bottom: 16px;
+}
+.hero h1 .gradient-text {
+  background: linear-gradient(135deg, #fff 0%, var(--accent-light) 50%, var(--cyan) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-subtitle {
+  font-size: clamp(16px, 2vw, 20px); color: var(--text-secondary);
+  max-width: 700px; line-height: 1.6; margin-bottom: 40px;
+}
+.hero-stats {
+  display: flex; flex-wrap: wrap; gap: 32px;
+}
+.hero-stat {
+  text-align: left;
+}
+.hero-stat-value {
+  font-size: 32px; font-weight: 800; letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(135deg, var(--text), var(--accent-light));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-stat-label {
+  font-size: 13px; color: var(--text-muted); font-weight: 500;
+}
+.hero-actions { margin-top: 40px; display: flex; gap: 12px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 24px; border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 600; font-family: var(--font-sans);
+  cursor: pointer; border: none; transition: all var(--transition);
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #4f46e5);
+  color: #fff; box-shadow: 0 0 20px rgba(99,102,241,0.3);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 30px rgba(99,102,241,0.5); }
+.btn-secondary {
+  background: var(--bg-surface); color: var(--text);
+  border: 1px solid var(--border-light);
+}
+.btn-secondary:hover { border-color: var(--accent); background: var(--bg-surface-2); }
 
-  .section-title h2 { font-size: 1.5rem; font-weight: 700; }
-  .section-desc { color: var(--muted); margin-bottom: 24px; font-size: 0.95rem; }
+/* ================================================================
+   SECTIONS
+   ================================================================ */
+.section {
+  padding: 80px 60px; border-top: 1px solid var(--border);
+  position: relative;
+}
+.section-header {
+  margin-bottom: 48px;
+}
+.section-label {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--accent-light);
+  margin-bottom: 12px;
+}
+.section-label svg { width: 14px; height: 14px; }
+.section h2 {
+  font-size: clamp(28px, 3vw, 40px); font-weight: 800;
+  letter-spacing: -0.02em; margin-bottom: 12px;
+}
+.section-desc {
+  font-size: 16px; color: var(--text-secondary);
+  max-width: 700px; line-height: 1.7;
+}
 
-  .diagram-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 32px;
-    overflow: auto;
-  }
-  .diagram-box .mermaid {
-    display: flex;
-    justify-content: center;
-  }
+/* ================================================================
+   ARCHITECTURE DIAGRAM
+   ================================================================ */
+.arch-diagram {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 40px;
+  overflow-x: auto;
+}
+.arch-flow {
+  display: flex; align-items: center; gap: 16px;
+  min-width: 900px; justify-content: center; flex-wrap: nowrap;
+}
+.arch-node {
+  background: var(--bg-surface-2); border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm); padding: 16px 20px;
+  text-align: center; min-width: 140px; position: relative;
+  transition: all var(--transition);
+}
+.arch-node:hover {
+  border-color: var(--accent); transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(99,102,241,0.15);
+}
+.arch-node-icon { font-size: 24px; margin-bottom: 6px; }
+.arch-node-title { font-size: 13px; font-weight: 700; }
+.arch-node-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.arch-arrow {
+  color: var(--text-muted); font-size: 20px; flex-shrink: 0;
+  animation: arrow-pulse 2s ease-in-out infinite;
+}
+@keyframes arrow-pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+.arch-branch {
+  display: flex; flex-direction: column; gap: 8px; align-items: center;
+}
+.arch-branch .arch-node { min-width: 120px; padding: 10px 14px; }
+.arch-branch .arch-node-title { font-size: 11px; }
+.arch-branch-line {
+  width: 1px; height: 20px;
+  background: linear-gradient(to bottom, var(--accent), transparent);
+}
+.arch-sub-row {
+  display: flex; gap: 8px; margin-top: 20px;
+  justify-content: center; flex-wrap: wrap;
+}
+.arch-sub-node {
+  background: var(--bg-surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-xs); padding: 8px 14px;
+  font-size: 11px; color: var(--text-secondary);
+  transition: all var(--transition);
+}
+.arch-sub-node:hover { border-color: var(--accent); color: var(--text); }
 
-  /* ── MINDMAP CSS ── */
-  .mindmap {
-    position: relative;
-    padding: 20px;
-  }
-  .mm-center {
-    text-align: center;
-    margin-bottom: 32px;
-  }
-  .mm-node-main {
-    display: inline-block;
-    background: linear-gradient(135deg, #1D4ED8, #7C3AED);
-    border-radius: 50px;
-    padding: 16px 32px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: white;
-    box-shadow: 0 0 30px rgba(59,130,246,0.3);
-  }
-  .mm-branches {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-top: 20px;
-  }
-  .mm-branch {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px;
-  }
-  .mm-branch-title {
-    font-weight: 600;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.95rem;
-  }
-  .mm-items { list-style: none; }
-  .mm-items li {
-    padding: 4px 0;
-    font-size: 0.85rem;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .mm-items li::before { content: '→'; color: var(--accent-blue); font-size: 0.75rem; }
-  .mm-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    display: inline-block;
-    flex-shrink: 0;
-  }
+/* ================================================================
+   CARD GRIDS
+   ================================================================ */
+.card-grid {
+  display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+.card-grid-sm {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+.card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px;
+  transition: all 0.3s ease; position: relative; overflow: hidden;
+}
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 2px; background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0; transition: opacity var(--transition);
+}
+.card:hover {
+  border-color: rgba(99,102,241,0.3);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.card:hover::before { opacity: 1; }
+.card-icon {
+  width: 40px; height: 40px; border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; margin-bottom: 14px;
+}
+.card-title {
+  font-size: 15px; font-weight: 700; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-desc {
+  font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+}
+.badge {
+  display: inline-flex; padding: 2px 8px; border-radius: 10px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
+.badge-blue { background: rgba(59,130,246,0.15); color: var(--blue); }
+.badge-green { background: rgba(16,185,129,0.15); color: var(--green); }
+.badge-yellow { background: rgba(245,158,11,0.15); color: var(--yellow); }
+.badge-purple { background: rgba(168,85,247,0.15); color: var(--purple); }
+.badge-orange { background: rgba(249,115,22,0.15); color: var(--orange); }
+.badge-cyan { background: rgba(6,182,212,0.15); color: var(--cyan); }
 
-  /* ── FLOW CARDS (custom flowchart) ── */
-  .flow-row {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    flex-wrap: wrap;
-    margin: 16px 0;
-  }
-  .flow-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 18px;
-    font-size: 0.88rem;
-    font-weight: 500;
-    white-space: nowrap;
-  }
-  .flow-card.blue { border-color: var(--accent-blue); color: var(--accent-blue); }
-  .flow-card.green { border-color: var(--accent-green); color: var(--accent-green); }
-  .flow-card.purple { border-color: var(--accent-purple); color: var(--accent-purple); }
-  .flow-card.gold { border-color: var(--accent-gold); color: var(--accent-gold); }
-  .flow-card.red { border-color: var(--accent-red); color: var(--accent-red); }
-  .flow-arrow {
-    padding: 0 8px;
-    color: var(--muted);
-    font-size: 1.1rem;
-    flex-shrink: 0;
-  }
-  .flow-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    background: rgba(255,255,255,0.02);
-    border: 1px dashed var(--border);
-    border-radius: 8px;
-    padding: 12px;
-  }
-  .flow-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
+/* Category filter pills */
+.filter-pills {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;
+}
+.filter-pill {
+  padding: 6px 14px; border-radius: 20px; font-size: 12px;
+  font-weight: 600; cursor: pointer; border: 1px solid var(--border);
+  background: var(--bg-surface); color: var(--text-secondary);
+  transition: all var(--transition); font-family: var(--font-sans);
+}
+.filter-pill:hover, .filter-pill.active {
+  border-color: var(--accent); color: var(--accent-light);
+  background: var(--accent-glow);
+}
 
-  /* ── VPS BLOCK DIAGRAM ── */
-  .vps-diagram {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-  .vps-server {
-    background: var(--surface2);
-    border: 2px solid var(--accent-blue);
-    border-radius: 12px;
-    padding: 20px;
-  }
-  .vps-server.vpn { border-color: var(--accent-green); }
-  .vps-title {
-    font-weight: 700;
-    font-size: 0.9rem;
-    color: var(--accent-blue);
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: 'JetBrains Mono', monospace;
-  }
-  .vps-server.vpn .vps-title { color: var(--accent-green); }
-  .vps-service {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.85rem;
-  }
-  .vps-service:last-child { border-bottom: none; }
-  .vps-service-name { font-family: 'JetBrains Mono', monospace; color: var(--text); }
-  .port-badge {
-    background: rgba(59,130,246,0.1);
-    border: 1px solid rgba(59,130,246,0.3);
-    border-radius: 4px;
-    padding: 2px 8px;
-    font-size: 0.75rem;
-    color: var(--accent-blue);
-    font-family: 'JetBrains Mono', monospace;
-  }
-  .status-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--accent-green);
-    box-shadow: 0 0 6px var(--accent-green);
-  }
+/* ================================================================
+   TIMELINE (HOOKS)
+   ================================================================ */
+.timeline { position: relative; padding-left: 32px; }
+.timeline::before {
+  content: ''; position: absolute; left: 11px; top: 0; bottom: 0;
+  width: 2px; background: linear-gradient(to bottom, var(--accent), var(--cyan), var(--emerald), var(--yellow));
+}
+.timeline-group { margin-bottom: 32px; }
+.timeline-group-header {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 16px; position: relative;
+}
+.timeline-dot {
+  position: absolute; left: -27px; width: 14px; height: 14px;
+  border-radius: 50%; border: 2px solid; background: var(--bg-deep);
+}
+.timeline-group-title {
+  font-size: 16px; font-weight: 700;
+}
+.timeline-items {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+.timeline-item {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-xs); padding: 10px 14px;
+  font-size: 12px; font-family: var(--font-mono);
+  color: var(--text-secondary); transition: all var(--transition);
+}
+.timeline-item:hover {
+  border-color: var(--accent); color: var(--text);
+  background: var(--bg-surface-2);
+}
 
-  /* ── MCP GRID ── */
-  .mcp-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
-  }
-  .mcp-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px;
-  }
-  .mcp-name {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
-    color: var(--accent-cyan);
-    margin-bottom: 4px;
-    font-weight: 500;
-  }
-  .mcp-desc { font-size: 0.8rem; color: var(--muted); }
-  .mcp-tools { font-size: 0.75rem; color: var(--accent-blue); margin-top: 6px; }
-  .mcp-status {
-    display: inline-block;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--accent-green);
-    margin-right: 4px;
-  }
+/* ================================================================
+   MCP SERVER CARDS
+   ================================================================ */
+.mcp-card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px;
+  transition: all 0.3s ease; position: relative;
+}
+.mcp-card:hover {
+  border-color: rgba(6,182,212,0.3);
+  box-shadow: 0 0 30px rgba(6,182,212,0.08);
+  transform: translateY(-2px);
+}
+.mcp-status {
+  position: absolute; top: 16px; right: 16px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--emerald);
+  box-shadow: 0 0 8px rgba(52,211,153,0.5);
+  animation: blink 2s ease-in-out infinite;
+}
+.mcp-name {
+  font-size: 15px; font-weight: 700; font-family: var(--font-mono);
+  margin-bottom: 6px;
+}
+.mcp-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; }
+.mcp-tools {
+  display: flex; flex-wrap: wrap; gap: 4px;
+}
+.mcp-tool {
+  padding: 2px 8px; border-radius: 4px; font-size: 10px;
+  font-family: var(--font-mono); background: var(--bg-surface-2);
+  color: var(--text-muted); border: 1px solid var(--border);
+}
 
-  /* ── HOOK TIMELINE ── */
-  .hook-timeline {
-    position: relative;
-    padding-left: 32px;
-  }
-  .hook-timeline::before {
-    content: '';
-    position: absolute;
-    left: 12px;
-    top: 0; bottom: 0;
-    width: 2px;
-    background: linear-gradient(180deg, var(--accent-blue), var(--accent-purple), var(--accent-green));
-  }
-  .hook-event {
-    position: relative;
-    margin-bottom: 20px;
-  }
-  .hook-event::before {
-    content: '';
-    position: absolute;
-    left: -24px;
-    top: 12px;
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: var(--accent-blue);
-    border: 2px solid var(--bg);
-  }
-  .hook-event.stop::before { background: var(--accent-purple); }
-  .hook-event.post::before { background: var(--accent-green); }
-  .hook-event.pre::before { background: var(--accent-red); }
-  .hook-event.submit::before { background: var(--accent-gold); }
-  .hook-event.compact::before { background: var(--accent-pink); }
-  .hook-event-title {
-    font-weight: 600;
-    font-size: 0.9rem;
-    margin-bottom: 6px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .hook-badge {
-    font-size: 0.75rem;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-family: 'JetBrains Mono', monospace;
-  }
-  .hook-badge.session { background: rgba(59,130,246,0.2); color: var(--accent-blue); }
-  .hook-badge.stop { background: rgba(139,92,246,0.2); color: var(--accent-purple); }
-  .hook-badge.post { background: rgba(16,185,129,0.2); color: var(--accent-green); }
-  .hook-badge.pre { background: rgba(239,68,68,0.2); color: var(--accent-red); }
-  .hook-badge.submit { background: rgba(245,158,11,0.2); color: var(--accent-gold); }
-  .hook-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 6px;
-  }
-  .hook-action {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 3px 10px;
-    font-size: 0.78rem;
-    color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
-  }
+/* ================================================================
+   SKILL CARDS
+   ================================================================ */
+.skill-card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px;
+  transition: all 0.3s ease; position: relative; overflow: hidden;
+}
+.skill-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 3px; background: linear-gradient(90deg, var(--accent), var(--cyan));
+  opacity: 0; transition: opacity var(--transition);
+}
+.skill-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.skill-card:hover::after { opacity: 1; }
+.skill-status-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.skill-status {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 600; color: var(--emerald);
+}
+.skill-status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--emerald);
+  box-shadow: 0 0 6px rgba(52,211,153,0.5);
+}
+.skill-name { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.skill-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
 
-  /* ── DATA FLOW ── */
-  .data-flow {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    overflow-x: auto;
-    padding-bottom: 8px;
-  }
-  .df-column {
-    flex-shrink: 0;
-    min-width: 160px;
-  }
-  .df-header {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-    margin-bottom: 8px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--border);
-  }
-  .df-item {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 8px 12px;
-    font-size: 0.82rem;
-    margin-bottom: 6px;
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--muted);
-  }
-  .df-item.active { border-color: var(--accent-blue); color: var(--text); }
-  .df-arrow-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 32px;
-    color: var(--muted);
-    font-size: 1.2rem;
-    flex-shrink: 0;
-  }
+/* ================================================================
+   COMMANDS TABLE
+   ================================================================ */
+.commands-section { margin-bottom: 32px; }
+.commands-section-title {
+  font-size: 16px; font-weight: 700; margin-bottom: 12px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.cmd-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+}
+.cmd-item {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 8px 12px; border-radius: var(--radius-xs);
+  transition: background var(--transition);
+}
+.cmd-item:hover { background: var(--bg-surface); }
+.cmd-name {
+  font-family: var(--font-mono); font-size: 13px;
+  font-weight: 600; color: var(--cyan); white-space: nowrap;
+  min-width: 120px;
+}
+.cmd-desc { font-size: 12px; color: var(--text-secondary); }
 
-  /* ── TWO COL ── */
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  @media (max-width: 900px) {
-    .two-col, .mm-branches, .vps-diagram { grid-template-columns: 1fr; }
-    .container, .hero, .nav-bar { padding-left: 20px; padding-right: 20px; }
-  }
+/* ================================================================
+   AGENTS GRID
+   ================================================================ */
+.agent-card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 16px;
+  transition: all var(--transition);
+}
+.agent-card:hover { border-color: var(--purple); transform: translateY(-1px); }
+.agent-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.agent-type { font-size: 11px; color: var(--text-muted); }
 
-  /* ── LEGEND ── */
-  .legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.82rem;
-    color: var(--muted);
-  }
-  .legend-dot {
-    width: 10px; height: 10px;
-    border-radius: 3px;
-    flex-shrink: 0;
-  }
+/* ================================================================
+   MODULAR ARCHITECTURE DIAGRAM
+   ================================================================ */
+.module-diagram {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 32px; overflow-x: auto;
+}
+.module-tree { font-family: var(--font-mono); font-size: 13px; line-height: 2; }
+.module-tree .dir { color: var(--cyan); font-weight: 600; }
+.module-tree .file { color: var(--text-secondary); }
+.module-tree .comment { color: var(--text-muted); font-style: italic; }
+.module-tree .indent { padding-left: 24px; }
+.module-tree .indent2 { padding-left: 48px; }
 
-  /* ── NIGHT MODE ── */
-  .night-flow {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  .night-timeline {
-    background: #0F172A;
-    border-right: 1px solid var(--border);
-    padding: 0;
-  }
-  .night-time {
-    padding: 12px 16px;
-    font-size: 0.82rem;
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--accent-purple);
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  .night-events { padding: 0; }
-  .night-event {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.85rem;
-  }
-  .night-event:last-child { border-bottom: none; }
-  .night-event-title { font-weight: 600; margin-bottom: 4px; }
-  .night-event-detail { color: var(--muted); font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; }
+/* ================================================================
+   GIT WORKFLOW PIPELINE
+   ================================================================ */
+.pipeline {
+  display: flex; align-items: stretch; gap: 0;
+  overflow-x: auto; padding: 20px 0;
+}
+.pipeline-stage {
+  flex: 1; min-width: 140px; text-align: center;
+  padding: 20px 16px; position: relative;
+  background: var(--bg-surface); border: 1px solid var(--border);
+}
+.pipeline-stage:first-child { border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
+.pipeline-stage:last-child { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.pipeline-stage:not(:last-child)::after {
+  content: ''; position: absolute; right: -8px; top: 50%;
+  transform: translateY(-50%); width: 0; height: 0;
+  border-left: 8px solid var(--bg-surface-2);
+  border-top: 16px solid transparent;
+  border-bottom: 16px solid transparent;
+  z-index: 1;
+}
+.pipeline-stage-icon { font-size: 20px; margin-bottom: 6px; }
+.pipeline-stage-title { font-size: 12px; font-weight: 700; }
+.pipeline-stage-desc { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
 
-  /* ── MERMAID THEME ── */
-  .mermaid svg { max-width: 100%; }
+/* ================================================================
+   VELOCITY DASHBOARD
+   ================================================================ */
+.velocity-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+.velocity-card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.velocity-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 0%, var(--accent-glow), transparent 70%);
+  opacity: 0; transition: opacity var(--transition);
+}
+.velocity-card:hover::before { opacity: 1; }
+.velocity-value {
+  font-size: 36px; font-weight: 900; letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums; position: relative;
+}
+.velocity-label {
+  font-size: 13px; color: var(--text-secondary); margin-top: 4px;
+  position: relative;
+}
+.velocity-badge {
+  display: inline-block; margin-top: 8px; padding: 2px 10px;
+  border-radius: 10px; font-size: 10px; font-weight: 700;
+  position: relative;
+}
+
+/* ================================================================
+   QUICK REFERENCE TABLE
+   ================================================================ */
+.ref-table-wrapper {
+  overflow-x: auto; border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.ref-table {
+  width: 100%; border-collapse: collapse; font-size: 13px;
+}
+.ref-table th {
+  text-align: left; padding: 12px 16px;
+  background: var(--bg-surface); font-weight: 700;
+  font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0;
+}
+.ref-table td {
+  padding: 10px 16px; border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.ref-table tr:hover td { background: rgba(99,102,241,0.04); }
+.ref-table .mono {
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--cyan);
+}
+
+/* ================================================================
+   CODE BLOCKS
+   ================================================================ */
+.code-block {
+  position: relative; background: var(--bg-surface);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  margin: 16px 0; overflow: hidden;
+}
+.code-block-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 16px; background: var(--bg-surface-2);
+  border-bottom: 1px solid var(--border);
+}
+.code-block-lang { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+.code-copy-btn {
+  background: none; border: 1px solid var(--border);
+  border-radius: var(--radius-xs); padding: 4px 10px;
+  font-size: 11px; color: var(--text-muted); cursor: pointer;
+  font-family: var(--font-sans); transition: all var(--transition);
+}
+.code-copy-btn:hover { border-color: var(--accent); color: var(--accent-light); }
+.code-block pre {
+  padding: 16px; overflow-x: auto; font-family: var(--font-mono);
+  font-size: 13px; line-height: 1.7; color: var(--text-secondary);
+}
+.code-block code .kw { color: var(--purple); }
+.code-block code .fn { color: var(--blue); }
+.code-block code .str { color: var(--emerald); }
+.code-block code .cm { color: var(--text-muted); }
+.code-block code .num { color: var(--yellow); }
+
+/* ================================================================
+   COLLAPSIBLE SECTIONS
+   ================================================================ */
+.collapsible { margin-bottom: 8px; }
+.collapsible-trigger {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; background: var(--bg-surface);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  cursor: pointer; font-family: var(--font-sans); font-size: 14px;
+  font-weight: 600; color: var(--text); transition: all var(--transition);
+}
+.collapsible-trigger:hover { border-color: var(--accent); }
+.collapsible-trigger .chevron {
+  transition: transform 0.3s ease; font-size: 12px; color: var(--text-muted);
+}
+.collapsible.open .collapsible-trigger .chevron { transform: rotate(180deg); }
+.collapsible-content {
+  max-height: 0; overflow: hidden; transition: max-height 0.4s ease;
+}
+.collapsible.open .collapsible-content { max-height: 3000px; }
+.collapsible-inner { padding: 16px 20px; }
+
+/* ================================================================
+   FOOTER
+   ================================================================ */
+.footer {
+  padding: 40px 60px; border-top: 1px solid var(--border);
+  text-align: center; color: var(--text-muted); font-size: 13px;
+}
+
+/* ================================================================
+   ANIMATIONS
+   ================================================================ */
+.fade-in {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+.stagger-1 { transition-delay: 0.1s; }
+.stagger-2 { transition-delay: 0.2s; }
+.stagger-3 { transition-delay: 0.3s; }
+.stagger-4 { transition-delay: 0.4s; }
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 1024px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
+  .sidebar-toggle { display: block; }
+  .main { margin-left: 0; }
+  .section { padding: 60px 24px; }
+  .hero { padding: 80px 24px 60px; }
+  .hero-stats { gap: 20px; }
+  .arch-flow { min-width: 700px; }
+  .footer { padding: 40px 24px; }
+}
+@media (max-width: 640px) {
+  .hero-stat-value { font-size: 24px; }
+  .card-grid { grid-template-columns: 1fr; }
+  .cmd-grid { grid-template-columns: 1fr; }
+  .velocity-grid { grid-template-columns: repeat(2, 1fr); }
+  .pipeline { flex-wrap: wrap; }
+  .pipeline-stage { min-width: auto; flex: auto; }
+}
+
+/* ================================================================
+   PRINT
+   ================================================================ */
+@media print {
+  .sidebar, .sidebar-toggle, #progress-bar, .code-copy-btn { display: none !important; }
+  .main { margin-left: 0 !important; }
+  .section { padding: 20px 0; page-break-inside: avoid; }
+  body { background: #fff; color: #000; }
+  .card, .mcp-card, .skill-card, .agent-card { border-color: #ccc; background: #f9f9f9; }
+  a { color: #333; }
+}
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════════ HERO -->
-<div class="hero">
-  <div class="hero-title">🗺️ Claude Code — <span>Visual Architecture Atlas</span></div>
-  <div class="hero-sub">Полная визуальная карта инфраструктуры разработки · Aragant.group / Дмитрий Гагауз</div>
-  <div class="hero-meta">
-    <span class="hero-badge"><strong>8</strong> диаграмм</span>
-    <span class="hero-badge"><strong>18</strong> Rules</span>
-    <span class="hero-badge"><strong>20</strong> Агентов</span>
-    <span class="hero-badge"><strong>13</strong> MCP серверов</span>
-    <span class="hero-badge"><strong>7</strong> Хук-событий</span>
-    <span class="hero-badge"><strong>7</strong> Проектов</span>
-    <span class="hero-badge">VPS 94.198.219.232</span>
-  </div>
-</div>
+<!-- Progress Bar -->
+<div id="progress-bar"></div>
 
-<!-- ═══════════════════════════════════════════════════════ NAV -->
-<nav class="nav-bar">
-  <a href="#map">🗺️ Карта</a>
-  <a href="#session">⚡ Сессия</a>
-  <a href="#hooks">🪝 Хуки</a>
-  <a href="#memory">🧠 Память</a>
-  <a href="#deploy">🚀 Деплой</a>
-  <a href="#vps">🖥️ VPS</a>
-  <a href="#mcp">🔌 MCP</a>
-  <a href="#night">🌙 Ночной</a>
-  <a href="#guide-auto">📄 Auto-Guide</a>
+<!-- Mobile Toggle -->
+<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="Toggle navigation">&#9776;</button>
+
+<!-- ================================================================
+     SIDEBAR
+     ================================================================ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <h2>Claude Code Infra</h2>
+    <span>v2.0 Architecture Docs</span>
+  </div>
+  <div class="sidebar-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="global-search" placeholder="Search docs..." autocomplete="off">
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Getting Started</div>
+    <a class="nav-link" href="#hero">Overview</a>
+    <a class="nav-link" href="#architecture">Architecture</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Core Systems</div>
+    <a class="nav-link" href="#rules">Rules (28)</a>
+    <a class="nav-link" href="#hooks">Hooks (31)</a>
+    <a class="nav-link" href="#mcp-servers">MCP Servers (15)</a>
+    <a class="nav-link" href="#skills">Skills (9)</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Operations</div>
+    <a class="nav-link" href="#commands">Commands (53)</a>
+    <a class="nav-link" href="#agents">Agents (23)</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Infrastructure</div>
+    <a class="nav-link" href="#modular-arch">Modular Architecture</a>
+    <a class="nav-link" href="#git-workflow">Git Workflow</a>
+    <a class="nav-link" href="#velocity">Velocity Dashboard</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Reference</div>
+    <a class="nav-link" href="#quick-ref">Quick Reference</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Deep Systems</div>
+    <a class="nav-link" href="#cto-layer">CTO Layer (4 Phases)</a>
+    <a class="nav-link" href="#virtual-company">Virtual Company (15)</a>
+    <a class="nav-link" href="#instincts">Instincts (10)</a>
+    <a class="nav-link" href="#gamification">Gamification (23)</a>
+    <a class="nav-link" href="#memory-system">Memory System</a>
+    <a class="nav-link" href="#sleepless">Sleepless Daemon</a>
+    <a class="nav-link" href="#teams">Teams (8)</a>
+    <a class="nav-link" href="#anti-patterns">Anti-Patterns</a>
+  </div>
 </nav>
 
-<div class="container">
+<!-- ================================================================
+     MAIN CONTENT
+     ================================================================ -->
+<div class="main">
 
-
-<!-- ═══════════════════════════════════════════════════════ 1. КАРТА -->
-<section class="diagram-section" id="map">
-  <div class="section-title">
-    <div class="section-icon icon-blue">🗺️</div>
-    <h2>Полная карта инфраструктуры</h2>
-  </div>
-  <p class="section-desc">Всё что существует вокруг разработки — единая экосистема Claude Code</p>
-
-  <div class="diagram-box">
-    <div class="mm-center">
-      <div class="mm-node-main">🧠 Claude Code Infrastructure<br><small style="font-weight:400;font-size:0.8rem;">Aragant.group / Дмитрий Гагауз</small></div>
+<!-- ================================================================
+     HERO
+     ================================================================ -->
+<section class="hero" id="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow hero-glow-1"></div>
+  <div class="hero-glow hero-glow-2"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Production Infrastructure
     </div>
-    <div class="mm-branches">
-
-      <div class="mm-branch">
-        <div class="mm-branch-title"><span style="color:#3B82F6">⚙️</span> Конфигурация</div>
-        <ul class="mm-items">
-          <li><span class="mm-dot" style="background:#3B82F6"></span>CLAUDE.md — глобальные инструкции</li>
-          <li><span class="mm-dot" style="background:#3B82F6"></span>settings.json — хуки + MCP + env</li>
-          <li><span class="mm-dot" style="background:#3B82F6"></span>18 Rules файлов (auto-apply)</li>
-          <li><span class="mm-dot" style="background:#3B82F6"></span>CLAUDE.md в каждом проекте</li>
-        </ul>
+    <h1>
+      <span class="gradient-text">Claude Code</span><br>
+      AI Infrastructure
+    </h1>
+    <p class="hero-subtitle">
+      Enterprise-grade AI development framework powering autonomous coding at scale.
+      28 rules, 31 hooks, 15 MCP servers, 9 custom skills, 53 commands, and 23 specialized agents
+      orchestrated into a self-healing, self-improving system.
+    </p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-value" data-target="28">0</div>
+        <div class="hero-stat-label">Rules</div>
       </div>
-
-      <div class="mm-branch">
-        <div class="mm-branch-title"><span style="color:#10B981">🪝</span> Хуки (7 типов)</div>
-        <ul class="mm-items">
-          <li><span class="mm-dot" style="background:#10B981"></span>SessionStart (5 хуков)</li>
-          <li><span class="mm-dot" style="background:#10B981"></span>PreToolUse (4 хука)</li>
-          <li><span class="mm-dot" style="background:#10B981"></span>PostToolUse (6 хуков)</li>
-          <li><span class="mm-dot" style="background:#10B981"></span>Stop (5 хуков)</li>
-          <li><span class="mm-dot" style="background:#10B981"></span>UserPromptSubmit</li>
-          <li><span class="mm-dot" style="background:#10B981"></span>PreCompact</li>
-        </ul>
+      <div class="hero-stat">
+        <div class="hero-stat-value" data-target="31">0</div>
+        <div class="hero-stat-label">Hooks</div>
       </div>
-
-      <div class="mm-branch">
-        <div class="mm-branch-title"><span style="color:#8B5CF6">🎮</span> Skills / Команды</div>
-        <ul class="mm-items">
-          <li><span class="mm-dot" style="background:#8B5CF6"></span>/continue /checkpoint /new-project</li>
-          <li><span class="mm-dot" style="background:#8B5CF6"></span>/good-morning /daily-review</li>
-          <li><span class="mm-dot" style="background:#8B5CF6"></span>/growth-coach /org-structure</li>
-          <li><span class="mm-dot" style="background:#8B5CF6"></span>/spec /review /audit /deploy-check</li>
-          <li><span class="mm-dot" style="background:#8B5CF6"></span>/parallel /wb-enrich /wb-qa</li>
-          <li><span class="mm-dot" style="background:#8B5CF6"></span>3158 скиллов в библиотеке</li>
-        </ul>
+      <div class="hero-stat">
+        <div class="hero-stat-value" data-target="15">0</div>
+        <div class="hero-stat-label">MCP Servers</div>
       </div>
-
-      <div class="mm-branch">
-        <div class="mm-branch-title"><span style="color:#F59E0B">🤖</span> Агенты (20)</div>
-        <ul class="mm-items">
-          <li><span class="mm-dot" style="background:#F59E0B"></span>coder, tester, reviewer</li>
-          <li><span class="mm-dot" style="background:#F59E0B"></span>architect, security-auditor</li>
-          <li><span class="mm-dot" style="background:#F59E0B"></span>wb-enrichment, ozon-specialist</li>
-          <li><span class="mm-dot" style="background:#F59E0B"></span>researcher, data-analyst</li>
-          <li><span class="mm-dot" style="background:#F59E0B"></span>devops-engineer, n8n-automator</li>
-          <li><span class="mm-dot" style="background:#F59E0B"></span>browser-automation, content-factory</li>
-        </ul>
+      <div class="hero-stat">
+        <div class="hero-stat-value" data-target="9">0</div>
+        <div class="hero-stat-label">Custom Skills</div>
       </div>
-
-      <div class="mm-branch">
-        <div class="mm-branch-title"><span style="color:#06B6D4">🔌</span> MCP (13 активных)</div>
-        <ul class="mm-items">
-          <li><span class="mm-dot" style="background:#06B6D4"></span>exa + brave-search (поиск)</li>
-          <li><span class="mm-dot" style="background:#06B6D4"></span>context7 (документация)</li>
-          <li><span class="mm-dot" style="background:#06B6D4"></span>playwright + puppeteer (браузер)</li>
-          <li><span class="mm-dot" style="background:#06B6D4"></span>filesystem + git + github</li>
-          <li><span class="mm-dot" style="background:#06B6D4"></span>postgres + sqlite (БД)</li>
-          <li><span class="mm-dot" style="background:#06B6D4"></span>telegram-notify, wildberries</li>
-        </ul>
+      <div class="hero-stat">
+        <div class="hero-stat-value" data-target="53">0</div>
+        <div class="hero-stat-label">Commands</div>
       </div>
-
-      <div class="mm-branch">
-        <div class="mm-branch-title"><span style="color:#EF4444">🧠</span> Память (∞)</div>
-        <ul class="mm-items">
-          <li><span class="mm-dot" style="background:#EF4444"></span>GLOBAL_MEMORY.md (все проекты)</li>
-          <li><span class="mm-dot" style="background:#EF4444"></span>MEMORY.md в каждом проекте</li>
-          <li><span class="mm-dot" style="background:#EF4444"></span>decay-7d (123 сессии)</li>
-          <li><span class="mm-dot" style="background:#EF4444"></span>permanent/ (5 файлов)</li>
-          <li><span class="mm-dot" style="background:#EF4444"></span>CL v2.1 (1569 наблюдений)</li>
-          <li><span class="mm-dot" style="background:#EF4444"></span>session-handoff.md</li>
-        </ul>
+      <div class="hero-stat">
+        <div class="hero-stat-value" data-target="23">0</div>
+        <div class="hero-stat-label">Agents</div>
       </div>
-
-      <div class="mm-branch">
-        <div class="mm-branch-title"><span style="color:#10B981">🏆</span> Геймификация</div>
-        <ul class="mm-items">
-          <li><span class="mm-dot" style="background:#10B981"></span>engine.py (SQLite WAL)</li>
-          <li><span class="mm-dot" style="background:#10B981"></span>12 уровней (0 → 350K XP)</li>
-          <li><span class="mm-dot" style="background:#10B981"></span>26 ачивок</li>
-          <li><span class="mm-dot" style="background:#10B981"></span>metrics_collector.py (09:00/21:00)</li>
-          <li><span class="mm-dot" style="background:#10B981"></span>learning_coach.py</li>
-          <li><span class="mm-dot" style="background:#10B981"></span>Telegram уведомления</li>
-        </ul>
-      </div>
-
-      <div class="mm-branch">
-        <div class="mm-branch-title"><span style="color:#EC4899">🖥️</span> Инфраструктура</div>
-        <ul class="mm-items">
-          <li><span class="mm-dot" style="background:#EC4899"></span>VPS 94.198.219.232 (4CPU/8GB)</li>
-          <li><span class="mm-dot" style="background:#EC4899"></span>VPN 72.56.121.84 (DE)</li>
-          <li><span class="mm-dot" style="background:#EC4899"></span>Docker + nginx + SSL</li>
-          <li><span class="mm-dot" style="background:#EC4899"></span>GitHub Actions CI/CD</li>
-          <li><span class="mm-dot" style="background:#EC4899"></span>PostgreSQL + Redis</li>
-          <li><span class="mm-dot" style="background:#EC4899"></span>Sentry (org: aragant)</li>
-        </ul>
-      </div>
-
-      <div class="mm-branch">
-        <div class="mm-branch-title"><span style="color:#F59E0B">📁</span> Проекты (7)</div>
-        <ul class="mm-items">
-          <li><span class="mm-dot" style="background:#F59E0B"></span>Aragant → aragant.pro ✅</li>
-          <li><span class="mm-dot" style="background:#F59E0B"></span>Bionovacia → :8002 ✅</li>
-          <li><span class="mm-dot" style="background:#F59E0B"></span>SoulWay B2B → Netlify ✅</li>
-          <li><span class="mm-dot" style="background:#F59E0B"></span>B2B Outreach 🚧</li>
-          <li><span class="mm-dot" style="background:#F59E0B"></span>WB Content Factory 🚧</li>
-          <li><span class="mm-dot" style="background:#F59E0B"></span>Content Factory ✅</li>
-        </ul>
-      </div>
-
+    </div>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="document.getElementById('architecture').scrollIntoView({behavior:'smooth'})">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Get Started
+      </button>
+      <button class="btn btn-secondary" onclick="document.getElementById('quick-ref').scrollIntoView({behavior:'smooth'})">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+        Quick Reference
+      </button>
     </div>
   </div>
 </section>
 
-
-<!-- ═══════════════════════════════════════════════════════ 2. СЕССИЯ -->
-<section class="diagram-section" id="session">
-  <div class="section-title">
-    <div class="section-icon icon-green">⚡</div>
-    <h2>Жизненный цикл сессии Claude Code</h2>
+<!-- ================================================================
+     ARCHITECTURE OVERVIEW
+     ================================================================ -->
+<section class="section" id="architecture">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      System Design
+    </div>
+    <h2>Architecture Overview</h2>
+    <p class="section-desc">
+      The complete data flow from user input through the CTO decision layer to domain execution.
+      Every prompt is routed through quality gates, hooks, and specialized MCP servers.
+    </p>
   </div>
-  <p class="section-desc">Что происходит автоматически от старта до завершения каждой сессии</p>
 
-  <div class="diagram-box">
-    <div class="mermaid">
-flowchart TD
-    A([🚀 Запуск Claude Code]) --> B[SessionStart hooks ×5]
+  <div class="arch-diagram fade-in">
+    <div class="arch-flow">
+      <div class="arch-node" style="border-color: rgba(249,115,22,0.4);">
+        <div class="arch-node-icon">&#127908;</div>
+        <div class="arch-node-title">User Input</div>
+        <div class="arch-node-sub">FlowWhisper Voice</div>
+      </div>
+      <div class="arch-arrow">&#10132;</div>
+      <div class="arch-branch">
+        <div class="arch-node" style="border-color: rgba(239,68,68,0.4);">
+          <div class="arch-node-icon">&#9881;</div>
+          <div class="arch-node-title">Hooks Layer</div>
+          <div class="arch-node-sub">31 hooks</div>
+        </div>
+        <div class="arch-branch-line"></div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;">
+          <div class="arch-sub-node">Pre-commit</div>
+          <div class="arch-sub-node">Sentry</div>
+          <div class="arch-sub-node">Quality Gates</div>
+        </div>
+      </div>
+      <div class="arch-arrow">&#10132;</div>
+      <div class="arch-node" style="border-color: rgba(99,102,241,0.4);">
+        <div class="arch-node-icon">&#129504;</div>
+        <div class="arch-node-title">CTO Layer</div>
+        <div class="arch-node-sub">Phase 0-4 Routing</div>
+      </div>
+      <div class="arch-arrow">&#10132;</div>
+      <div class="arch-branch">
+        <div class="arch-node" style="border-color: rgba(168,85,247,0.4);">
+          <div class="arch-node-icon">&#9889;</div>
+          <div class="arch-node-title">Skills Router</div>
+          <div class="arch-node-sub">9 custom skills</div>
+        </div>
+        <div class="arch-branch-line"></div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;">
+          <div class="arch-sub-node">MCP Servers</div>
+          <div class="arch-sub-node">Serena LSP</div>
+          <div class="arch-sub-node">Context7</div>
+        </div>
+      </div>
+      <div class="arch-arrow">&#10132;</div>
+      <div class="arch-node" style="border-color: rgba(16,185,129,0.4);">
+        <div class="arch-node-icon">&#128640;</div>
+        <div class="arch-node-title">Domain Execution</div>
+        <div class="arch-node-sub">23 agents</div>
+      </div>
+    </div>
+  </div>
 
-    B --> C[🧠 memory-restore\nЧитает GLOBAL_MEMORY.md\n+ MEMORY.md проекта\n+ git log последние 5]
-    B --> D[🎮 gamification-boot\nПоказывает XP, уровень,\nстрик, challenge дня]
-    B --> E[🔌 mcp-health-check\nПроверяет 13/14 MCP\nотмечает недоступные]
-    B --> F[🤖 cl-v2.1-boot\nЗагружает инстинкты,\npre-activates patterns]
-    B --> G[📋 preflight-check\nContext7 reminder\nExa reminder\nTier classification]
+  <div class="arch-sub-row fade-in" style="margin-top:24px;">
+    <div class="arch-sub-node">28 Rules enforce standards</div>
+    <div class="arch-sub-node">Gamification tracks XP</div>
+    <div class="arch-sub-node">MEMORY.md persists context</div>
+    <div class="arch-sub-node">Git sync across sessions</div>
+    <div class="arch-sub-node">Telegram notifications</div>
+    <div class="arch-sub-node">Self-healing watchdog</div>
+  </div>
+</section>
 
-    C & D & E & F & G --> H([💬 Пользователь пишет промпт])
+<!-- ================================================================
+     RULES (28)
+     ================================================================ -->
+<section class="section" id="rules">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Governance
+    </div>
+    <h2>Rules <span style="color:var(--text-muted);font-weight:400;">(28)</span></h2>
+    <p class="section-desc">
+      Enforcement rules that govern every aspect of the development process.
+      Blocking rules prevent completion without compliance. Quality rules ensure standards.
+    </p>
+  </div>
 
-    H --> I[UserPromptSubmit hook\nUniversal Preflight:\nContext7 + Exa + Tier]
+  <div class="filter-pills fade-in" id="rules-filters">
+    <button class="filter-pill active" data-filter="all">All (28)</button>
+    <button class="filter-pill" data-filter="blocking">Blocking (5)</button>
+    <button class="filter-pill" data-filter="quality">Quality (4)</button>
+    <button class="filter-pill" data-filter="workflow">Workflow (5)</button>
+    <button class="filter-pill" data-filter="security">Security (3)</button>
+    <button class="filter-pill" data-filter="infrastructure">Infrastructure (4)</button>
+    <button class="filter-pill" data-filter="domain">Domain (7)</button>
+  </div>
 
-    I --> J{Тип задачи?}
-    J -->|Tier 1 мелочь| K[Сразу выполнить]
-    J -->|Tier 2 фича| L[Research → Design → Code]
-    J -->|Tier 3 архитектура| M[All CTO phases]
+  <div class="card-grid fade-in" id="rules-grid">
+    <!-- BLOCKING -->
+    <div class="card" data-category="blocking" data-searchable="serena-sentry-enforcement">
+      <div class="card-icon" style="background:rgba(239,68,68,0.1);color:var(--red);">&#128274;</div>
+      <div class="card-title">serena-sentry-enforcement <span class="badge badge-red">BLOCKING</span></div>
+      <div class="card-desc">Mandatory Serena activation for code navigation and Sentry check before any bug fix. No exceptions.</div>
+    </div>
+    <div class="card" data-category="blocking" data-searchable="verify-before-done">
+      <div class="card-icon" style="background:rgba(239,68,68,0.1);color:var(--red);">&#9989;</div>
+      <div class="card-title">verify-before-done <span class="badge badge-red">BLOCKING</span></div>
+      <div class="card-desc">No "done" without real proof: screenshot, curl output, passing test, or Playwright verification.</div>
+    </div>
+    <div class="card" data-category="blocking" data-searchable="git-workflow-enforcement">
+      <div class="card-icon" style="background:rgba(239,68,68,0.1);color:var(--red);">&#128193;</div>
+      <div class="card-title">git-workflow-enforcement <span class="badge badge-red">BLOCKING</span></div>
+      <div class="card-desc">Feature branches only. Never force-push main. Conventional commits. Pre-commit hooks required.</div>
+    </div>
+    <div class="card" data-category="blocking" data-searchable="modular-architecture">
+      <div class="card-icon" style="background:rgba(239,68,68,0.1);color:var(--red);">&#128230;</div>
+      <div class="card-title">modular-architecture <span class="badge badge-red">BLOCKING</span></div>
+      <div class="card-desc">Domain-driven structure enforced. Import rules: domain cannot import from another domain directly.</div>
+    </div>
+    <div class="card" data-category="blocking" data-searchable="testing-always">
+      <div class="card-icon" style="background:rgba(239,68,68,0.1);color:var(--red);">&#129514;</div>
+      <div class="card-title">testing-always <span class="badge badge-red">BLOCKING</span></div>
+      <div class="card-desc">Every code change requires tests. Bug fix requires regression test first (TDD). No deploy without green.</div>
+    </div>
 
-    K & L & M --> N[PreToolUse hook\n🛡️ Блокировка:\n• push force to main\n• запись в .env/.pem\n• деструктивные ops]
+    <!-- QUALITY -->
+    <div class="card" data-category="quality" data-searchable="quality-gates">
+      <div class="card-icon" style="background:rgba(59,130,246,0.1);color:var(--blue);">&#128736;</div>
+      <div class="card-title">quality-gates <span class="badge badge-blue">QUALITY</span></div>
+      <div class="card-desc">Pre-code checklist: read MEMORY.md, check Sentry, run existing tests, activate Serena project.</div>
+    </div>
+    <div class="card" data-category="quality" data-searchable="docs-always">
+      <div class="card-icon" style="background:rgba(59,130,246,0.1);color:var(--blue);">&#128196;</div>
+      <div class="card-title">docs-always <span class="badge badge-blue">QUALITY</span></div>
+      <div class="card-desc">Google-style docstrings mandatory. 80% function coverage, 90% class coverage. Interrogate enforced.</div>
+    </div>
+    <div class="card" data-category="quality" data-searchable="coding-standards">
+      <div class="card-icon" style="background:rgba(59,130,246,0.1);color:var(--blue);">&#128200;</div>
+      <div class="card-title">coding-standards <span class="badge badge-blue">QUALITY</span></div>
+      <div class="card-desc">Strict type hints, async/await, SQLAlchemy 2.0, tenacity retry, proper timeouts (API 30s, AI 60s, DB 10s).</div>
+    </div>
+    <div class="card" data-category="quality" data-searchable="data-correctness">
+      <div class="card-icon" style="background:rgba(59,130,246,0.1);color:var(--blue);">&#128202;</div>
+      <div class="card-title">data-correctness <span class="badge badge-blue">QUALITY</span></div>
+      <div class="card-desc">Verify real data, not mocks. Cross-check counts between DB and frontend. Empty array = bug.</div>
+    </div>
 
-    N --> O[Выполнение инструментов\nRead/Write/Edit/Bash/Task]
+    <!-- WORKFLOW -->
+    <div class="card" data-category="workflow" data-searchable="chain-thinking">
+      <div class="card-icon" style="background:rgba(16,185,129,0.1);color:var(--green);">&#128279;</div>
+      <div class="card-title">chain-thinking <span class="badge badge-green">WORKFLOW</span></div>
+      <div class="card-desc">Trace entire pipeline: Frontend -> API -> Worker -> Cron -> DB -> External API. Never fix symptoms.</div>
+    </div>
+    <div class="card" data-category="workflow" data-searchable="research-before-code">
+      <div class="card-icon" style="background:rgba(16,185,129,0.1);color:var(--green);">&#128270;</div>
+      <div class="card-title">research-before-code <span class="badge badge-green">WORKFLOW</span></div>
+      <div class="card-desc">Context7 first. Check existing solutions. Buy vs build analysis. 3 variants always.</div>
+    </div>
+    <div class="card" data-category="workflow" data-searchable="spec-first">
+      <div class="card-icon" style="background:rgba(16,185,129,0.1);color:var(--green);">&#128221;</div>
+      <div class="card-title">spec-first <span class="badge badge-green">WORKFLOW</span></div>
+      <div class="card-desc">Specification before code for tasks >3 files. User stories, API contracts, data models, edge cases.</div>
+    </div>
+    <div class="card" data-category="workflow" data-searchable="think-ahead">
+      <div class="card-icon" style="background:rgba(16,185,129,0.1);color:var(--green);">&#129300;</div>
+      <div class="card-title">think-ahead <span class="badge badge-green">WORKFLOW</span></div>
+      <div class="card-desc">Consider x10/x100 scale. Tech debt tracking. API backward compatibility. Rollback plans.</div>
+    </div>
+    <div class="card" data-category="workflow" data-searchable="time-estimation">
+      <div class="card-icon" style="background:rgba(16,185,129,0.1);color:var(--green);">&#9200;</div>
+      <div class="card-title">time-estimation <span class="badge badge-green">WORKFLOW</span></div>
+      <div class="card-desc">AI-speed formula: Human time / 5 / parallel agents. Always show wave breakdown in hours.</div>
+    </div>
 
-    O --> P[PostToolUse hook ×6\n⚡ +XP за операции\n🔬 CL v2.1 наблюдение\n📊 Метрики трекинг\n🚫 Quality sentinel]
+    <!-- SECURITY -->
+    <div class="card" data-category="security" data-searchable="security-baseline">
+      <div class="card-icon" style="background:rgba(245,158,11,0.1);color:var(--yellow);">&#128272;</div>
+      <div class="card-title">security-baseline <span class="badge badge-yellow">SECURITY</span></div>
+      <div class="card-desc">OWASP baseline: .env secrets, input validation, parameterized SQL, CORS whitelist, JWT expiration.</div>
+    </div>
+    <div class="card" data-category="security" data-searchable="safe-ops">
+      <div class="card-icon" style="background:rgba(245,158,11,0.1);color:var(--yellow);">&#128737;</div>
+      <div class="card-title">safe-ops <span class="badge badge-yellow">SECURITY</span></div>
+      <div class="card-desc">Backup before critical changes. Auto-rotation of last 10 backups. Restore script available.</div>
+    </div>
+    <div class="card" data-category="security" data-searchable="sentry-first">
+      <div class="card-icon" style="background:rgba(245,158,11,0.1);color:var(--yellow);">&#128680;</div>
+      <div class="card-title">sentry-first <span class="badge badge-yellow">SECURITY</span></div>
+      <div class="card-desc">Never fix bugs without Sentry. list_issues -> get_issue_details -> analyze_issue_with_seer -> fix.</div>
+    </div>
 
-    P --> Q{Задача завершена?}
-    Q -->|Нет| H
-    Q -->|Да| R([Дмитрий закрывает сессию])
+    <!-- INFRASTRUCTURE -->
+    <div class="card" data-category="infrastructure" data-searchable="ci-cd-templates">
+      <div class="card-icon" style="background:rgba(168,85,247,0.1);color:var(--purple);">&#128640;</div>
+      <div class="card-title">ci-cd-templates <span class="badge badge-purple">INFRA</span></div>
+      <div class="card-desc">GitHub Actions templates for Python (FastAPI) and TypeScript (Next.js). AI review on PRs.</div>
+    </div>
+    <div class="card" data-category="infrastructure" data-searchable="project-bootstrap">
+      <div class="card-icon" style="background:rgba(168,85,247,0.1);color:var(--purple);">&#128193;</div>
+      <div class="card-title">project-bootstrap <span class="badge badge-purple">INFRA</span></div>
+      <div class="card-desc">Standard directory structure for new projects: src/, tests/, docs/adr/, MEMORY.md, CI/CD from day 1.</div>
+    </div>
+    <div class="card" data-category="infrastructure" data-searchable="vps-deploy">
+      <div class="card-icon" style="background:rgba(168,85,247,0.1);color:var(--purple);">&#9729;</div>
+      <div class="card-title">vps-deploy <span class="badge badge-purple">INFRA</span></div>
+      <div class="card-desc">VPS deployment via SSH+Docker. Nginx reverse proxy, Certbot SSL, health checks, auto-rollback.</div>
+    </div>
+    <div class="card" data-category="infrastructure" data-searchable="self-healing">
+      <div class="card-icon" style="background:rgba(168,85,247,0.1);color:var(--purple);">&#129657;</div>
+      <div class="card-title">self-healing <span class="badge badge-purple">INFRA</span></div>
+      <div class="card-desc">Health monitoring on all services. Auto-recovery: 2x down = restart, 3x = Telegram alert, 5x = escalate.</div>
+    </div>
 
-    R --> S[Stop hooks ×5]
-    S --> T[📝 session-summarizer\nСохраняет в decay-7d/\nPopulates permanent/]
-    S --> U[🎮 gamification-stop\nXP итоги сессии\nLevel-up check\nTelegram уведомление]
-    S --> V[💾 auto-checkpoint\nОбновляет session-handoff.md\nGit status snapshot]
-    S --> W[📄 generate_guide.py\nОбновляет HTML гайд\nBumps version + changelog]
-    S --> X[🎯 quality-sentinel\nСканирует bare except\nraw SQL, TODO/FIXME]
-
-    style A fill:#1D4ED8,color:#fff,stroke:none
-    style R fill:#7C3AED,color:#fff,stroke:none
-    style N fill:#991B1B,color:#fff,stroke:none
-    style S fill:#065F46,color:#fff,stroke:none
+    <!-- DOMAIN -->
+    <div class="card" data-category="domain" data-searchable="marketplace-ops">
+      <div class="card-icon" style="background:rgba(249,115,22,0.1);color:var(--orange);">&#128722;</div>
+      <div class="card-title">marketplace-ops <span class="badge badge-orange">DOMAIN</span></div>
+      <div class="card-desc">WB/Ozon/YM operations. Rate limiting, test on 1-3 products first, log every API mutation.</div>
+    </div>
+    <div class="card" data-category="domain" data-searchable="outreach-automation">
+      <div class="card-icon" style="background:rgba(249,115,22,0.1);color:var(--orange);">&#128231;</div>
+      <div class="card-title">outreach-automation <span class="badge badge-orange">DOMAIN</span></div>
+      <div class="card-desc">B2B outreach pipeline: Data Collection -> Enrichment -> Scoring -> Personalization -> Follow-up -> CRM.</div>
+    </div>
+    <div class="card" data-category="domain" data-searchable="seo-automation">
+      <div class="card-icon" style="background:rgba(249,115,22,0.1);color:var(--orange);">&#127760;</div>
+      <div class="card-title">seo-automation <span class="badge badge-orange">DOMAIN</span></div>
+      <div class="card-desc">SEO pipeline: Keyword Research -> Content Gen -> Publishing -> Indexing -> Monitoring -> Optimization.</div>
+    </div>
+    <div class="card" data-category="domain" data-searchable="skolkovo-product">
+      <div class="card-icon" style="background:rgba(249,115,22,0.1);color:var(--orange);">&#127891;</div>
+      <div class="card-title">skolkovo-product <span class="badge badge-orange">DOMAIN</span></div>
+      <div class="card-desc">Skolkovo IT product standards: AI/ML required, SaaS model, C4 diagrams, 3-year roadmap.</div>
+    </div>
+    <div class="card" data-category="domain" data-searchable="auto-coaching">
+      <div class="card-icon" style="background:rgba(249,115,22,0.1);color:var(--orange);">&#127941;</div>
+      <div class="card-title">auto-coaching <span class="badge badge-orange">DOMAIN</span></div>
+      <div class="card-desc">AI coaching after tasks: growth metrics, regression warnings, underused tools, max 3 tips per session.</div>
+    </div>
+    <div class="card" data-category="domain" data-searchable="virtual-company">
+      <div class="card-icon" style="background:rgba(249,115,22,0.1);color:var(--orange);">&#127970;</div>
+      <div class="card-title">virtual-company <span class="badge badge-orange">DOMAIN</span></div>
+      <div class="card-desc">Auto-routing by task type: >1 day = Architect, >3 files = Designer, deploy = Security+DevOps.</div>
+    </div>
+    <div class="card" data-category="domain" data-searchable="context7-mandatory testing-mandatory">
+      <div class="card-icon" style="background:rgba(249,115,22,0.1);color:var(--orange);">&#128218;</div>
+      <div class="card-title">context7-mandatory <span class="badge badge-orange">DOMAIN</span></div>
+      <div class="card-desc">Always resolve-library-id + query-docs before using any library. Never guess APIs.</div>
     </div>
   </div>
 </section>
 
-
-<!-- ═══════════════════════════════════════════════════════ 3. ХУКИ -->
-<section class="diagram-section" id="hooks">
-  <div class="section-title">
-    <div class="section-icon icon-red">🪝</div>
-    <h2>Система хуков — детальная карта</h2>
-  </div>
-  <p class="section-desc">Все 7 типов хуков, что они делают и в каком порядке срабатывают</p>
-
-  <div class="diagram-box">
-    <div class="hook-timeline">
-
-      <div class="hook-event">
-        <div class="hook-event-title">
-          <span class="hook-badge session">SessionStart</span>
-          5 хуков · при каждом запуске
-        </div>
-        <div class="hook-actions">
-          <span class="hook-action">memory-restore.sh → GLOBAL_MEMORY + MEMORY.md</span>
-          <span class="hook-action">gamification-boot → XP banner + уровень</span>
-          <span class="hook-action">mcp-health-check → 13/14 статус</span>
-          <span class="hook-action">cl-v2.1-boot → instincts load</span>
-          <span class="hook-action">process-watchdog → zombie kill</span>
-        </div>
-      </div>
-
-      <div class="hook-event submit">
-        <div class="hook-event-title">
-          <span class="hook-badge submit">UserPromptSubmit</span>
-          1 хук · на каждое сообщение
-        </div>
-        <div class="hook-actions">
-          <span class="hook-action">universal-preflight → Context7 reminder + Exa + Tier classify</span>
-        </div>
-      </div>
-
-      <div class="hook-event pre">
-        <div class="hook-event-title">
-          <span class="hook-badge pre">PreToolUse</span>
-          4 хука · перед каждым инструментом
-        </div>
-        <div class="hook-actions">
-          <span class="hook-action">[Edit|Write] block-secrets → .env/.pem/.key ЗАПРЕЩЕНО</span>
-          <span class="hook-action">[Bash] block-force-push → main/master force ЗАПРЕЩЕНО</span>
-          <span class="hook-action">[Edit|Write] anti-pattern → bare except + raw SQL</span>
-          <span class="hook-action">[*] serena-reminder → activate_project reminder</span>
-        </div>
-      </div>
-
-      <div class="hook-event post">
-        <div class="hook-event-title">
-          <span class="hook-badge post">PostToolUse</span>
-          6 хуков · после каждого инструмента
-        </div>
-        <div class="hook-actions">
-          <span class="hook-action">[Write|Edit] xp-tracker → +10 XP за файл</span>
-          <span class="hook-action">[Write|Edit] cl-observation → новое наблюдение в JSON</span>
-          <span class="hook-action">[Write|Edit|Bash|Task] metrics-update → commits/files counter</span>
-          <span class="hook-action">[*] auto-doc-memory → MEMORY.md auto-populate</span>
-          <span class="hook-action">[Bash] sentry-check → новые ошибки после деплоя</span>
-          <span class="hook-action">[Bash] auto-xp → git commit message → +XP</span>
-        </div>
-      </div>
-
-      <div class="hook-event stop">
-        <div class="hook-event-title">
-          <span class="hook-badge stop">Stop</span>
-          5 хуков · при завершении сессии
-        </div>
-        <div class="hook-actions">
-          <span class="hook-action">quality-sentinel → TODO/FIXME + code quality scan</span>
-          <span class="hook-action">session-summarizer → decay-7d/session-YYYY-MM-DD.md</span>
-          <span class="hook-action">gamification-stop → XP итоги + Telegram</span>
-          <span class="hook-action">auto-checkpoint → session-handoff.md snapshot</span>
-          <span class="hook-action">generate_guide.py → HTML atlas v bump</span>
-        </div>
-      </div>
-
-      <div class="hook-event compact">
-        <div class="hook-event-title">
-          <span class="hook-badge" style="background:rgba(236,72,153,0.2);color:#EC4899">PreCompact</span>
-          1 хук · перед сжатием контекста
-        </div>
-        <div class="hook-actions">
-          <span class="hook-action">auto-checkpoint → сохранить прогресс ДО потери контекста</span>
-        </div>
-      </div>
-
-      <div class="hook-event">
-        <div class="hook-event-title">
-          <span class="hook-badge session">Notification</span>
-          1 хук · при долгих операциях
-        </div>
-        <div class="hook-actions">
-          <span class="hook-action">notify-long-op → Telegram если операция &gt;30s</span>
-        </div>
-      </div>
-
+<!-- ================================================================
+     HOOKS (31)
+     ================================================================ -->
+<section class="section" id="hooks">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+      Automation
     </div>
+    <h2>Hooks Pipeline <span style="color:var(--text-muted);font-weight:400;">(31)</span></h2>
+    <p class="section-desc">
+      Hooks intercept every action at four lifecycle stages: SessionStart, PreToolUse, PostToolUse, and Stop.
+      They enforce quality, security, and learning automatically.
+    </p>
   </div>
-</section>
 
-
-<!-- ═══════════════════════════════════════════════════════ 4. ПАМЯТЬ -->
-<section class="diagram-section" id="memory">
-  <div class="section-title">
-    <div class="section-icon icon-purple">🧠</div>
-    <h2>Система памяти — поток данных</h2>
-  </div>
-  <p class="section-desc">Как информация создаётся, перемещается и становится постоянной памятью</p>
-
-  <div class="diagram-box">
-    <div class="mermaid">
-flowchart LR
-    subgraph INPUT["📥 Входящие данные"]
-        A[Действия Claude\nWrite/Edit/Bash/Task]
-        B[Git коммиты\n+ git log]
-        C[Дмитрий пишет\nговорит в FlowWhisper]
-    end
-
-    subgraph CAPTURE["🔬 Захват (автоматический)"]
-        D[PostToolUse hook\nCL v2.1 observation\n→ observations.json]
-        E[Stop hook\nsession-summarizer\n→ session-YYYY-MM-DD.md]
-        F[GLOBAL_MEMORY.md\nручное + auto-snapshot]
-    end
-
-    subgraph DECAY["⏳ Временная память"]
-        G[decay-7d/\n123 сессии\nАвто-удаление через 7д]
-        H[decay-30d/\ndaily-reviews\nАвто-удаление через 30д]
-    end
-
-    subgraph PERMANENT["💾 Постоянная память"]
-        I[permanent/\nreflexion.md\ngotchas.md\ndecisions.md\nskill-tree.md\nflowwhisper-analysis.md]
-    end
-
-    subgraph PROJECT["📁 Проектная память"]
-        J[MEMORY.md\nв каждом проекте]
-        K[docs/adr/\nАрхитектурные решения]
-        L[session-handoff.md\n.claude/ в проекте]
-    end
-
-    subgraph LEARNING["🤖 Самообучение"]
-        M[CL v2.1\nInstincts Engine\n1569 observations]
-        N[learning_coach.py\nElite benchmarks]
-        O[auto_evolution.py\nВоскресенье 20:00]
-    end
-
-    A --> D
-    B --> E
-    C --> F
-    D --> G
-    D --> M
-    E --> G
-    G -->|Промоушен если важно| I
-    H -->|Промоушен если важно| I
-    F --> PROJECT
-    M --> N
-    N --> O
-    O --> F
-
-    style INPUT fill:#0F172A,stroke:#374151
-    style CAPTURE fill:#0F172A,stroke:#374151
-    style DECAY fill:#0F172A,stroke:#374151
-    style PERMANENT fill:#0F172A,stroke:#1D4ED8
-    style PROJECT fill:#0F172A,stroke:#374151
-    style LEARNING fill:#0F172A,stroke:#374151
-    </div>
-  </div>
-</section>
-
-
-<!-- ═══════════════════════════════════════════════════════ 5. DEPLOY -->
-<section class="diagram-section" id="deploy">
-  <div class="section-title">
-    <div class="section-icon icon-gold">🚀</div>
-    <h2>Deploy Pipeline — от коммита до продакшна</h2>
-  </div>
-  <p class="section-desc">Полный путь кода от локальной разработки до живого сервиса</p>
-
-  <div class="diagram-box">
-    <div class="mermaid">
-sequenceDiagram
-    participant D as 👤 Дмитрий
-    participant CC as 🤖 Claude Code
-    participant PRE as 🛡️ Pre-commit
-    participant GH as 🐙 GitHub
-    participant CI as ⚙️ GitHub Actions
-    participant VPS as 🖥️ VPS 94.198.219.232
-    participant TG as 📱 Telegram
-
-    D->>CC: "задеплой Aragant"
-    CC->>CC: /deploy-check (pre-deploy checklist)
-    CC->>CC: pytest tests/ → ✅
-    CC->>CC: ruff check . → ✅
-    CC->>PRE: git commit -m "feat: ..."
-    PRE->>PRE: detect-secrets scan
-    PRE->>PRE: ruff format + check
-    PRE->>PRE: trailing-whitespace
-    PRE-->>CC: ✅ Hooks passed
-    CC->>GH: git push origin main
-    GH->>CI: Trigger workflow deploy.yml
-    CI->>CI: checkout@v4
-    CI->>CI: Setup Python 3.11
-    CI->>CI: pip install requirements
-    CI->>CI: ruff check (lint)
-    CI->>CI: pytest tests/ (unit)
-    CI->>VPS: appleboy/ssh-action
-    VPS->>VPS: cd /opt/aragant
-    VPS->>VPS: git pull origin main
-    VPS->>VPS: docker compose build
-    VPS->>VPS: docker compose up -d
-    VPS->>VPS: sleep 10
-    VPS->>VPS: curl /health → {"status":"ok"}
-    alt Health check passed
-        VPS-->>CI: ✅ Deploy successful
-        CI-->>TG: 🚀 Deployed aragant.pro v1.8.1
-    else Health check failed
-        VPS->>VPS: docker compose rollback
-        VPS-->>CI: ❌ Rollback triggered
-        CI-->>TG: 🔴 Deploy failed — rolled back
-    end
-    CI-->>CC: Deploy status
-    CC-->>D: "задеплоено, проверь aragant.pro 🔥"
-    </div>
-  </div>
-</section>
-
-
-<!-- ═══════════════════════════════════════════════════════ 6. VPS -->
-<section class="diagram-section" id="vps">
-  <div class="section-title">
-    <div class="section-icon icon-cyan">🖥️</div>
-    <h2>VPS Архитектура</h2>
-  </div>
-  <p class="section-desc">Что крутится на серверах, порты, сети, защита</p>
-
-  <div class="diagram-box">
-    <div class="vps-diagram">
-
-      <!-- Production VPS -->
-      <div class="vps-server">
-        <div class="vps-title">🖥️ Production VPS — 94.198.219.232</div>
-        <div style="font-size:0.78rem;color:#6B7280;margin-bottom:12px;">SPB, Russia · 4 CPU / 8 GB / 80 GB NVMe · Ubuntu 24.04</div>
-
-        <div style="font-size:0.75rem;text-transform:uppercase;color:#6B7280;margin-bottom:8px;">Nginx (reverse proxy)</div>
-        <div class="vps-service">
-          <span class="vps-service-name">nginx :80/:443</span>
-          <span style="display:flex;gap:6px;align-items:center">
-            <span class="status-dot"></span>
-            <span class="port-badge">SSL/TLS</span>
-          </span>
-        </div>
-
-        <div style="font-size:0.75rem;text-transform:uppercase;color:#6B7280;margin:12px 0 8px;">Приложения (Docker)</div>
-        <div class="vps-service">
-          <span class="vps-service-name">Aragant (FastAPI)</span>
-          <span style="display:flex;gap:6px;align-items:center">
-            <span class="status-dot"></span>
-            <span class="port-badge">:8000</span>
-          </span>
-        </div>
-        <div class="vps-service">
-          <span class="vps-service-name">Bionovacia (FastAPI)</span>
-          <span style="display:flex;gap:6px;align-items:center">
-            <span class="status-dot"></span>
-            <span class="port-badge">:8002</span>
-          </span>
-        </div>
-
-        <div style="font-size:0.75rem;text-transform:uppercase;color:#6B7280;margin:12px 0 8px;">Базы данных</div>
-        <div class="vps-service">
-          <span class="vps-service-name">PostgreSQL</span>
-          <span class="port-badge">:5432</span>
-        </div>
-        <div class="vps-service">
-          <span class="vps-service-name">Redis</span>
-          <span class="port-badge">:6379</span>
-        </div>
-
-        <div style="font-size:0.75rem;text-transform:uppercase;color:#6B7280;margin:12px 0 8px;">Защита</div>
-        <div class="vps-service">
-          <span class="vps-service-name">UFW Firewall</span>
-          <span style="font-size:0.78rem;color:#10B981;">22,80,443,8000,8002</span>
-        </div>
-        <div class="vps-service">
-          <span class="vps-service-name">fail2ban</span>
-          <span style="font-size:0.78rem;color:#10B981;">SSH protection</span>
-        </div>
-        <div class="vps-service">
-          <span class="vps-service-name">Certbot (Let's Encrypt)</span>
-          <span style="font-size:0.78rem;color:#10B981;">auto-renew SSL</span>
-        </div>
-        <div class="vps-service">
-          <span class="vps-service-name">SSH Watchdog</span>
-          <span style="font-size:0.78rem;color:#10B981;">restart каждые 5 мин</span>
-        </div>
-        <div class="vps-service">
-          <span class="vps-service-name">Swap 4 GB</span>
-          <span style="font-size:0.78rem;color:#6B7280;">OOM protection</span>
-        </div>
+  <div class="timeline fade-in">
+    <!-- SessionStart -->
+    <div class="timeline-group">
+      <div class="timeline-group-header">
+        <div class="timeline-dot" style="border-color:var(--green);"></div>
+        <div class="timeline-group-title" style="color:var(--green);">SessionStart <span style="color:var(--text-muted);font-weight:400;">(5 hooks)</span></div>
       </div>
-
-      <!-- VPN VPS + Local -->
-      <div style="display:flex;flex-direction:column;gap:20px;">
-        <div class="vps-server vpn">
-          <div class="vps-title" style="color:#10B981;">🛡️ VPN VPS — 72.56.121.84</div>
-          <div style="font-size:0.78rem;color:#6B7280;margin-bottom:12px;">Frankfurt, DE · Amnezia VPN only</div>
-          <div class="vps-service">
-            <span class="vps-service-name">Amnezia VPN</span>
-            <span style="display:flex;gap:6px;align-items:center">
-              <span class="status-dot"></span>
-              <span class="port-badge" style="border-color:#10B981;color:#10B981;">WireGuard</span>
-            </span>
-          </div>
-          <div class="vps-service">
-            <span class="vps-service-name">SOCKS5 Proxy</span>
-            <span class="port-badge" style="border-color:#10B981;color:#10B981;">:9074</span>
-          </div>
-          <div style="font-size:0.78rem;color:#6B7280;margin-top:8px;">Используется: WB API, парсинг, обход гео-ограничений</div>
-        </div>
-
-        <div class="vps-server" style="border-color:#8B5CF6;">
-          <div class="vps-title" style="color:#8B5CF6;">💻 Локальная машина (MacBook Pro)</div>
-          <div style="font-size:0.78rem;color:#6B7280;margin-bottom:12px;">Claude Code v2.1.83 · 128 GB RAM</div>
-          <div class="vps-service">
-            <span class="vps-service-name">Content Factory (FastAPI)</span>
-            <span class="port-badge" style="border-color:#8B5CF6;color:#8B5CF6;">:8100</span>
-          </div>
-          <div class="vps-service">
-            <span class="vps-service-name">LM Studio (Qwen 2.5)</span>
-            <span class="port-badge" style="border-color:#8B5CF6;color:#8B5CF6;">:1234</span>
-          </div>
-          <div class="vps-service">
-            <span class="vps-service-name">PostgreSQL (local dev)</span>
-            <span class="port-badge" style="border-color:#8B5CF6;color:#8B5CF6;">:5432</span>
-          </div>
-          <div class="vps-service">
-            <span class="vps-service-name">MCP серверов</span>
-            <span style="font-size:0.78rem;color:#8B5CF6;">13/14 active</span>
-          </div>
-        </div>
+      <div class="timeline-items">
+        <div class="timeline-item">session-start.js</div>
+        <div class="timeline-item">mcp-health-check.py</div>
+        <div class="timeline-item">memory-decay.py</div>
+        <div class="timeline-item">skill-auto-activate.py</div>
+        <div class="timeline-item">context-loader.js</div>
       </div>
-
     </div>
 
-    <div style="margin-top:20px;">
-      <div class="mermaid">
-flowchart LR
-    DNS[🌐 DNS reg.ru\nA record → 94.198.219.232]
-    CF[☁️ Cloudflare\noptional CDN]
-    NGINX[nginx :443\nSSL termination]
-    A[Aragant\n:8000]
-    B[Bionovacia\n:8002]
-    PG[(PostgreSQL\n:5432)]
-    RD[(Redis\n:6379)]
+    <!-- PreToolUse -->
+    <div class="timeline-group">
+      <div class="timeline-group-header">
+        <div class="timeline-dot" style="border-color:var(--blue);"></div>
+        <div class="timeline-group-title" style="color:var(--blue);">PreToolUse <span style="color:var(--text-muted);font-weight:400;">(7 hooks)</span></div>
+      </div>
+      <div class="timeline-items">
+        <div class="timeline-item">secret-scanner.js</div>
+        <div class="timeline-item">block-dev-server.js</div>
+        <div class="timeline-item">block-md-creation.js</div>
+        <div class="timeline-item">prompt-check.js</div>
+        <div class="timeline-item">pre-push-check.js</div>
+        <div class="timeline-item">commit-validator.js</div>
+        <div class="timeline-item">commit-guard.js</div>
+      </div>
+    </div>
 
-    DNS --> NGINX
-    CF -.-> NGINX
-    NGINX -->|aragant.pro| A
-    NGINX -->|bionovacia.ru| B
-    A --> PG
-    A --> RD
-    B --> PG
+    <!-- PostToolUse -->
+    <div class="timeline-group">
+      <div class="timeline-group-header">
+        <div class="timeline-dot" style="border-color:var(--purple);"></div>
+        <div class="timeline-group-title" style="color:var(--purple);">PostToolUse <span style="color:var(--text-muted);font-weight:400;">(8 hooks)</span></div>
+      </div>
+      <div class="timeline-items">
+        <div class="timeline-item">auto-test.js</div>
+        <div class="timeline-item">lint-fix.js</div>
+        <div class="timeline-item">post-edit-check.js</div>
+        <div class="timeline-item">type-check.js</div>
+        <div class="timeline-item">auto-doc.py</div>
+        <div class="timeline-item">bundle-check.js</div>
+        <div class="timeline-item">learning-log.js</div>
+        <div class="timeline-item">notification-log.js</div>
+      </div>
+    </div>
 
-    style DNS fill:#1F2937,stroke:#374151,color:#9CA3AF
-    style NGINX fill:#1F2937,stroke:#374151,color:#9CA3AF
-    style A fill:#1D4ED8,stroke:none,color:#fff
-    style B fill:#065F46,stroke:none,color:#fff
+    <!-- Stop -->
+    <div class="timeline-group">
+      <div class="timeline-group-header">
+        <div class="timeline-dot" style="border-color:var(--yellow);"></div>
+        <div class="timeline-group-title" style="color:var(--yellow);">Stop <span style="color:var(--text-muted);font-weight:400;">(5 hooks)</span></div>
+      </div>
+      <div class="timeline-items">
+        <div class="timeline-item">result-verifier.sh</div>
+        <div class="timeline-item">quality-sentinel.sh</div>
+        <div class="timeline-item">suggest-compact.js</div>
+        <div class="timeline-item">stop-check.js</div>
+        <div class="timeline-item">auto-checkpoint.py</div>
+      </div>
+    </div>
+
+    <!-- Other -->
+    <div class="timeline-group">
+      <div class="timeline-group-header">
+        <div class="timeline-dot" style="border-color:var(--cyan);"></div>
+        <div class="timeline-group-title" style="color:var(--cyan);">Lifecycle &amp; Monitoring <span style="color:var(--text-muted);font-weight:400;">(6 hooks)</span></div>
+      </div>
+      <div class="timeline-items">
+        <div class="timeline-item">session-end.js</div>
+        <div class="timeline-item">e2e-on-deploy.py</div>
+        <div class="timeline-item">pre-compact.js</div>
+        <div class="timeline-item">process-watchdog.py</div>
+        <div class="timeline-item">session-summarizer.py</div>
+        <div class="timeline-item">verify-adr.sh</div>
       </div>
     </div>
   </div>
 </section>
 
-
-<!-- ═══════════════════════════════════════════════════════ 7. MCP -->
-<section class="diagram-section" id="mcp">
-  <div class="section-title">
-    <div class="section-icon icon-cyan">🔌</div>
-    <h2>MCP Экосистема — кто что делает</h2>
-  </div>
-  <p class="section-desc">13 активных MCP серверов, их назначение и направление потоков данных</p>
-
-  <div class="diagram-box">
-    <div class="mermaid">
-flowchart TB
-    CC([🤖 Claude Code])
-
-    subgraph SEARCH["🔍 Поиск и исследование"]
-        EXA[exa\n8 инструментов\nweb_search, company_research\ndeep_researcher, crawling]
-        BRAVE[brave-search\nвеб поиск с API ключом]
-        CTX7[context7\nАктуальная документация\nбиблиотек]
-    end
-
-    subgraph BROWSER["🌐 Браузер автоматизация"]
-        PW[playwright\nheadless/headed/Firefox\nbrowser automation]
-        PPTR[puppeteer\nChrome DevTools\nProtocol]
-    end
-
-    subgraph FS["💾 Файлы и код"]
-        FSYS[filesystem\n~/Documents + ~/.claude\nполный доступ]
-        GIT[git\ngit операции\nlocal repos]
-        GH[github-mcp\nGitHub API\nPRs, issues, repos]
-    end
-
-    subgraph DB["🗄️ Базы данных"]
-        PG[postgres\nSQL к b2b_intelligence\nread-only analytics]
-        SQLITE[sqlite\nлокальная БД\ngamification.db]
-    end
-
-    subgraph COMM["📡 Коммуникации"]
-        TG[telegram-notify\nHuman-in-the-loop\nуведомления + alerts]
-        WB[wildberries\nWB API MCP\nseller 544455]
-    end
-
-    subgraph INFRA["⚙️ Инфраструктура"]
-        DOCKER[docker\nуправление\nконтейнерами]
-        TIME[time\nтекущее время/дата]
-        FETCH[fetch\nHTTP запросы\nлюбые API]
-    end
-
-    CC --> SEARCH
-    CC --> BROWSER
-    CC --> FS
-    CC --> DB
-    CC --> COMM
-    CC --> INFRA
-
-    style SEARCH fill:#0F172A,stroke:#1D4ED8
-    style BROWSER fill:#0F172A,stroke:#065F46
-    style FS fill:#0F172A,stroke:#7C3AED
-    style DB fill:#0F172A,stroke:#92400E
-    style COMM fill:#0F172A,stroke:#BE185D
-    style INFRA fill:#0F172A,stroke:#374151
-    style CC fill:#1D4ED8,stroke:none,color:#fff
+<!-- ================================================================
+     MCP SERVERS (15)
+     ================================================================ -->
+<section class="section" id="mcp-servers">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Integrations
     </div>
+    <h2>MCP Servers <span style="color:var(--text-muted);font-weight:400;">(15)</span></h2>
+    <p class="section-desc">
+      Model Context Protocol servers provide structured tool access to external systems.
+      Each server exposes specialized capabilities through a unified interface.
+    </p>
+  </div>
 
-    <div style="margin-top:24px;">
-      <div class="legend">
-        <div class="legend-item"><span class="legend-dot" style="background:#3B82F6"></span>Исследование и поиск</div>
-        <div class="legend-item"><span class="legend-dot" style="background:#10B981"></span>Браузер автоматизация</div>
-        <div class="legend-item"><span class="legend-dot" style="background:#8B5CF6"></span>Файловая система</div>
-        <div class="legend-item"><span class="legend-dot" style="background:#F59E0B"></span>Базы данных</div>
-        <div class="legend-item"><span class="legend-dot" style="background:#EC4899"></span>Коммуникации</div>
-        <div class="legend-item"><span class="legend-dot" style="background:#6B7280"></span>Инфраструктура</div>
-      </div>
-
-      <div class="mcp-grid" style="margin-top:12px;">
-        <div class="mcp-card">
-          <div class="mcp-name"><span class="mcp-status"></span>exa</div>
-          <div class="mcp-desc">Веб-поиск с глубоким понимием</div>
-          <div class="mcp-tools">8 инструментов · HTTP MCP</div>
-        </div>
-        <div class="mcp-card">
-          <div class="mcp-name"><span class="mcp-status"></span>context7</div>
-          <div class="mcp-desc">Актуальная документация любых библиотек</div>
-          <div class="mcp-tools">2 инструмента · resolve + query</div>
-        </div>
-        <div class="mcp-card">
-          <div class="mcp-name"><span class="mcp-status"></span>playwright</div>
-          <div class="mcp-desc">E2E тесты и browser automation</div>
-          <div class="mcp-tools">headed/headless/Firefox</div>
-        </div>
-        <div class="mcp-card">
-          <div class="mcp-name"><span class="mcp-status"></span>filesystem</div>
-          <div class="mcp-desc">Полный доступ к ~/Documents</div>
-          <div class="mcp-tools">read/write/search/list</div>
-        </div>
-        <div class="mcp-card">
-          <div class="mcp-name"><span class="mcp-status"></span>github-mcp</div>
-          <div class="mcp-desc">GitHub API — PRs, issues, repos</div>
-          <div class="mcp-tools">token настроен</div>
-        </div>
-        <div class="mcp-card">
-          <div class="mcp-name"><span class="mcp-status"></span>postgres</div>
-          <div class="mcp-desc">SQL к b2b_intelligence (read-only)</div>
-          <div class="mcp-tools">marketai / marketai</div>
-        </div>
-        <div class="mcp-card">
-          <div class="mcp-name"><span class="mcp-status"></span>wildberries</div>
-          <div class="mcp-desc">WB Seller API</div>
-          <div class="mcp-tools">seller 544455 · токен активен</div>
-        </div>
-        <div class="mcp-card">
-          <div class="mcp-name"><span class="mcp-status"></span>telegram-notify</div>
-          <div class="mcp-desc">Human-in-the-loop уведомления</div>
-          <div class="mcp-tools">→ @Dimavertut</div>
-        </div>
-        <div class="mcp-card">
-          <div class="mcp-name"><span class="mcp-status"></span>docker</div>
-          <div class="mcp-desc">Управление контейнерами</div>
-          <div class="mcp-tools">build/up/down/logs</div>
-        </div>
-        <div class="mcp-card">
-          <div class="mcp-name"><span class="mcp-status"></span>git</div>
-          <div class="mcp-desc">Git операции в local repos</div>
-          <div class="mcp-tools">commit/diff/log/branch</div>
-        </div>
-        <div class="mcp-card">
-          <div class="mcp-name"><span class="mcp-status"></span>sqlite</div>
-          <div class="mcp-desc">Локальная БД (gamification)</div>
-          <div class="mcp-tools">gamification.db</div>
-        </div>
-        <div class="mcp-card">
-          <div class="mcp-name"><span class="mcp-status"></span>fetch</div>
-          <div class="mcp-desc">HTTP запросы к любым API</div>
-          <div class="mcp-tools">GET/POST/PUT/DELETE</div>
-        </div>
-        <div class="mcp-card" style="border-color:#4B5563;opacity:0.6">
-          <div class="mcp-name" style="color:#6B7280">⚠️ n8n</div>
-          <div class="mcp-desc">N8N workflow manager</div>
-          <div class="mcp-tools" style="color:#EF4444;">connection failed (timed out)</div>
-        </div>
+  <div class="card-grid fade-in">
+    <div class="mcp-card">
+      <div class="mcp-status"></div>
+      <div class="mcp-name">serena</div>
+      <div class="mcp-desc">LSP-powered code navigation. Symbol search, references, semantic editing. Faster and more accurate than text search.</div>
+      <div class="mcp-tools">
+        <span class="mcp-tool">find_symbol</span>
+        <span class="mcp-tool">find_referencing_symbols</span>
+        <span class="mcp-tool">get_symbols_overview</span>
+        <span class="mcp-tool">replace_symbol_body</span>
+        <span class="mcp-tool">activate_project</span>
       </div>
     </div>
-  </div>
-</section>
 
-
-<!-- ═══════════════════════════════════════════════════════ 8. НОЧНОЙ РЕЖИМ -->
-<section class="diagram-section" id="night">
-  <div class="section-title">
-    <div class="section-icon icon-purple">🌙</div>
-    <h2>Sleepless — Ночной режим разработки</h2>
-  </div>
-  <p class="section-desc">Автономная разработка 24/7 пока Дмитрий спит</p>
-
-  <div class="diagram-box">
-    <div class="mermaid">
-flowchart TD
-    D([👤 Дмитрий перед сном])
-    D --> Q[sleepy add "задача" -p aragant]
-    D --> Q2[sleepy add "задача2" -p bionovacia]
-    D --> START[sleepy start]
-
-    START --> DAEMON[🌙 Daemon запущен\n~/.claude/sleepless/daemon.py\nRedis queue + tmux workers]
-
-    DAEMON --> W1[tmux: sleepless-aragant\nClaude Code агент #1]
-    DAEMON --> W2[tmux: sleepless-bionovacia\nClaude Code агент #2]
-
-    W1 --> R1[📖 Research: читает MEMORY.md\ngit log, файлы проекта]
-    W1 --> P1[📝 Plan: составляет TodoList\nразбивает на шаги]
-    W1 --> I1[⚡ Implement: пишет код\nв feature/* branch]
-    W1 --> T1[🧪 Tests: pytest перед\nи после изменений]
-    W1 --> C1[💾 Commit: каждый шаг\nописательное сообщение]
-
-    W2 --> R2[📖 Research]
-    W2 --> P2[📝 Plan]
-    W2 --> I2[⚡ Implement]
-    W2 --> T2[🧪 Tests]
-    W2 --> C2[💾 Commit]
-
-    C1 & C2 --> GUARD{🛡️ Правила\nночного режима}
-    GUARD -->|НЕТ push в main| FEAT[Только feature/*\nили fix/* ветки]
-    GUARD -->|2 раза фейл → СТОП| BLOCK[Пометить blocked\nперейти к след задаче]
-    GUARD -->|.env НИКОГДА| SAFE[Безопасность\nсекретов]
-
-    FEAT --> TG[📱 Telegram digest\nутром 08:00:\n✅ Что сделано\n❌ Что заблокировано\n📋 PR готовы к ревью]
-
-    GUARD2[⏰ Завтра утром]
-    TG --> GUARD2
-    GUARD2 --> REVIEW[Дмитрий читает digest]
-    REVIEW -->|ок| MERGE[git merge feature → main]
-    REVIEW -->|не то| CLOSE[git branch -D feature/...]
-
-    style D fill:#7C3AED,color:#fff,stroke:none
-    style DAEMON fill:#1D4ED8,color:#fff,stroke:none
-    style TG fill:#065F46,color:#fff,stroke:none
-    style GUARD fill:#991B1B,color:#fff,stroke:none
+    <div class="mcp-card">
+      <div class="mcp-status"></div>
+      <div class="mcp-name">sentry-mcp</div>
+      <div class="mcp-desc">Production error monitoring. Real stack traces, user impact analysis, AI-powered root cause detection.</div>
+      <div class="mcp-tools">
+        <span class="mcp-tool">list_issues</span>
+        <span class="mcp-tool">get_issue_details</span>
+        <span class="mcp-tool">analyze_issue_with_seer</span>
+        <span class="mcp-tool">list_events</span>
+        <span class="mcp-tool">get_trace_details</span>
+      </div>
     </div>
 
-    <div style="margin-top:20px;background:#0F172A;border:1px solid #1F2937;border-radius:8px;padding:16px;">
-      <div style="font-size:0.8rem;color:#6B7280;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.1em;">Правила ночного агента (ОБЯЗАТЕЛЬНО)</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        <div style="background:#1F2937;border-radius:6px;padding:10px;font-size:0.82rem;">
-          <div style="color:#F59E0B;font-weight:600;margin-bottom:4px;">MERGE CONTRACT</div>
-          <div style="color:#9CA3AF;">Только feature/* и fix/* ветки. НИКОГДА не мерджи в main автоматически</div>
-        </div>
-        <div style="background:#1F2937;border-radius:6px;padding:10px;font-size:0.82rem;">
-          <div style="color:#F59E0B;font-weight:600;margin-bottom:4px;">TWO STRIKES</div>
-          <div style="color:#9CA3AF;">Если тест фейлится 2 раза подряд — СТОП, пометить blocked, перейти к след задаче</div>
-        </div>
-        <div style="background:#1F2937;border-radius:6px;padding:10px;font-size:0.82rem;">
-          <div style="color:#F59E0B;font-weight:600;margin-bottom:4px;">RPI Protocol</div>
-          <div style="color:#9CA3AF;">Research → Plan → Implement. Не кодить вслепую. Читать файлы сначала</div>
-        </div>
-        <div style="background:#1F2937;border-radius:6px;padding:10px;font-size:0.82rem;">
-          <div style="color:#F59E0B;font-weight:600;margin-bottom:4px;">NO .env</div>
-          <div style="color:#9CA3AF;">Никогда не редактировать .env, credentials, секреты. Абсолютный запрет</div>
-        </div>
+    <div class="mcp-card">
+      <div class="mcp-status"></div>
+      <div class="mcp-name">exa</div>
+      <div class="mcp-desc">Neural web search with 8 specialized tools. Research companies, extract code context, deep research.</div>
+      <div class="mcp-tools">
+        <span class="mcp-tool">web_search</span>
+        <span class="mcp-tool">get_code_context</span>
+        <span class="mcp-tool">company_research</span>
+        <span class="mcp-tool">deep_researcher</span>
+        <span class="mcp-tool">crawling</span>
+      </div>
+    </div>
+
+    <div class="mcp-card">
+      <div class="mcp-status"></div>
+      <div class="mcp-name">brave-search</div>
+      <div class="mcp-desc">Fast web search with privacy focus. Active API key. Fallback for Exa when needed.</div>
+      <div class="mcp-tools">
+        <span class="mcp-tool">brave_web_search</span>
+        <span class="mcp-tool">brave_local_search</span>
+      </div>
+    </div>
+
+    <div class="mcp-card">
+      <div class="mcp-status"></div>
+      <div class="mcp-name">github-mcp</div>
+      <div class="mcp-desc">GitHub API operations. Issues, PRs, repositories, actions, releases management.</div>
+      <div class="mcp-tools">
+        <span class="mcp-tool">create_issue</span>
+        <span class="mcp-tool">create_pr</span>
+        <span class="mcp-tool">list_repos</span>
+        <span class="mcp-tool">get_file_contents</span>
+      </div>
+    </div>
+
+    <div class="mcp-card">
+      <div class="mcp-status"></div>
+      <div class="mcp-name">filesystem</div>
+      <div class="mcp-desc">Direct file system access to ~/. Read, write, list directories, watch for changes.</div>
+      <div class="mcp-tools">
+        <span class="mcp-tool">read_file</span>
+        <span class="mcp-tool">write_file</span>
+        <span class="mcp-tool">list_dir</span>
+        <span class="mcp-tool">search_files</span>
+      </div>
+    </div>
+
+    <div class="mcp-card">
+      <div class="mcp-status"></div>
+      <div class="mcp-name">git</div>
+      <div class="mcp-desc">Git operations: status, diff, log, branch management, stash, cherry-pick.</div>
+      <div class="mcp-tools">
+        <span class="mcp-tool">git_status</span>
+        <span class="mcp-tool">git_diff</span>
+        <span class="mcp-tool">git_log</span>
+        <span class="mcp-tool">git_commit</span>
+      </div>
+    </div>
+
+    <div class="mcp-card">
+      <div class="mcp-status"></div>
+      <div class="mcp-name">docker</div>
+      <div class="mcp-desc">Docker container management. Build, run, compose, logs, health status.</div>
+      <div class="mcp-tools">
+        <span class="mcp-tool">docker_ps</span>
+        <span class="mcp-tool">docker_logs</span>
+        <span class="mcp-tool">docker_compose</span>
+        <span class="mcp-tool">docker_build</span>
+      </div>
+    </div>
+
+    <div class="mcp-card">
+      <div class="mcp-status"></div>
+      <div class="mcp-name">telegram-notify</div>
+      <div class="mcp-desc">Telegram human-in-the-loop notifications. Alert on errors, task completion, approvals needed.</div>
+      <div class="mcp-tools">
+        <span class="mcp-tool">send_message</span>
+        <span class="mcp-tool">send_alert</span>
+      </div>
+    </div>
+
+    <div class="mcp-card">
+      <div class="mcp-status"></div>
+      <div class="mcp-name">time</div>
+      <div class="mcp-desc">Current time and date provider for time-sensitive operations and scheduling.</div>
+      <div class="mcp-tools">
+        <span class="mcp-tool">get_current_time</span>
+        <span class="mcp-tool">get_timezone</span>
+      </div>
+    </div>
+
+    <div class="mcp-card">
+      <div class="mcp-status"></div>
+      <div class="mcp-name">security-scanner</div>
+      <div class="mcp-desc">Custom security scanner combining pip-audit, bandit, detect-secrets, and trivy in one interface.</div>
+      <div class="mcp-tools">
+        <span class="mcp-tool">scan_dependencies</span>
+        <span class="mcp-tool">scan_secrets</span>
+        <span class="mcp-tool">scan_code</span>
+        <span class="mcp-tool">scan_docker</span>
+      </div>
+    </div>
+
+    <div class="mcp-card">
+      <div class="mcp-status"></div>
+      <div class="mcp-name">vps-monitor</div>
+      <div class="mcp-desc">Custom SSH server monitoring with 8 tools. CPU, memory, disk, process management, service status.</div>
+      <div class="mcp-tools">
+        <span class="mcp-tool">check_cpu</span>
+        <span class="mcp-tool">check_memory</span>
+        <span class="mcp-tool">check_disk</span>
+        <span class="mcp-tool">list_services</span>
+        <span class="mcp-tool">restart_service</span>
+      </div>
+    </div>
+
+    <div class="mcp-card">
+      <div class="mcp-status"></div>
+      <div class="mcp-name">deep-research</div>
+      <div class="mcp-desc">Multi-source deep web research agent. Synthesizes information from multiple sources into structured reports.</div>
+      <div class="mcp-tools">
+        <span class="mcp-tool">research_topic</span>
+        <span class="mcp-tool">compare_solutions</span>
+      </div>
+    </div>
+
+    <div class="mcp-card">
+      <div class="mcp-status"></div>
+      <div class="mcp-name">gpt-researcher</div>
+      <div class="mcp-desc">Autonomous research agent. Plans research strategy, gathers sources, generates comprehensive reports.</div>
+      <div class="mcp-tools">
+        <span class="mcp-tool">research</span>
+        <span class="mcp-tool">get_report</span>
+      </div>
+    </div>
+
+    <div class="mcp-card">
+      <div class="mcp-status"></div>
+      <div class="mcp-name">moysklad-api</div>
+      <div class="mcp-desc">Inventory management integration. Products, stock levels, orders, counterparties.</div>
+      <div class="mcp-tools">
+        <span class="mcp-tool">get_products</span>
+        <span class="mcp-tool">get_stock</span>
+        <span class="mcp-tool">create_order</span>
       </div>
     </div>
   </div>
 </section>
 
-
-<!-- ═══════════════════════════════════════════════════════ 9. AUTO-GUIDE -->
-<section class="diagram-section" id="guide-auto">
-  <div class="section-title">
-    <div class="section-icon icon-blue">📄</div>
-    <h2>Auto-Guide Update System</h2>
+<!-- ================================================================
+     CUSTOM SKILLS (9)
+     ================================================================ -->
+<section class="section" id="skills">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Capabilities
+    </div>
+    <h2>Custom Skills <span style="color:var(--text-muted);font-weight:400;">(9)</span></h2>
+    <p class="section-desc">
+      Domain-specific skill modules that activate automatically based on task context.
+      Each skill encapsulates expert knowledge and decision frameworks.
+    </p>
   </div>
-  <p class="section-desc">Как HTML гайд обновляется автоматически при каждом изменении инфраструктуры</p>
 
-  <div class="diagram-box">
-    <div class="mermaid">
-flowchart LR
-    subgraph SOURCES["📂 Источники данных"]
-        R[~/.claude/rules/*.md\n18 файлов]
-        A[~/.claude/agents/*.md\n20 агентов]
-        SK[~/.claude/skills/*/SKILL.md\nкастомные скиллы]
-        ST[settings.json\nхуки и конфиг]
-        GM[memory/GLOBAL_MEMORY.md\nстатус проектов]
-        GE[gamification/engine.py\nXP + Level + Streak]
-    end
+  <div class="card-grid fade-in">
+    <div class="skill-card">
+      <div class="skill-status-row">
+        <div class="skill-status"><span class="skill-status-dot"></span> Auto-activate</div>
+        <span class="badge badge-purple">VOICE</span>
+      </div>
+      <div class="skill-name">elite-prompts</div>
+      <div class="skill-desc">Auto-activating voice pattern recognition from FlowWhisper. Interprets intent, not literal words. Enriches prompts with project context and past decisions.</div>
+    </div>
 
-    subgraph SCRIPT["⚙️ generate_guide.py"]
-        COLLECT[collect_data\nСобрать всё]
-        DIFF[detect_changes\nЧто изменилось?]
-        INJECT[inject_sections\nAUTO маркеры]
-        VERSION[bump_version\n3.0 → 3.1 → 3.2]
-    end
+    <div class="skill-card">
+      <div class="skill-status-row">
+        <div class="skill-status"><span class="skill-status-dot"></span> Active</div>
+        <span class="badge badge-red">CRITICAL</span>
+      </div>
+      <div class="skill-name">infra-doctor</div>
+      <div class="skill-desc">Chain-thinking diagnostics with 9 chains (A-I): Docker, Dependencies, Data Flow, Rate Limits, Scheduler, Network, Permissions, State, External APIs.</div>
+    </div>
 
-    subgraph OUTPUT["📄 Результат"]
-        HTML[Claude-Code-Infrastructure-Guide.html\nv3.1 · 109KB]
-        BACKUP[guide_versions/\nguide-v3.1-20260327.html\nпоследние 10 версий]
-        CHLOG[CHANGELOG.md\nИстория изменений]
-    end
+    <div class="skill-card">
+      <div class="skill-status-row">
+        <div class="skill-status"><span class="skill-status-dot"></span> Active</div>
+        <span class="badge badge-red">BLOCKING</span>
+      </div>
+      <div class="skill-name">verify</div>
+      <div class="skill-desc">Real verification enforcement. No "should work" accepted. Requires: pytest output, curl response, screenshot, or Playwright evidence.</div>
+    </div>
 
-    TRIGGER[🪝 Stop hook\nконец сессии]
+    <div class="skill-card">
+      <div class="skill-status-row">
+        <div class="skill-status"><span class="skill-status-dot"></span> Auto-route</div>
+        <span class="badge badge-blue">ROUTING</span>
+      </div>
+      <div class="skill-name">org-structure</div>
+      <div class="skill-desc">Virtual Elite IT Company routing. Maps tasks to roles: CTO, Architect, Designer, Security, DevOps, Debugger, SEO Engineer.</div>
+    </div>
 
-    TRIGGER --> COLLECT
-    R & A & SK & ST & GM & GE --> COLLECT
-    COLLECT --> DIFF
-    DIFF --> INJECT
-    INJECT --> VERSION
-    VERSION --> HTML
-    VERSION --> BACKUP
-    VERSION --> CHLOG
+    <div class="skill-card">
+      <div class="skill-status-row">
+        <div class="skill-status"><span class="skill-status-dot"></span> Active</div>
+        <span class="badge badge-green">COACHING</span>
+      </div>
+      <div class="skill-name">growth-coach</div>
+      <div class="skill-desc">CTO coaching with competitive benchmarking. Tracks metrics: commits, tests, deploys, LOC. Provides actionable growth tips tied to XP and rank.</div>
+    </div>
 
-    style TRIGGER fill:#7C3AED,color:#fff,stroke:none
-    style SOURCES fill:#0F172A,stroke:#374151
-    style SCRIPT fill:#0F172A,stroke:#1D4ED8
-    style OUTPUT fill:#0F172A,stroke:#065F46
+    <div class="skill-card">
+      <div class="skill-status-row">
+        <div class="skill-status"><span class="skill-status-dot"></span> Active</div>
+        <span class="badge badge-cyan">META</span>
+      </div>
+      <div class="skill-name">improver</div>
+      <div class="skill-desc">Meta-agent self-improvement. Analyzes past sessions, identifies patterns, suggests rule/hook/skill optimizations. Continuous learning loop.</div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-status-row">
+        <div class="skill-status"><span class="skill-status-dot"></span> Active</div>
+        <span class="badge badge-purple">ARCH</span>
+      </div>
+      <div class="skill-name">modularize</div>
+      <div class="skill-desc">Domain-driven architecture migration assistant. Analyzes codebase, identifies bounded contexts, generates migration plan with import rule enforcement.</div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-status-row">
+        <div class="skill-status"><span class="skill-status-dot"></span> Quarterly</div>
+        <span class="badge badge-yellow">STRATEGY</span>
+      </div>
+      <div class="skill-name">tech-radar</div>
+      <div class="skill-desc">Technology radar quarterly review. Evaluates Adopt/Trial/Assess/Hold for all tools. Tracks technology lifecycle and migration paths.</div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-status-row">
+        <div class="skill-status"><span class="skill-status-dot"></span> Active</div>
+        <span class="badge badge-orange">DOMAIN</span>
+      </div>
+      <div class="skill-name">wb-marketplace</div>
+      <div class="skill-desc">WB/Ozon content specialist. Card quality scoring, SEO optimization, AI response generation with scientific references (PubMed).</div>
     </div>
   </div>
 </section>
 
+<!-- ================================================================
+     COMMANDS (53)
+     ================================================================ -->
+<section class="section" id="commands">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      Operations
+    </div>
+    <h2>Commands <span style="color:var(--text-muted);font-weight:400;">(53)</span></h2>
+    <p class="section-desc">
+      Slash commands for every development operation. From git workflows to security audits,
+      each command encapsulates a complete workflow.
+    </p>
+  </div>
 
-</div><!-- /container -->
+  <div id="commands-container" class="fade-in">
+    <!-- Git -->
+    <div class="commands-section">
+      <div class="commands-section-title" style="color:var(--green);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><line x1="6" y1="9" x2="6" y2="21"/></svg>
+        Git (6)
+      </div>
+      <div class="cmd-grid">
+        <div class="cmd-item"><span class="cmd-name">/commit</span><span class="cmd-desc">Analyze staged changes, create commit</span></div>
+        <div class="cmd-item"><span class="cmd-name">/pr-create</span><span class="cmd-desc">Create pull request with summary</span></div>
+        <div class="cmd-item"><span class="cmd-name">/pr-review</span><span class="cmd-desc">Review PR by number</span></div>
+        <div class="cmd-item"><span class="cmd-name">/release</span><span class="cmd-desc">Create tagged release</span></div>
+        <div class="cmd-item"><span class="cmd-name">/changelog</span><span class="cmd-desc">Generate changelog from commits</span></div>
+        <div class="cmd-item"><span class="cmd-name">/worktree</span><span class="cmd-desc">Set up git worktrees</span></div>
+      </div>
+    </div>
 
-<footer style="border-top:1px solid #1F2937;padding:24px 60px;text-align:center;color:#4B5563;font-size:0.85rem;">
-  Claude Code Visual Architecture Atlas · Aragant.group · Дмитрий Гагауз · gagauzdmitriy@gmail.com
-  &nbsp;·&nbsp; <a href="Claude-Code-Infrastructure-Guide.html" style="color:#3B82F6;text-decoration:none;">→ Полный гайд</a>
+    <!-- Code -->
+    <div class="commands-section">
+      <div class="commands-section-title" style="color:var(--blue);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Code (6)
+      </div>
+      <div class="cmd-grid">
+        <div class="cmd-item"><span class="cmd-name">/refactor</span><span class="cmd-desc">Systematic refactoring</span></div>
+        <div class="cmd-item"><span class="cmd-name">/rename</span><span class="cmd-desc">Rename symbol across codebase</span></div>
+        <div class="cmd-item"><span class="cmd-name">/extract</span><span class="cmd-desc">Extract function/component</span></div>
+        <div class="cmd-item"><span class="cmd-name">/simplify</span><span class="cmd-desc">Simplify code for readability</span></div>
+        <div class="cmd-item"><span class="cmd-name">/dead-code</span><span class="cmd-desc">Find and remove dead code</span></div>
+        <div class="cmd-item"><span class="cmd-name">/cleanup</span><span class="cmd-desc">General code cleanup</span></div>
+      </div>
+    </div>
+
+    <!-- Testing -->
+    <div class="commands-section">
+      <div class="commands-section-title" style="color:var(--emerald);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+        Testing (6)
+      </div>
+      <div class="cmd-grid">
+        <div class="cmd-item"><span class="cmd-name">/tdd</span><span class="cmd-desc">Start TDD red-green-refactor</span></div>
+        <div class="cmd-item"><span class="cmd-name">/test-fix</span><span class="cmd-desc">Diagnose and fix failing tests</span></div>
+        <div class="cmd-item"><span class="cmd-name">/test-coverage</span><span class="cmd-desc">Analyze coverage gaps</span></div>
+        <div class="cmd-item"><span class="cmd-name">/e2e</span><span class="cmd-desc">Generate E2E Playwright tests</span></div>
+        <div class="cmd-item"><span class="cmd-name">/integration-test</span><span class="cmd-desc">Generate integration tests</span></div>
+        <div class="cmd-item"><span class="cmd-name">/snapshot-test</span><span class="cmd-desc">Generate snapshot tests</span></div>
+      </div>
+    </div>
+
+    <!-- Deploy -->
+    <div class="commands-section">
+      <div class="commands-section-title" style="color:var(--cyan);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12l-4-4v3H3v2h15v3l4-4z"/></svg>
+        Deploy (6)
+      </div>
+      <div class="cmd-grid">
+        <div class="cmd-item"><span class="cmd-name">/deploy</span><span class="cmd-desc">Deploy to VPS via SSH+Docker</span></div>
+        <div class="cmd-item"><span class="cmd-name">/deploy-check</span><span class="cmd-desc">Pre-deploy verification</span></div>
+        <div class="cmd-item"><span class="cmd-name">/dockerfile</span><span class="cmd-desc">Generate optimized Dockerfile</span></div>
+        <div class="cmd-item"><span class="cmd-name">/ci-pipeline</span><span class="cmd-desc">Generate CI pipeline config</span></div>
+        <div class="cmd-item"><span class="cmd-name">/hardening</span><span class="cmd-desc">Apply security hardening</span></div>
+        <div class="cmd-item"><span class="cmd-name">/monitor</span><span class="cmd-desc">Set up monitoring/alerts</span></div>
+      </div>
+    </div>
+
+    <!-- Documentation -->
+    <div class="commands-section">
+      <div class="commands-section-title" style="color:var(--purple);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Documentation (6)
+      </div>
+      <div class="cmd-grid">
+        <div class="cmd-item"><span class="cmd-name">/doc-gen</span><span class="cmd-desc">Generate docs from code</span></div>
+        <div class="cmd-item"><span class="cmd-name">/api-docs</span><span class="cmd-desc">Generate API documentation</span></div>
+        <div class="cmd-item"><span class="cmd-name">/diagram</span><span class="cmd-desc">Generate Mermaid diagrams</span></div>
+        <div class="cmd-item"><span class="cmd-name">/adr</span><span class="cmd-desc">Write Architecture Decision Record</span></div>
+        <div class="cmd-item"><span class="cmd-name">/onboard</span><span class="cmd-desc">Generate onboarding guide</span></div>
+        <div class="cmd-item"><span class="cmd-name">/update-codemap</span><span class="cmd-desc">Update project codemap</span></div>
+      </div>
+    </div>
+
+    <!-- Security -->
+    <div class="commands-section">
+      <div class="commands-section-title" style="color:var(--yellow);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Security (4)
+      </div>
+      <div class="cmd-grid">
+        <div class="cmd-item"><span class="cmd-name">/audit</span><span class="cmd-desc">Full security audit</span></div>
+        <div class="cmd-item"><span class="cmd-name">/secrets-scan</span><span class="cmd-desc">Scan for leaked secrets</span></div>
+        <div class="cmd-item"><span class="cmd-name">/csp</span><span class="cmd-desc">Generate Content Security Policy</span></div>
+        <div class="cmd-item"><span class="cmd-name">/review</span><span class="cmd-desc">Strict code review</span></div>
+      </div>
+    </div>
+
+    <!-- Planning -->
+    <div class="commands-section">
+      <div class="commands-section-title" style="color:var(--pink);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Planning (4)
+      </div>
+      <div class="cmd-grid">
+        <div class="cmd-item"><span class="cmd-name">/plan</span><span class="cmd-desc">Create structured implementation plan</span></div>
+        <div class="cmd-item"><span class="cmd-name">/spec</span><span class="cmd-desc">Spec-Driven Development</span></div>
+        <div class="cmd-item"><span class="cmd-name">/design-review</span><span class="cmd-desc">Structured design review</span></div>
+        <div class="cmd-item"><span class="cmd-name">/memory-bank</span><span class="cmd-desc">Update project CLAUDE.md</span></div>
+      </div>
+    </div>
+
+    <!-- Project -->
+    <div class="commands-section">
+      <div class="commands-section-title" style="color:var(--orange);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+        Project (6)
+      </div>
+      <div class="cmd-grid">
+        <div class="cmd-item"><span class="cmd-name">/new-project</span><span class="cmd-desc">Initialize project with memory</span></div>
+        <div class="cmd-item"><span class="cmd-name">/checkpoint</span><span class="cmd-desc">Save progress to MEMORY.md + git</span></div>
+        <div class="cmd-item"><span class="cmd-name">/continue</span><span class="cmd-desc">Restore context + next step</span></div>
+        <div class="cmd-item"><span class="cmd-name">/wrap-up</span><span class="cmd-desc">End session with summary</span></div>
+        <div class="cmd-item"><span class="cmd-name">/xp</span><span class="cmd-desc">Gamification dashboard</span></div>
+        <div class="cmd-item"><span class="cmd-name">/parallel</span><span class="cmd-desc">Launch Agent Team in parallel</span></div>
+      </div>
+    </div>
+
+    <!-- Business -->
+    <div class="commands-section">
+      <div class="commands-section-title" style="color:var(--amber);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Business (9)
+      </div>
+      <div class="cmd-grid">
+        <div class="cmd-item"><span class="cmd-name">/wb-enrich</span><span class="cmd-desc">WB Content Factory pipeline</span></div>
+        <div class="cmd-item"><span class="cmd-name">/wb-qa</span><span class="cmd-desc">QA-check marketplace cards</span></div>
+        <div class="cmd-item"><span class="cmd-name">/market-analytics</span><span class="cmd-desc">Marketplace analytics</span></div>
+        <div class="cmd-item"><span class="cmd-name">/n8n-status</span><span class="cmd-desc">N8N workflow status</span></div>
+        <div class="cmd-item"><span class="cmd-name">/orchestrate</span><span class="cmd-desc">Multi-step workflow runner</span></div>
+        <div class="cmd-item"><span class="cmd-name">/fix-issue</span><span class="cmd-desc">Fix GitHub issue by number</span></div>
+        <div class="cmd-item"><span class="cmd-name">/migrate</span><span class="cmd-desc">Framework migration</span></div>
+        <div class="cmd-item"><span class="cmd-name">/dependency-audit</span><span class="cmd-desc">Audit project dependencies</span></div>
+        <div class="cmd-item"><span class="cmd-name">/cto</span><span class="cmd-desc">CTO strategic assessment</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     AGENTS (23)
+     ================================================================ -->
+<section class="section" id="agents">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      AI Team
+    </div>
+    <h2>Specialized Agents <span style="color:var(--text-muted);font-weight:400;">(23)</span></h2>
+    <p class="section-desc">
+      Autonomous agents that can be dispatched in parallel via tmux. Each agent has a specific domain
+      of expertise and can communicate with others through the Agent Team protocol.
+    </p>
+  </div>
+
+  <div class="card-grid card-grid-sm fade-in">
+    <div class="agent-card"><div class="agent-name">architect</div><div class="agent-type" style="color:var(--purple);">System design, ADR, tech selection, C4 diagrams</div></div>
+    <div class="agent-card"><div class="agent-name">coder</div><div class="agent-type" style="color:var(--cyan);">Implementation from spec, clean architecture</div></div>
+    <div class="agent-card"><div class="agent-name">tester</div><div class="agent-type" style="color:var(--emerald);">pytest, Jest, Playwright, property-based</div></div>
+    <div class="agent-card"><div class="agent-name">reviewer</div><div class="agent-type" style="color:var(--blue);">Code review: architecture, patterns, quality</div></div>
+    <div class="agent-card"><div class="agent-name">code-reviewer</div><div class="agent-type" style="color:var(--accent);">Deep code review: security, logic, perf</div></div>
+    <div class="agent-card"><div class="agent-name">qa-reviewer</div><div class="agent-type" style="color:var(--green);">Content QA scoring (0-10 quality gate)</div></div>
+    <div class="agent-card"><div class="agent-name">qa-engineer</div><div class="agent-type" style="color:var(--emerald);">Full QA: unit, integration, E2E, coverage</div></div>
+    <div class="agent-card"><div class="agent-name">api-debugger</div><div class="agent-type" style="color:var(--red);">REST API debugging (WB, Ozon, N8N, Dify)</div></div>
+    <div class="agent-card"><div class="agent-name">researcher</div><div class="agent-type" style="color:var(--violet);">Web research, best practices, comparisons</div></div>
+    <div class="agent-card"><div class="agent-name">data-analyst</div><div class="agent-type" style="color:var(--amber);">SQL, pandas, business analytics</div></div>
+    <div class="agent-card"><div class="agent-name">devops-engineer</div><div class="agent-type" style="color:var(--cyan);">Docker, CI/CD, infrastructure, monitoring</div></div>
+    <div class="agent-card"><div class="agent-name">security-reviewer</div><div class="agent-type" style="color:var(--red);">OWASP, vulnerability scanning</div></div>
+    <div class="agent-card"><div class="agent-name">security-auditor</div><div class="agent-type" style="color:var(--rose);">Full security audit, penetration testing</div></div>
+    <div class="agent-card"><div class="agent-name">browser-automation</div><div class="agent-type" style="color:var(--green);">Stealth browser (camoufox, anti-bot)</div></div>
+    <div class="agent-card"><div class="agent-name">n8n-automator</div><div class="agent-type" style="color:var(--orange);">N8N workflows, JSON bug fixes</div></div>
+    <div class="agent-card"><div class="agent-name">content-factory</div><div class="agent-type" style="color:var(--pink);">Bio-STM / SoulWay / BioNordiq content</div></div>
+    <div class="agent-card"><div class="agent-name">ozon-specialist</div><div class="agent-type" style="color:var(--blue);">Ozon API (Client ID 2003894), analytics</div></div>
+    <div class="agent-card"><div class="agent-name">wb-enrichment</div><div class="agent-type" style="color:var(--orange);">WB/Ozon card enrichment pipeline</div></div>
+    <div class="agent-card"><div class="agent-name">fullstack-developer</div><div class="agent-type" style="color:var(--accent);">React + FastAPI, end-to-end features</div></div>
+    <div class="agent-card"><div class="agent-name">solution-architect</div><div class="agent-type" style="color:var(--purple);">Cross-system integration design</div></div>
+    <div class="agent-card"><div class="agent-name">sync-architect</div><div class="agent-type" style="color:var(--cyan);">Cross-platform data sync design</div></div>
+    <div class="agent-card"><div class="agent-name">sync-researcher</div><div class="agent-type" style="color:var(--violet);">Sync patterns research, conflict resolution</div></div>
+    <div class="agent-card"><div class="agent-name">sync-tester</div><div class="agent-type" style="color:var(--emerald);">Data sync testing, idempotency verification</div></div>
+  </div>
+</section>
+
+<!-- ================================================================
+     MODULAR ARCHITECTURE
+     ================================================================ -->
+<section class="section" id="modular-arch">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Structure
+    </div>
+    <h2>Modular Architecture</h2>
+    <p class="section-desc">
+      Domain-driven structure where each domain is self-contained.
+      Strict import rules prevent coupling between domains.
+    </p>
+  </div>
+
+  <div class="module-diagram fade-in">
+    <div class="module-tree">
+      <div><span class="dir">src/</span></div>
+      <div class="indent"><span class="dir">shared/</span> <span class="comment">-- config, database, auth (used by all)</span></div>
+      <div class="indent2"><span class="file">config.py, database.py, auth.py, exceptions.py</span></div>
+      <div class="indent"><span class="dir">{domain}/</span> <span class="comment">-- self-contained bounded context</span></div>
+      <div class="indent2"><span class="file">models.py</span> <span class="comment">-- SQLAlchemy models</span></div>
+      <div class="indent2"><span class="file">schemas.py</span> <span class="comment">-- Pydantic schemas</span></div>
+      <div class="indent2"><span class="file">service.py</span> <span class="comment">-- business logic</span></div>
+      <div class="indent2"><span class="file">router.py</span> <span class="comment">-- FastAPI endpoints</span></div>
+      <div class="indent2"><span class="file">gateway.py</span> <span class="comment">-- external API calls</span></div>
+      <div class="indent2"><span class="file">events.py</span> <span class="comment">-- domain events</span></div>
+      <div class="indent2"><span class="file">tests/</span> <span class="comment">-- domain-scoped tests</span></div>
+      <div class="indent2"><span class="file">CLAUDE.md</span> <span class="comment">-- domain documentation</span></div>
+    </div>
+  </div>
+
+  <div style="margin-top:24px;" class="fade-in">
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">Import Rules</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-xs);">
+        <span style="color:var(--green);font-size:18px;">&#10004;</span>
+        <span style="font-size:13px;"><code style="color:var(--cyan);font-family:var(--font-mono);">domain</code> can import from <code style="color:var(--cyan);font-family:var(--font-mono);">shared/</code></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-xs);">
+        <span style="color:var(--red);font-size:18px;">&#10008;</span>
+        <span style="font-size:13px;"><code style="color:var(--cyan);font-family:var(--font-mono);">domain_A</code> cannot import from <code style="color:var(--cyan);font-family:var(--font-mono);">domain_B</code></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-xs);">
+        <span style="color:var(--green);font-size:18px;">&#10004;</span>
+        <span style="font-size:13px;">Cross-domain via <code style="color:var(--cyan);font-family:var(--font-mono);">events</code> or <code style="color:var(--cyan);font-family:var(--font-mono);">shared/</code> interfaces</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-xs);">
+        <span style="color:var(--green);font-size:18px;">&#10004;</span>
+        <span style="font-size:13px;">Each domain has its own <code style="color:var(--cyan);font-family:var(--font-mono);">tests/</code> and <code style="color:var(--cyan);font-family:var(--font-mono);">CLAUDE.md</code></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     GIT WORKFLOW
+     ================================================================ -->
+<section class="section" id="git-workflow">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 012 2v7"/><line x1="6" y1="9" x2="6" y2="21"/></svg>
+      CI/CD
+    </div>
+    <h2>Git Workflow Pipeline</h2>
+    <p class="section-desc">
+      Every code change flows through a multi-stage pipeline with automated quality gates, security scans,
+      and AI-powered code review before reaching production.
+    </p>
+  </div>
+
+  <div class="pipeline fade-in">
+    <div class="pipeline-stage" style="border-left:3px solid var(--green);">
+      <div class="pipeline-stage-icon">&#128421;</div>
+      <div class="pipeline-stage-title">Feature Branch</div>
+      <div class="pipeline-stage-desc">feat/* or fix/*</div>
+    </div>
+    <div class="pipeline-stage" style="border-left:3px solid var(--blue);">
+      <div class="pipeline-stage-icon">&#9881;</div>
+      <div class="pipeline-stage-title">Pre-commit</div>
+      <div class="pipeline-stage-desc">ruff, detect-secrets</div>
+    </div>
+    <div class="pipeline-stage" style="border-left:3px solid var(--purple);">
+      <div class="pipeline-stage-icon">&#128640;</div>
+      <div class="pipeline-stage-title">Push</div>
+      <div class="pipeline-stage-desc">pre-push-check.js</div>
+    </div>
+    <div class="pipeline-stage" style="border-left:3px solid var(--cyan);">
+      <div class="pipeline-stage-icon">&#128736;</div>
+      <div class="pipeline-stage-title">CI Pipeline</div>
+      <div class="pipeline-stage-desc">lint + test + security</div>
+    </div>
+    <div class="pipeline-stage" style="border-left:3px solid var(--accent);">
+      <div class="pipeline-stage-icon">&#129302;</div>
+      <div class="pipeline-stage-title">AI Review</div>
+      <div class="pipeline-stage-desc">Claude Code Action</div>
+    </div>
+    <div class="pipeline-stage" style="border-left:3px solid var(--yellow);">
+      <div class="pipeline-stage-icon">&#128269;</div>
+      <div class="pipeline-stage-title">PR Review</div>
+      <div class="pipeline-stage-desc">Human approval</div>
+    </div>
+    <div class="pipeline-stage" style="border-left:3px solid var(--emerald);">
+      <div class="pipeline-stage-icon">&#127919;</div>
+      <div class="pipeline-stage-title">Deploy</div>
+      <div class="pipeline-stage-desc">Health + rollback</div>
+    </div>
+  </div>
+
+  <div class="code-block fade-in" style="margin-top:24px;">
+    <div class="code-block-header">
+      <span class="code-block-lang">deploy-flow.sh</span>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copy</button>
+    </div>
+    <pre><code><span class="cm"># Standard deploy flow (all projects)</span>
+git push origin feat/my-feature     <span class="cm"># triggers CI</span>
+gh pr create --title <span class="str">"feat: ..."</span>   <span class="cm"># opens PR with AI review</span>
+<span class="cm"># After merge to main:</span>
+ssh root@94.198.219.232 <span class="str">"cd /opt/project && git pull && docker compose up -d"</span>
+curl -sf https://domain.com/health  <span class="cm"># verify or auto-rollback</span></code></pre>
+  </div>
+</section>
+
+<!-- ================================================================
+     VELOCITY DASHBOARD
+     ================================================================ -->
+<section class="section" id="velocity">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      Metrics
+    </div>
+    <h2>Velocity Dashboard</h2>
+    <p class="section-desc">
+      Real-time development velocity metrics. AI-assisted development enables throughput
+      that puts this setup in the top 1% of developer productivity.
+    </p>
+  </div>
+
+  <div class="velocity-grid fade-in">
+    <div class="velocity-card">
+      <div class="velocity-value" style="color:var(--accent-light);" data-target="287">0</div>
+      <div class="velocity-label">Commits / Week</div>
+      <div class="velocity-badge" style="background:rgba(16,185,129,0.15);color:var(--emerald);">Top 1%</div>
+    </div>
+    <div class="velocity-card">
+      <div class="velocity-value" style="color:var(--cyan);">261K</div>
+      <div class="velocity-label">Lines of Code / Week</div>
+      <div class="velocity-badge" style="background:rgba(6,182,212,0.15);color:var(--cyan);">God Tier</div>
+    </div>
+    <div class="velocity-card">
+      <div class="velocity-value" style="color:var(--emerald);">1,974</div>
+      <div class="velocity-label">Total Tests</div>
+      <div class="velocity-badge" style="background:rgba(16,185,129,0.15);color:var(--emerald);">Growing</div>
+    </div>
+    <div class="velocity-card">
+      <div class="velocity-value" style="color:var(--purple);">90K</div>
+      <div class="velocity-label">Total LOC</div>
+      <div class="velocity-badge" style="background:rgba(168,85,247,0.15);color:var(--purple);">Multi-Project</div>
+    </div>
+    <div class="velocity-card">
+      <div class="velocity-value" style="color:var(--yellow);">24/7</div>
+      <div class="velocity-label">Sleepless Agent</div>
+      <div class="velocity-badge" style="background:rgba(245,158,11,0.15);color:var(--yellow);">Active</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     CTO LAYER (4 PHASES)
+     ================================================================ -->
+<section class="section" id="cto-layer">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      Decision Framework
+    </div>
+    <h2>CTO Layer <span style="color:var(--text-muted);font-weight:400;">(4 Phases)</span></h2>
+    <p class="section-desc">
+      Every prompt is processed through four phases. Claude acts as CTO, routing decisions
+      top-down: strategy first, then architecture, then code. Never jump straight to implementation.
+    </p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;" class="fade-in">
+    <div class="card" style="border-top:3px solid var(--cyan);">
+      <div style="font-size:32px;font-weight:900;color:var(--cyan);margin-bottom:8px;">0</div>
+      <div class="card-title">Understanding</div>
+      <div class="card-desc">Interpret real intent (not literal words). Classify scale: Quick fix (&lt;5 min) / Task (1-3 days) / Project (&gt;3 days). Ask clarifying questions if ambiguous.</div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--accent);">
+      <div style="font-size:32px;font-weight:900;color:var(--accent);margin-bottom:8px;">1</div>
+      <div class="card-title">Strategy</div>
+      <div class="card-desc">WHY before HOW. Business goal identification. Priority check (top-3?). Cost of inaction. Challenge if wrong direction: "real problem is Y, let's do Z instead."</div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--purple);">
+      <div style="font-size:32px;font-weight:900;color:var(--purple);margin-bottom:8px;">2</div>
+      <div class="card-title">Architecture &amp; Design</div>
+      <div class="card-desc">Modules, data flow, dependencies, tool selection. 3 variants minimum: Quick / Balanced / Ideal. System impact analysis. Definition of Done before code. Approval required.</div>
+    </div>
+    <div class="card" style="border-top:3px solid var(--emerald);">
+      <div style="font-size:32px;font-weight:900;color:var(--emerald);margin-bottom:8px;">3</div>
+      <div class="card-title">Implementation + Verification</div>
+      <div class="card-desc">Break into tasks, execute sequentially. Code -> tests -> verify -> next. If architecture fails -> STOP, return to Phase 2. Tests pass, lint clean, Sentry clear.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     VIRTUAL ELITE IT COMPANY (15 roles)
+     ================================================================ -->
+<section class="section" id="virtual-company">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Organization
+    </div>
+    <h2>Virtual Elite IT Company <span style="color:var(--text-muted);font-weight:400;">(15 roles)</span></h2>
+    <p class="section-desc">
+      Auto-routing system that assigns virtual roles based on task type.
+      Modeled after elite engineering orgs: Stripe, Vercel, Cloudflare.
+    </p>
+  </div>
+
+  <div class="card-grid card-grid-sm fade-in">
+    <div class="agent-card" style="border-left:3px solid var(--accent);">
+      <div class="agent-name">CTO</div>
+      <div class="agent-type" style="color:var(--accent);">Every prompt. Strategic routing, Phase 0-4.</div>
+    </div>
+    <div class="agent-card" style="border-left:3px solid var(--purple);">
+      <div class="agent-name">Chief Architect</div>
+      <div class="agent-type" style="color:var(--purple);">Tasks &gt;1 day. 3 variants, ADR, trade-offs.</div>
+    </div>
+    <div class="agent-card" style="border-left:3px solid var(--blue);">
+      <div class="agent-name">Product Designer</div>
+      <div class="agent-type" style="color:var(--blue);">Tasks &gt;3 files. Spec, acceptance criteria, edge cases.</div>
+    </div>
+    <div class="agent-card" style="border-left:3px solid var(--cyan);">
+      <div class="agent-name">Research Lead</div>
+      <div class="agent-type" style="color:var(--cyan);">New tech. Context7 check, buy vs build.</div>
+    </div>
+    <div class="agent-card" style="border-left:3px solid var(--emerald);">
+      <div class="agent-name">Senior Engineer</div>
+      <div class="agent-type" style="color:var(--emerald);">Implementation. Clean code, tests, docs.</div>
+    </div>
+    <div class="agent-card" style="border-left:3px solid var(--red);">
+      <div class="agent-name">Security Officer</div>
+      <div class="agent-type" style="color:var(--red);">Every deploy. OWASP, audit, hardening.</div>
+    </div>
+    <div class="agent-card" style="border-left:3px solid var(--orange);">
+      <div class="agent-name">DevOps Engineer</div>
+      <div class="agent-type" style="color:var(--orange);">Deploy. Docker, CI/CD, health checks, rollback.</div>
+    </div>
+    <div class="agent-card" style="border-left:3px solid var(--rose);">
+      <div class="agent-name">Debugger</div>
+      <div class="agent-type" style="color:var(--rose);">Bugs. Sentry first, root cause, regression test.</div>
+    </div>
+    <div class="agent-card" style="border-left:3px solid var(--yellow);">
+      <div class="agent-name">SEO Engineer</div>
+      <div class="agent-type" style="color:var(--yellow);">Content/sites. Technical SEO, schema, keywords.</div>
+    </div>
+    <div class="agent-card" style="border-left:3px solid var(--green);">
+      <div class="agent-name">QA Engineer</div>
+      <div class="agent-type" style="color:var(--green);">Testing. Unit, integration, E2E, coverage.</div>
+    </div>
+    <div class="agent-card" style="border-left:3px solid var(--violet);">
+      <div class="agent-name">Data Analyst</div>
+      <div class="agent-type" style="color:var(--violet);">Analytics. SQL, pandas, metrics, dashboards.</div>
+    </div>
+    <div class="agent-card" style="border-left:3px solid var(--pink);">
+      <div class="agent-name">Content Specialist</div>
+      <div class="agent-type" style="color:var(--pink);">Marketplace content. Cards, descriptions, SEO.</div>
+    </div>
+    <div class="agent-card" style="border-left:3px solid var(--amber);">
+      <div class="agent-name">Performance Engineer</div>
+      <div class="agent-type" style="color:var(--amber);">Optimization. Profiling, caching, N+1 fixes.</div>
+    </div>
+    <div class="agent-card" style="border-left:3px solid var(--cyan);">
+      <div class="agent-name">Documentation Lead</div>
+      <div class="agent-type" style="color:var(--cyan);">Docs. ADR, API docs, onboarding, codemap.</div>
+    </div>
+    <div class="agent-card" style="border-left:3px solid var(--text-muted);">
+      <div class="agent-name">Project Manager</div>
+      <div class="agent-type" style="color:var(--text-muted);">Coordination. Priorities, timelines, blockers.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:24px;padding:16px 20px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--text-secondary);" class="fade-in">
+    <strong style="color:var(--text);">Elite Standards:</strong>
+    Martin Fowler: "Make implicit explicit" &mdash;
+    Werner Vogels: "Everything fails" &mdash;
+    Pieter Levels: "Ship fast" &mdash;
+    Patrick Collison: "Don't break things"
+  </div>
+</section>
+
+<!-- ================================================================
+     INSTINCTS (10)
+     ================================================================ -->
+<section class="section" id="instincts">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      Reflexes
+    </div>
+    <h2>Instincts <span style="color:var(--text-muted);font-weight:400;">(10)</span></h2>
+    <p class="section-desc">
+      Learned behavioral reflexes from the Continuous Learning v2.1 system.
+      These trigger automatically based on recognized patterns -- no explicit invocation needed.
+    </p>
+  </div>
+
+  <div class="card-grid fade-in">
+    <div class="card">
+      <div class="card-icon" style="background:rgba(168,85,247,0.1);color:var(--purple);">&#129504;</div>
+      <div class="card-title">architect-mode-triggers</div>
+      <div class="card-desc">Auto-engages architecture mode when task complexity exceeds threshold. Forces Phase 2 before any code.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(16,185,129,0.1);color:var(--green);">&#128190;</div>
+      <div class="card-title">checkpoint-auto</div>
+      <div class="card-desc">Automatically saves progress after significant changes. Triggers MEMORY.md update and git commit.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(59,130,246,0.1);color:var(--blue);">&#128269;</div>
+      <div class="card-title">deep-research-not-surface</div>
+      <div class="card-desc">Forces deep investigation instead of surface-level answers. Uses Exa, Context7, Brave in combination.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(239,68,68,0.1);color:var(--red);">&#128545;</div>
+      <div class="card-title">frustration-same-error</div>
+      <div class="card-desc">Detects repeated failure pattern (same error 2x). Switches strategy: step back, rethink, try different approach.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(249,115,22,0.1);color:var(--orange);">&#128165;</div>
+      <div class="card-title">n8n-is-broken</div>
+      <div class="card-desc">When N8N workflows fail, instinct prefers Python scripts over fixing N8N. More reliable, easier to debug.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(99,102,241,0.1);color:var(--accent);">&#127769;</div>
+      <div class="card-title">night-agent-ready</div>
+      <div class="card-desc">Recognizes end-of-session patterns. Prepares night queue tasks, saves context for Sleepless Daemon pickup.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(245,158,11,0.1);color:var(--yellow);">&#9200;</div>
+      <div class="card-title">no-days-estimates</div>
+      <div class="card-desc">Blocks "X days" estimates. Forces AI-speed calculation: Human time / 5 / parallel agents = hours.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(6,182,212,0.1);color:var(--cyan);">&#9994;</div>
+      <div class="card-title">parallel-not-sequential</div>
+      <div class="card-desc">Detects independent tasks and auto-suggests parallel execution via Agent Teams instead of sequential work.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(236,72,153,0.1);color:var(--pink);">&#127942;</div>
+      <div class="card-title">quality-score-mandatory</div>
+      <div class="card-desc">Forces quality scoring on every deliverable. No output without explicit quality metric (tests, coverage, lint).</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(52,211,153,0.1);color:var(--emerald);">&#128214;</div>
+      <div class="card-title">study-before-act</div>
+      <div class="card-desc">Before modifying code: read surrounding context, check Serena references, understand the system first.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     GAMIFICATION SYSTEM (23 files)
+     ================================================================ -->
+<section class="section" id="gamification">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      XP System
+    </div>
+    <h2>Gamification System <span style="color:var(--text-muted);font-weight:400;">(23 files)</span></h2>
+    <p class="section-desc">
+      XP-based progression system that tracks development velocity, quality metrics,
+      and competitive benchmarking against top 100 AI-assisted developers.
+    </p>
+  </div>
+
+  <div class="fade-in" style="margin-bottom:24px;">
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">Core Engine</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;">
+      <div class="timeline-item" style="display:flex;justify-content:space-between;"><span style="color:var(--cyan);">engine.py</span><span>Main XP calculator + leveling</span></div>
+      <div class="timeline-item" style="display:flex;justify-content:space-between;"><span style="color:var(--cyan);">auto_xp.py</span><span>Automatic XP from git activity</span></div>
+      <div class="timeline-item" style="display:flex;justify-content:space-between;"><span style="color:var(--cyan);">auto_evolution.py</span><span>Self-evolving difficulty curves</span></div>
+      <div class="timeline-item" style="display:flex;justify-content:space-between;"><span style="color:var(--cyan);">metrics_collector.py</span><span>Collect LOC, commits, tests</span></div>
+      <div class="timeline-item" style="display:flex;justify-content:space-between;"><span style="color:var(--cyan);">quests.py</span><span>Quest system (daily/weekly)</span></div>
+      <div class="timeline-item" style="display:flex;justify-content:space-between;"><span style="color:var(--cyan);">config.json</span><span>XP rates, levels, thresholds</span></div>
+    </div>
+  </div>
+
+  <div class="fade-in" style="margin-bottom:24px;">
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">Coaching &amp; Analytics</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;">
+      <div class="timeline-item" style="display:flex;justify-content:space-between;"><span style="color:var(--emerald);">creator_coaching.py</span><span>Competitive benchmarking</span></div>
+      <div class="timeline-item" style="display:flex;justify-content:space-between;"><span style="color:var(--emerald);">learning_coach.py</span><span>Personalized learning paths</span></div>
+      <div class="timeline-item" style="display:flex;justify-content:space-between;"><span style="color:var(--emerald);">growth-engine.py</span><span>Growth rate calculation</span></div>
+      <div class="timeline-item" style="display:flex;justify-content:space-between;"><span style="color:var(--emerald);">elite_benchmarks.json</span><span>Elite tier thresholds</span></div>
+      <div class="timeline-item" style="display:flex;justify-content:space-between;"><span style="color:var(--emerald);">top100_creators.json</span><span>Top 100 developer profiles</span></div>
+      <div class="timeline-item" style="display:flex;justify-content:space-between;"><span style="color:var(--emerald);">learning_progress.json</span><span>Skills progression tracking</span></div>
+    </div>
+  </div>
+
+  <div class="fade-in">
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">UI &amp; Notifications</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;">
+      <div class="timeline-item" style="display:flex;justify-content:space-between;"><span style="color:var(--purple);">dashboard.py</span><span>Terminal dashboard</span></div>
+      <div class="timeline-item" style="display:flex;justify-content:space-between;"><span style="color:var(--purple);">xp_dashboard.py</span><span>Rich XP visualization</span></div>
+      <div class="timeline-item" style="display:flex;justify-content:space-between;"><span style="color:var(--purple);">session_reporter.py</span><span>Session summary cards</span></div>
+      <div class="timeline-item" style="display:flex;justify-content:space-between;"><span style="color:var(--purple);">telegram_notifier.py</span><span>Level-up Telegram alerts</span></div>
+      <div class="timeline-item" style="display:flex;justify-content:space-between;"><span style="color:var(--purple);">sounds.py</span><span>Achievement sound effects</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     MEMORY SYSTEM
+     ================================================================ -->
+<section class="section" id="memory-system">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/><path d="M12 6v6l4 2"/></svg>
+      Persistence
+    </div>
+    <h2>Memory System</h2>
+    <p class="section-desc">
+      Multi-tier memory architecture that persists context across sessions, with automatic decay
+      for short-term data and permanent storage for key decisions.
+    </p>
+  </div>
+
+  <div class="module-diagram fade-in">
+    <div class="module-tree">
+      <div><span class="dir">~/.claude/memory/</span></div>
+      <div class="indent"><span class="file">GLOBAL_MEMORY.md</span> <span class="comment">-- 229 lines, all projects, decisions, statuses</span></div>
+      <div class="indent"><span class="dir">decay-7d/</span> <span class="comment">-- session summaries, auto-expire after 7 days</span></div>
+      <div class="indent"><span class="dir">decay-30d/</span> <span class="comment">-- daily reviews, auto-expire after 30 days</span></div>
+      <div class="indent"><span class="dir">permanent/</span> <span class="comment">-- never expires: architecture decisions, key configs</span></div>
+      <div class="indent"><span class="dir">decisions/</span> <span class="comment">-- ADR-style decision records</span></div>
+      <div class="indent"><span class="dir">plans/</span> <span class="comment">-- active implementation plans</span></div>
+      <div class="indent"><span class="dir">projects/</span> <span class="comment">-- per-project memory snapshots</span></div>
+      <div class="indent"><span class="file">PROJECT_MEMORY_TEMPLATE.md</span> <span class="comment">-- template for new project memories</span></div>
+    </div>
+  </div>
+
+  <div style="margin-top:24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;" class="fade-in">
+    <div style="padding:16px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);border-left:3px solid var(--green);">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px;">GLOBAL_MEMORY.md</div>
+      <div style="font-size:12px;color:var(--text-secondary);">229 lines. Cross-project context. Auto-updated by /checkpoint.</div>
+    </div>
+    <div style="padding:16px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);border-left:3px solid var(--blue);">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px;">PROJECT MEMORY.md</div>
+      <div style="font-size:12px;color:var(--text-secondary);">Per-project. Current sprint, known issues, tech stack.</div>
+    </div>
+    <div style="padding:16px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);border-left:3px solid var(--purple);">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px;">session-handoff.md</div>
+      <div style="font-size:12px;color:var(--text-secondary);">Auto-snapshot on session close. Restored by /continue.</div>
+    </div>
+    <div style="padding:16px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);border-left:3px solid var(--cyan);">
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Git Sync</div>
+      <div style="font-size:12px;color:var(--text-secondary);">github.com/DmitriyMutagen/claude-memory. Auto-push on checkpoint.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     SLEEPLESS DAEMON
+     ================================================================ -->
+<section class="section" id="sleepless">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      Autonomous
+    </div>
+    <h2>Sleepless Daemon</h2>
+    <p class="section-desc">
+      24/7 autonomous development daemon. Picks up tasks from a Redis queue, executes them in tmux
+      workers with Claude Code, and reports results via Telegram.
+    </p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;" class="fade-in">
+    <div class="card">
+      <div class="card-icon" style="background:rgba(99,102,241,0.1);color:var(--accent);">&#128126;</div>
+      <div class="card-title">daemon.py</div>
+      <div class="card-desc">Main daemon. Redis queue consumer, tmux worker spawner, watchdog for stuck tasks. Auto-restart on crash.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(6,182,212,0.1);color:var(--cyan);">&#9000;</div>
+      <div class="card-title">cli.py (sleepy)</div>
+      <div class="card-desc">CLI interface: <code style="font-family:var(--font-mono);color:var(--cyan);">sleepy add/status/start/stop/queue/results/digest</code></div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(59,130,246,0.1);color:var(--blue);">&#128172;</div>
+      <div class="card-title">telegram_bot.py</div>
+      <div class="card-desc">Telegram bot interface: <code style="font-family:var(--font-mono);color:var(--cyan);">/task, /status, /queue, /stop, /results</code></div>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(16,185,129,0.1);color:var(--green);">&#128196;</div>
+      <div class="card-title">worker.sh + config.yaml</div>
+      <div class="card-desc">Worker shell template and project configuration. Defines repos, limits, task priorities.</div>
+    </div>
+  </div>
+
+  <div class="code-block fade-in" style="margin-top:24px;">
+    <div class="code-block-header">
+      <span class="code-block-lang">Night Agent Rules</span>
+      <button class="code-copy-btn" onclick="copyCode(this)">Copy</button>
+    </div>
+    <pre><code><span class="cm"># MERGE CONTRACT: Only feature/* and fix/* branches. NEVER merge to main.</span>
+<span class="cm"># COMMIT OFTEN: git add + commit after each significant step.</span>
+<span class="cm"># TWO STRIKES: Same test fails 2x = STOP. Mark blocked, next task.</span>
+<span class="cm"># RPI: Research -> Plan -> Implement. Never code blind.</span>
+<span class="cm"># NO .env: Never edit .env, credentials, secrets.</span>
+<span class="cm"># MAX 2 RETRIES: Per error. Then skip.</span>
+<span class="cm"># ON STUCK: >10 min same problem = skip, move on.</span>
+
+sleepy start              <span class="cm"># start daemon (tmux + caffeinate)</span>
+sleepy add <span class="str">"task"</span> -p proj  <span class="cm"># add task to queue</span>
+sleepy status             <span class="cm"># current status</span>
+sleepy stop               <span class="cm"># stop daemon</span></code></pre>
+  </div>
+</section>
+
+<!-- ================================================================
+     TEAMS (8)
+     ================================================================ -->
+<section class="section" id="teams">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3h-8l-2 4h12l-2-4z"/></svg>
+      Collaboration
+    </div>
+    <h2>Agent Teams <span style="color:var(--text-muted);font-weight:400;">(8 configs)</span></h2>
+    <p class="section-desc">
+      Pre-configured team compositions for common workflows. Agents communicate via tmux panes
+      with the teammateMode protocol. Launch with <code style="font-family:var(--font-mono);color:var(--cyan);">/parallel</code>.
+    </p>
+  </div>
+
+  <div class="card-grid fade-in">
+    <div class="card">
+      <div class="card-title" style="color:var(--cyan);">marketai-sprint</div>
+      <div class="card-desc">Full sprint team: Architect + Coder + Tester + Reviewer. For feature development on MarketAI.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--yellow);">marketai-audit</div>
+      <div class="card-desc">Security + QA audit: Security-Reviewer + QA-Engineer + Tester. Pre-deploy validation.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--green);">marketai-responses-v3</div>
+      <div class="card-desc">AI response pipeline: Content-Factory + QA-Reviewer + Data-Analyst. Review auto-response quality.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--purple);">b2b-dashboard</div>
+      <div class="card-desc">B2B intelligence: Data-Analyst + Frontend-Dev + Backend-Dev. Build analytics dashboards.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--orange);">nep-mp-audit</div>
+      <div class="card-desc">Marketplace audit: QA-Engineer + Security-Auditor. Audit marketplace integrations.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--blue);">nep-mp-v3</div>
+      <div class="card-desc">Marketplace v3: Coder + Tester + OzonSpecialist. Build next-gen marketplace connectors.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--emerald);">sync-team</div>
+      <div class="card-desc">Sync architecture: Sync-Architect + Sync-Researcher + Sync-Tester. Cross-platform data sync.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--pink);">content-pipeline</div>
+      <div class="card-desc">Content generation: Content-Factory + Copywriter + SEO-Specialist. End-to-end content creation.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     ANTI-PATTERNS
+     ================================================================ -->
+<section class="section" id="anti-patterns">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+      Stop Signals
+    </div>
+    <h2>Anti-Patterns</h2>
+    <p class="section-desc">
+      Recognized failure modes that trigger automatic STOP and course correction.
+      These patterns are enforced by hooks and instincts to prevent wasted effort.
+    </p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;" class="fade-in">
+    <div style="padding:16px 20px;background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius-sm);display:flex;gap:14px;align-items:flex-start;">
+      <span style="color:var(--red);font-size:20px;flex-shrink:0;">&#9888;</span>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:4px;">"Let me quickly code this"</div>
+        <div style="font-size:12px;color:var(--text-secondary);">STOP. Phase 1 (Strategy) was skipped. Why are we doing this? What metric does it move?</div>
+      </div>
+    </div>
+    <div style="padding:16px 20px;background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius-sm);display:flex;gap:14px;align-items:flex-start;">
+      <span style="color:var(--red);font-size:20px;flex-shrink:0;">&#9888;</span>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:4px;">"Let's also add X while we're at it"</div>
+        <div style="font-size:12px;color:var(--text-secondary);">STOP. Scope creep. What's in MVP? What's for later? Finish current task first.</div>
+      </div>
+    </div>
+    <div style="padding:16px 20px;background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius-sm);display:flex;gap:14px;align-items:flex-start;">
+      <span style="color:var(--red);font-size:20px;flex-shrink:0;">&#9888;</span>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:4px;">"We need to rewrite everything"</div>
+        <div style="font-size:12px;color:var(--text-secondary);">STOP. What's the minimum change to achieve the goal? Rewrite is almost never the answer.</div>
+      </div>
+    </div>
+    <div style="padding:16px 20px;background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius-sm);display:flex;gap:14px;align-items:flex-start;">
+      <span style="color:var(--red);font-size:20px;flex-shrink:0;">&#9888;</span>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:4px;">"It's obvious, no need for a plan"</div>
+        <div style="font-size:12px;color:var(--text-secondary);">STOP. If it takes >1 day, show 3 variants with trade-offs. Nothing is obvious at scale.</div>
+      </div>
+    </div>
+    <div style="padding:16px 20px;background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius-sm);display:flex;gap:14px;align-items:flex-start;">
+      <span style="color:var(--red);font-size:20px;flex-shrink:0;">&#9888;</span>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:4px;">Code without approved plan</div>
+        <div style="font-size:12px;color:var(--text-secondary);">STOP. Return to Phase 2. Get architecture approval before writing a single line.</div>
+      </div>
+    </div>
+    <div style="padding:16px 20px;background:rgba(239,68,68,0.05);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius-sm);display:flex;gap:14px;align-items:flex-start;">
+      <span style="color:var(--red);font-size:20px;flex-shrink:0;">&#9888;</span>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:4px;">"Done" without verification</div>
+        <div style="font-size:12px;color:var(--text-secondary);">STOP. "Should work" is not done. Provide: test output, curl result, screenshot, or Playwright proof.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     QUICK REFERENCE
+     ================================================================ -->
+<section class="section" id="quick-ref">
+  <div class="section-header fade-in">
+    <div class="section-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+      Reference
+    </div>
+    <h2>Quick Reference</h2>
+    <p class="section-desc">
+      Searchable index of all infrastructure components. Use the search box to filter.
+    </p>
+  </div>
+
+  <div class="sidebar-search fade-in" style="max-width:400px;margin-bottom:20px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text-muted);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="ref-search" placeholder="Filter reference table..." autocomplete="off" style="width:100%;padding:8px 12px 8px 34px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13px;font-family:var(--font-sans);outline:none;">
+  </div>
+
+  <div class="ref-table-wrapper fade-in">
+    <table class="ref-table" id="ref-table">
+      <thead>
+        <tr>
+          <th style="width:130px;">Type</th>
+          <th style="width:200px;">Name</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="badge badge-red">Rule</span></td><td class="mono">verify-before-done</td><td>No "done" without real proof (screenshot, test, curl)</td></tr>
+        <tr><td><span class="badge badge-red">Rule</span></td><td class="mono">testing-always</td><td>Every change requires tests. Bug fix = regression test first</td></tr>
+        <tr><td><span class="badge badge-red">Rule</span></td><td class="mono">serena-sentry</td><td>Mandatory Serena + Sentry for all code changes</td></tr>
+        <tr><td><span class="badge badge-red">Rule</span></td><td class="mono">git-workflow</td><td>Feature branches, conventional commits, no force-push</td></tr>
+        <tr><td><span class="badge badge-red">Rule</span></td><td class="mono">modular-arch</td><td>Domain-driven structure with strict import rules</td></tr>
+        <tr><td><span class="badge badge-blue">Rule</span></td><td class="mono">quality-gates</td><td>Pre-code checklist: MEMORY, Sentry, tests, Serena</td></tr>
+        <tr><td><span class="badge badge-blue">Rule</span></td><td class="mono">docs-always</td><td>Google-style docstrings, 80% coverage minimum</td></tr>
+        <tr><td><span class="badge badge-blue">Rule</span></td><td class="mono">data-correctness</td><td>Verify real data, cross-check DB and frontend</td></tr>
+        <tr><td><span class="badge badge-green">Rule</span></td><td class="mono">chain-thinking</td><td>Trace entire pipeline, fix root cause not symptoms</td></tr>
+        <tr><td><span class="badge badge-green">Rule</span></td><td class="mono">research-before-code</td><td>Context7 first, buy vs build, 3 variants</td></tr>
+        <tr><td><span class="badge badge-green">Rule</span></td><td class="mono">spec-first</td><td>Specification before code for tasks >3 files</td></tr>
+        <tr><td><span class="badge badge-yellow">Rule</span></td><td class="mono">security-baseline</td><td>OWASP baseline for every project</td></tr>
+        <tr><td><span class="badge badge-yellow">Rule</span></td><td class="mono">sentry-first</td><td>Always check Sentry before fixing bugs</td></tr>
+        <tr><td><span class="badge badge-purple">Rule</span></td><td class="mono">ci-cd-templates</td><td>GitHub Actions for Python and TypeScript</td></tr>
+        <tr><td><span class="badge badge-purple">Rule</span></td><td class="mono">self-healing</td><td>Auto-recovery: restart, alert, escalate</td></tr>
+        <tr><td><span class="badge badge-cyan">Hook</span></td><td class="mono">session-start.js</td><td>SessionStart: initialize session context</td></tr>
+        <tr><td><span class="badge badge-cyan">Hook</span></td><td class="mono">secret-scanner.js</td><td>PreToolUse: block writes to .env/.pem/.key</td></tr>
+        <tr><td><span class="badge badge-cyan">Hook</span></td><td class="mono">auto-test.js</td><td>PostToolUse: run tests after code edits</td></tr>
+        <tr><td><span class="badge badge-cyan">Hook</span></td><td class="mono">quality-sentinel.sh</td><td>Stop: check for bare except, raw SQL</td></tr>
+        <tr><td><span class="badge badge-cyan">Hook</span></td><td class="mono">auto-checkpoint.py</td><td>Stop: save progress on session end</td></tr>
+        <tr><td><span class="badge badge-orange">MCP</span></td><td class="mono">serena</td><td>LSP navigation: find_symbol, references, overview</td></tr>
+        <tr><td><span class="badge badge-orange">MCP</span></td><td class="mono">sentry-mcp</td><td>Error monitoring: issues, traces, AI analysis</td></tr>
+        <tr><td><span class="badge badge-orange">MCP</span></td><td class="mono">exa</td><td>Neural web search with 8 tools</td></tr>
+        <tr><td><span class="badge badge-orange">MCP</span></td><td class="mono">github-mcp</td><td>GitHub API: issues, PRs, repos</td></tr>
+        <tr><td><span class="badge badge-orange">MCP</span></td><td class="mono">security-scanner</td><td>Custom: pip-audit + bandit + detect-secrets + trivy</td></tr>
+        <tr><td><span class="badge badge-orange">MCP</span></td><td class="mono">vps-monitor</td><td>Custom: SSH server monitoring (8 tools)</td></tr>
+        <tr><td><span class="badge badge-purple">Skill</span></td><td class="mono">elite-prompts</td><td>Voice pattern recognition, prompt enrichment</td></tr>
+        <tr><td><span class="badge badge-purple">Skill</span></td><td class="mono">infra-doctor</td><td>9 diagnostic chains (A-I)</td></tr>
+        <tr><td><span class="badge badge-purple">Skill</span></td><td class="mono">verify</td><td>Real verification enforcement</td></tr>
+        <tr><td><span class="badge badge-purple">Skill</span></td><td class="mono">growth-coach</td><td>CTO coaching + competitive benchmarking</td></tr>
+        <tr><td><span class="badge badge-purple">Skill</span></td><td class="mono">org-structure</td><td>Virtual company role routing</td></tr>
+        <tr><td><span class="badge badge-green">Command</span></td><td class="mono">/commit</td><td>Analyze staged changes, create commit</td></tr>
+        <tr><td><span class="badge badge-green">Command</span></td><td class="mono">/deploy</td><td>Deploy to VPS via SSH+Docker</td></tr>
+        <tr><td><span class="badge badge-green">Command</span></td><td class="mono">/tdd</td><td>Test-Driven Development workflow</td></tr>
+        <tr><td><span class="badge badge-green">Command</span></td><td class="mono">/checkpoint</td><td>Save progress to MEMORY.md + git</td></tr>
+        <tr><td><span class="badge badge-green">Command</span></td><td class="mono">/continue</td><td>Restore context and next step</td></tr>
+        <tr><td><span class="badge badge-green">Command</span></td><td class="mono">/parallel</td><td>Launch Agent Team in parallel</td></tr>
+        <tr><td><span class="badge badge-green">Command</span></td><td class="mono">/audit</td><td>Full security audit</td></tr>
+        <tr><td><span class="badge badge-green">Command</span></td><td class="mono">/spec</td><td>Spec-Driven Development</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================================================================
+     FOOTER
+     ================================================================ -->
+<footer class="footer">
+  <p>Claude Code AI Infrastructure v2.0 &mdash; Built with Opus 4.6 (1M context)</p>
+  <p style="margin-top:8px;font-size:11px;">28 rules &middot; 31 hooks &middot; 15 MCP servers &middot; 9 skills &middot; 53 commands &middot; 23 agents</p>
+  <p style="margin-top:8px;font-size:11px;color:var(--text-muted);">Last updated: 2026-03-28</p>
 </footer>
 
-<script>
-  mermaid.initialize({
-    startOnLoad: true,
-    theme: 'dark',
-    themeVariables: {
-      primaryColor: '#1D4ED8',
-      primaryTextColor: '#F9FAFB',
-      primaryBorderColor: '#374151',
-      lineColor: '#4B5563',
-      secondaryColor: '#1F2937',
-      tertiaryColor: '#111827',
-      background: '#0A0E1A',
-      mainBkg: '#1F2937',
-      nodeBorder: '#374151',
-      clusterBkg: '#0F172A',
-      titleColor: '#F9FAFB',
-      edgeLabelBackground: '#1F2937',
-      activeTaskBkgColor: '#1D4ED8',
-      fontFamily: 'Inter, sans-serif',
-      fontSize: '13px'
-    }
-  });
+</div><!-- .main -->
 
-  // Active nav on scroll
-  const sections = document.querySelectorAll('.diagram-section');
-  const navLinks = document.querySelectorAll('.nav-bar a');
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        navLinks.forEach(l => l.style.borderBottomColor = 'transparent');
-        const active = document.querySelector(`.nav-bar a[href="#${entry.target.id}"]`);
-        if (active) active.style.borderBottomColor = '#3B82F6';
+<!-- ================================================================
+     JAVASCRIPT
+     ================================================================ -->
+<script>
+(function() {
+  'use strict';
+
+  // ── Scroll progress bar ──
+  const progressBar = document.getElementById('progress-bar');
+  function updateProgress() {
+    const h = document.documentElement;
+    const scroll = h.scrollTop || document.body.scrollTop;
+    const total = h.scrollHeight - h.clientHeight;
+    progressBar.style.width = total > 0 ? (scroll / total * 100) + '%' : '0%';
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+
+  // ── Active nav link on scroll ──
+  const sections = document.querySelectorAll('section[id], .hero[id]');
+  const navLinks = document.querySelectorAll('.nav-link');
+  function updateActiveNav() {
+    let current = '';
+    sections.forEach(function(s) {
+      if (window.scrollY >= s.offsetTop - 120) current = s.id;
+    });
+    navLinks.forEach(function(link) {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+  }
+  window.addEventListener('scroll', updateActiveNav, { passive: true });
+
+  // ── Fade-in on scroll (Intersection Observer) ──
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('visible'); }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.fade-in').forEach(function(el) { observer.observe(el); });
+
+  // ── Animated counters ──
+  function animateCounters() {
+    document.querySelectorAll('[data-target]').forEach(function(el) {
+      const target = parseInt(el.getAttribute('data-target'));
+      const duration = 1500;
+      const start = performance.now();
+      function step(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(target * eased);
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }
+  const heroObserver = new IntersectionObserver(function(entries) {
+    if (entries[0].isIntersecting) { animateCounters(); heroObserver.disconnect(); }
+  }, { threshold: 0.3 });
+  var heroEl = document.querySelector('.hero');
+  if (heroEl) heroObserver.observe(heroEl);
+
+  // ── Rule category filter ──
+  var rulesFilters = document.getElementById('rules-filters');
+  if (rulesFilters) {
+    rulesFilters.addEventListener('click', function(e) {
+      if (!e.target.classList.contains('filter-pill')) return;
+      rulesFilters.querySelectorAll('.filter-pill').forEach(function(p) { p.classList.remove('active'); });
+      e.target.classList.add('active');
+      var filter = e.target.getAttribute('data-filter');
+      document.querySelectorAll('#rules-grid .card').forEach(function(card) {
+        card.style.display = (filter === 'all' || card.getAttribute('data-category') === filter) ? '' : 'none';
+      });
+    });
+  }
+
+  // ── Global search (sidebar) ──
+  var globalSearch = document.getElementById('global-search');
+  if (globalSearch) {
+    globalSearch.addEventListener('input', function() {
+      var q = this.value.toLowerCase().trim();
+      document.querySelectorAll('.card, .mcp-card, .skill-card, .agent-card, .timeline-item, .cmd-item').forEach(function(el) {
+        if (!q) { el.style.display = ''; return; }
+        el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    });
+  }
+
+  // ── Reference table search ──
+  var refSearch = document.getElementById('ref-search');
+  if (refSearch) {
+    refSearch.addEventListener('input', function() {
+      var q = this.value.toLowerCase().trim();
+      var rows = document.querySelectorAll('#ref-table tbody tr');
+      rows.forEach(function(row) {
+        row.style.display = (!q || row.textContent.toLowerCase().includes(q)) ? '' : 'none';
+      });
+    });
+  }
+
+  // ── Close sidebar on mobile nav click ──
+  navLinks.forEach(function(link) {
+    link.addEventListener('click', function() {
+      if (window.innerWidth <= 1024) {
+        document.querySelector('.sidebar').classList.remove('open');
       }
     });
-  }, { threshold: 0.3, rootMargin: '-60px 0px -40% 0px' });
-  sections.forEach(s => observer.observe(s));
-
-  navLinks.forEach(link => {
-    link.addEventListener('click', e => {
-      e.preventDefault();
-      const target = document.querySelector(link.getAttribute('href'));
-      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
   });
+
+})();
+
+// ── Copy code to clipboard ──
+function copyCode(btn) {
+  var pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent).then(function() {
+    btn.textContent = 'Copied!';
+    setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+  });
+}
 </script>
+
 </body>
 </html>
