@@ -2,179 +2,2871 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Claude Code Infrastructure — Полное руководство</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code Infrastructure v3.0 — Дмитрий Гагауз</title>
 <style>
-  @page { margin: 2cm; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 900px; margin: 0 auto; padding: 40px; color: #1a1a2e; line-height: 1.6; }
-  h1 { color: #7B2FBE; border-bottom: 3px solid #7B2FBE; padding-bottom: 10px; font-size: 28px; }
-  h2 { color: #E63946; margin-top: 30px; font-size: 22px; border-left: 4px solid #E63946; padding-left: 12px; }
-  h3 { color: #457B9D; font-size: 18px; }
-  table { border-collapse: collapse; width: 100%; margin: 15px 0; }
-  th { background: #1a1a2e; color: white; padding: 10px; text-align: left; }
-  td { border: 1px solid #ddd; padding: 8px; }
-  tr:nth-child(even) { background: #f8f9fa; }
-  code { background: #f1f3f5; padding: 2px 6px; border-radius: 3px; font-size: 14px; }
-  pre { background: #1a1a2e; color: #a5d6ff; padding: 15px; border-radius: 8px; overflow-x: auto; }
-  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; color: white; }
-  .done { background: #2d6a4f; }
-  .info { background: #457B9D; }
-  .warn { background: #E63946; }
-  .section { background: #f8f9fa; border-radius: 12px; padding: 20px; margin: 20px 0; }
-  .stat { font-size: 36px; font-weight: bold; color: #7B2FBE; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-  .card { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; }
-  @media print { body { padding: 0; } pre { font-size: 11px; } }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --purple: #7B2FBE;
+    --purple-light: #9d4fd4;
+    --purple-dark: #5a1f9a;
+    --red: #E63946;
+    --blue: #457B9D;
+    --blue-light: #6b9fc4;
+    --dark: #0d0d1a;
+    --dark2: #1a1a2e;
+    --dark3: #16213e;
+    --green: #2d6a4f;
+    --green-light: #40916c;
+    --gold: #f4a261;
+    --gold-dark: #e76f51;
+    --text: #e8eaf6;
+    --text-muted: #9ea3c8;
+    --border: #2a2a4a;
+    --card-bg: #1e1e3a;
+    --code-bg: #0a0a18;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--dark);
+    color: var(--text);
+    line-height: 1.6;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: var(--dark2);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    top: 0; left: 0;
+    overflow-y: auto;
+    z-index: 100;
+    padding-bottom: 40px;
+  }
+
+  .sidebar-logo {
+    padding: 20px 16px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, var(--purple-dark), var(--dark2));
+  }
+
+  .sidebar-logo .logo-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .sidebar-logo .logo-version {
+    font-size: 11px;
+    color: var(--gold);
+    margin-top: 2px;
+  }
+
+  .sidebar nav a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 12.5px;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .sidebar nav a:hover,
+  .sidebar nav a.active {
+    color: var(--text);
+    background: rgba(123, 47, 190, 0.12);
+    border-left-color: var(--purple);
+  }
+
+  .sidebar nav .section-divider {
+    padding: 12px 16px 4px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--purple-light);
+    font-weight: 600;
+  }
+
+  /* MAIN CONTENT */
+  .main {
+    margin-left: 260px;
+    flex: 1;
+    max-width: calc(100% - 260px);
+    overflow-x: hidden;
+    min-width: 0;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, var(--dark2) 0%, var(--dark3) 50%, #0f0f2d 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 40px 48px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(123,47,190,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .version-badge {
+    background: linear-gradient(135deg, var(--purple), var(--purple-light));
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .date-badge {
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  .header h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+
+  .header h1 span {
+    background: linear-gradient(135deg, var(--purple-light), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header-sub {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .stat-num {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--purple-light);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+  }
+
+  .stat-divider {
+    width: 1px;
+    background: var(--border);
+    align-self: stretch;
+    margin: 2px 0;
+  }
+
+  /* LEVEL BAR */
+  .level-bar-wrap {
+    background: var(--dark3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-top: 20px;
+  }
+
+  .level-bar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .level-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .level-xp {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .progress-track {
+    background: var(--border);
+    border-radius: 100px;
+    height: 10px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--purple), var(--gold));
+    border-radius: 100px;
+    width: 49%;
+    position: relative;
+    transition: width 0.6s ease;
+  }
+
+  .progress-fill::after {
+    content: '49%';
+    position: absolute;
+    right: 6px;
+    top: -18px;
+    font-size: 10px;
+    color: var(--gold);
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .level-milestones {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  /* CONTENT */
+  .content {
+    padding: 40px 48px;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 56px;
+    scroll-margin-top: 20px;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .icon-purple { background: rgba(123,47,190,0.2); border: 1px solid rgba(123,47,190,0.4); }
+  .icon-red { background: rgba(230,57,70,0.2); border: 1px solid rgba(230,57,70,0.4); }
+  .icon-blue { background: rgba(69,123,157,0.2); border: 1px solid rgba(69,123,157,0.4); }
+  .icon-green { background: rgba(45,106,79,0.2); border: 1px solid rgba(45,106,79,0.4); }
+  .icon-gold { background: rgba(244,162,97,0.2); border: 1px solid rgba(244,162,97,0.4); }
+
+  .section-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .section-header .section-num {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--dark3);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  /* CARDS */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .cards-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .cards-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .card:hover {
+    border-color: rgba(123,47,190,0.5);
+    transform: translateY(-1px);
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .card-stat {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--purple-light);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  /* TABLES */
+  table {
+    width: 100%;
+    max-width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13px;
+    table-layout: auto;
+    word-break: break-word;
+  }
+
+  .data-table td,
+  .data-table th {
+    word-break: normal;
+    white-space: normal;
+    overflow-wrap: break-word;
+    max-width: 300px;
+  }
+
+  th {
+    background: var(--dark3);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(42,42,74,0.6);
+    color: var(--text);
+    vertical-align: top;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(123,47,190,0.05); }
+
+  .table-wrap {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 16px 0;
+  }
+
+  /* BADGES */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .badge-purple { background: rgba(123,47,190,0.2); color: var(--purple-light); border: 1px solid rgba(123,47,190,0.4); }
+  .badge-green { background: rgba(45,106,79,0.2); color: #52b788; border: 1px solid rgba(45,106,79,0.4); }
+  .badge-red { background: rgba(230,57,70,0.2); color: #ff6b7a; border: 1px solid rgba(230,57,70,0.4); }
+  .badge-blue { background: rgba(69,123,157,0.2); color: var(--blue-light); border: 1px solid rgba(69,123,157,0.4); }
+  .badge-gold { background: rgba(244,162,97,0.2); color: var(--gold); border: 1px solid rgba(244,162,97,0.4); }
+  .badge-dark { background: var(--dark3); color: var(--text-muted); border: 1px solid var(--border); }
+
+  /* CODE BLOCKS */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--code-bg);
+    color: #a5d6ff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    border: 1px solid var(--border);
+  }
+
+  pre {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    overflow-x: auto;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #a5d6ff;
+    margin: 12px 0;
+  }
+
+  pre .c { color: #6a737d; }
+  pre .kw { color: #ff79c6; }
+  pre .st { color: #f1fa8c; }
+  pre .fn { color: #50fa7b; }
+
+  /* PHASE STEPS */
+  .phases {
+    display: flex;
+    gap: 0;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+
+  .phase {
+    flex: 1;
+    min-width: 140px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 16px;
+    text-align: center;
+    position: relative;
+  }
+
+  .phase:not(:last-child)::after {
+    content: '→';
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--purple);
+    font-size: 18px;
+    z-index: 1;
+  }
+
+  .phase:first-child { border-radius: 10px 0 0 10px; }
+  .phase:last-child { border-radius: 0 10px 10px 0; }
+
+  .phase-num {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 4px;
+  }
+
+  .phase-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .phase-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* INFO BOXES */
+  .info-box {
+    background: var(--card-bg);
+    border-left: 4px solid var(--purple);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-size: 13px;
+  }
+
+  .info-box.warn { border-left-color: var(--gold); }
+  .info-box.danger { border-left-color: var(--red); }
+  .info-box.success { border-left-color: var(--green-light); }
+
+  .info-box .box-title {
+    font-weight: 700;
+    margin-bottom: 4px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+
+  /* ROLE CARDS */
+  .roles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .role-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .role-emoji { font-size: 24px; margin-bottom: 8px; display: block; }
+  .role-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .role-when { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+  .role-mentor { font-size: 10px; color: var(--gold); }
+
+  /* XP TABLE */
+  .xp-row td:last-child {
+    color: var(--gold);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+  }
+
+  /* LEVEL TABLE */
+  .level-row.current td {
+    background: rgba(123,47,190,0.1);
+    color: var(--gold);
+    font-weight: 700;
+  }
+
+  .level-row.next td {
+    background: rgba(244,162,97,0.05);
+    color: var(--text-muted);
+  }
+
+  /* COMMAND BLOCKS */
+  .cmd-group {
+    margin: 16px 0;
+  }
+
+  .cmd-group-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--purple-light);
+    font-weight: 700;
+    margin-bottom: 8px;
+    padding-left: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .cmd-item {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 8px 14px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 4px;
+    font-size: 12px;
+  }
+
+  .cmd-name {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--green-light);
+    font-weight: 600;
+    white-space: nowrap;
+    min-width: 200px;
+  }
+
+  .cmd-desc {
+    color: var(--text-muted);
+  }
+
+  /* FOOTER */
+  .footer {
+    padding: 32px 48px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--dark2); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--purple); }
+
+  /* TAG */
+  .tag {
+    display: inline-block;
+    background: var(--dark3);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    margin: 2px;
+  }
+
+  p { margin-bottom: 10px; color: var(--text-muted); font-size: 13px; }
+
+  h3 { font-size: 15px; font-weight: 700; color: var(--text); margin: 20px 0 10px; }
+  h4 { font-size: 13px; font-weight: 700; color: var(--purple-light); margin: 14px 0 8px; }
+
+  .highlight-box {
+    background: linear-gradient(135deg, rgba(123,47,190,0.1), rgba(244,162,97,0.05));
+    border: 1px solid rgba(123,47,190,0.3);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+
+  .flow-arrow {
+    text-align: center;
+    font-size: 20px;
+    color: var(--purple);
+    margin: 8px 0;
+  }
+
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; max-width: 100%; }
+    .header { padding: 24px; }
+    .content { padding: 24px; }
+    .cards-grid-3 { grid-template-columns: 1fr 1fr; }
+    .cards-grid-2 { grid-template-columns: 1fr; }
+  }
+/* ── Auto-generated sections ── */
+.auto-placeholder { color: #6B7280; font-style: italic; padding: 8px; border: 1px dashed #374151; border-radius: 4px; }
+.agents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin: 12px 0; }
+.agent-card { background: #1F2937; border: 1px solid #374151; border-radius: 6px; padding: 12px; }
+.agent-name { font-weight: 600; color: #60A5FA; font-family: 'JetBrains Mono', monospace; margin-bottom: 4px; }
+.agent-desc { font-size: 0.85rem; color: #9CA3AF; }
+.projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; margin: 12px 0; }
+.project-card { background: #1F2937; border: 1px solid #374151; border-left: 3px solid #10B981; border-radius: 6px; padding: 12px; }
+.project-name { font-weight: 700; color: #F9FAFB; margin-bottom: 4px; }
+.project-path { font-size: 0.8rem; color: #60A5FA; font-family: 'JetBrains Mono', monospace; margin-bottom: 4px; }
+.project-status { font-size: 0.8rem; margin-bottom: 4px; }
+.project-last { font-size: 0.8rem; color: #6B7280; }
+.gm-stats { background: linear-gradient(135deg, #1F2937, #111827); border: 1px solid #374151; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+.gm-level { font-size: 1.3rem; font-weight: 700; color: #F59E0B; }
+.gm-xp { color: #9CA3AF; margin: 4px 0; }
+.progress-bar { background: #374151; border-radius: 4px; height: 8px; margin: 8px 0; }
+.progress-fill { background: linear-gradient(90deg, #3B82F6, #8B5CF6); height: 100%; border-radius: 4px; transition: width 0.5s; }
+.progress-label { font-size: 0.8rem; color: #6B7280; }
+.achievements-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin: 12px 0; }
+.achievement { background: #1F2937; border: 1px solid #374151; border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
+.hidden-ach { opacity: 0.4; }
+.xp-badge { background: #78350F; color: #FCD34D; border-radius: 4px; padding: 2px 6px; font-size: 0.75rem; }
+.memory-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.stat-item { background: #1F2937; border: 1px solid #374151; border-radius: 6px; padding: 8px 16px; }
+.perm-list { list-style: none; padding: 0; display: flex; gap: 8px; flex-wrap: wrap; }
+.perm-list li { background: #1F2937; border: 1px solid #374151; border-radius: 4px; padding: 4px 10px; font-size: 0.85rem; }
+.changelog-entry { background: #1F2937; border: 1px solid #374151; border-radius: 6px; padding: 12px; margin-bottom: 8px; }
+.version-badge { background: #1D4ED8; color: #BFDBFE; border-radius: 4px; padding: 2px 8px; font-size: 0.85rem; font-weight: 600; margin-right: 8px; }
+.date { color: #6B7280; font-size: 0.85rem; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.data-table th { background: #1F2937; padding: 8px 12px; text-align: left; color: #9CA3AF; font-weight: 600; border-bottom: 1px solid #374151; }
+.data-table td { padding: 8px 12px; border-bottom: 1px solid #1F2937; vertical-align: top; }
+.data-table tr:hover td { background: #1F2937; }
 </style>
 </head>
 <body>
 
-<h1>🧠 Claude Code Infrastructure — Полное руководство</h1>
-<p><strong>Автор:</strong> Дмитрий Гагауз (Aragant.group) + Claude CTO<br>
-<strong>Дата:</strong> 27 марта 2026<br>
-<strong>Версия:</strong> 2.0<br>
-<strong>GitHub:</strong> github.com/DmitriyMutagen/claude-code-template</p>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-title">Claude Code Infra</div>
+    <div class="logo-version">v<span id="guide-version">v3.247</span> — <span id="guide-updated">2026-03-28 11:51</span></div>
+    <meta name="guide-version" content="3.247">
+  </div>
+  <nav>
+    <div class="section-divider">Основы</div>
+    <a href="#section-0">📊 Метрики системы</a>
+    <a href="#section-1">🧠 CTO-слой</a>
+    <a href="#section-2">📋 Rules (17 файлов)</a>
+    <a href="#section-3">⚡ Hooks система</a>
+    <div class="section-divider">Команды</div>
+    <a href="#section-4">🎮 Skills / Commands</a>
+    <a href="#section-5">🏢 Virtual Company (12 ролей)</a>
+    <div class="section-divider">Прогресс</div>
+    <a href="#section-6">🏆 Геймификация</a>
+    <a href="#section-7">📈 Elite Benchmarks</a>
+    <a href="#section-8">🔬 Самообучение (CL v2.1)</a>
+    <div class="section-divider">Инфраструктура</div>
+    <a href="#section-9">🔌 MCP Серверы</a>
+    <a href="#section-10">🖥️ VPS + домены</a>
+    <a href="#section-11">📁 Активные проекты</a>
+    <div class="section-divider">Автоматизация</div>
+    <a href="#section-12">🤖 Auto-Evolution</a>
+    <a href="#section-13">💾 Smart Backup</a>
+    <a href="#section-14">⌨️ Quick Reference</a>
+    <a href="#section-15">🚀 Установка</a>
+    <a href="#section-16">📜 Changelog</a>
+    <div class="section-divider">Карта команд</div>
+    <a href="#section-17">🗺️ Когда что использовать</a>
+  </nav>
+</aside>
 
-<div class="section">
-<div class="grid">
-<div class="card"><div class="stat">420+</div>файлов в template</div>
-<div class="card"><div class="stat">22</div>hook groups</div>
-<div class="card"><div class="stat">16</div>rules</div>
-<div class="card"><div class="stat">10</div>skills</div>
-<div class="card"><div class="stat">10</div>instincts</div>
-<div class="card"><div class="stat">13,500+</div>XP</div>
-</div>
-</div>
+<!-- MAIN -->
+<main class="main">
 
-<h2>📋 Что внедрено (26-27 марта 2026)</h2>
+<!-- HEADER -->
+<header class="header">
+  <div class="header-meta">
+    <span class="version-badge">v3.0</span>
+    <span class="date-badge">27 марта 2026</span>
+    <span class="badge badge-gold">Aragant.group</span>
+    <span class="badge badge-green">LIVE</span>
+  </div>
+  <h1>🧠 Claude Code Infrastructure<br><span>Полное руководство</span></h1>
+  <p class="header-sub">Дмитрий Гагауз · gagauzdmitriy@gmail.com · github.com/DmitriyMutagen/claude-code-template</p>
 
-<h3>Самообучающаяся система (CL v2.1)</h3>
-<table>
-<tr><th>Компонент</th><th>Файл</th><th>Статус</th></tr>
-<tr><td>Continuous Learning v2.1</td><td>~/.claude/skills/continuous-learning-v2/</td><td><span class="badge done">ACTIVE</span></td></tr>
-<tr><td>Observer (фоновый анализ)</td><td>config.json → observer.enabled: true</td><td><span class="badge done">ON</span></td></tr>
-<tr><td>10 FlowWhisper instincts</td><td>~/.claude/homunculus/instincts/personal/*.yaml</td><td><span class="badge done">LOADED</span></td></tr>
-<tr><td>Session Summarizer</td><td>~/.claude/hooks/session-summarizer.py</td><td><span class="badge done">ACTIVE</span></td></tr>
-<tr><td>Memory Decay Manager</td><td>~/.claude/hooks/memory-decay.py</td><td><span class="badge done">ACTIVE</span></td></tr>
-<tr><td>Auto-Checkpoint</td><td>~/.claude/hooks/auto-checkpoint.py</td><td><span class="badge done">ACTIVE</span></td></tr>
-</table>
+  <div class="stats-bar">
+    <div class="stat-item"><div class="stat-num">17</div><div class="stat-label">Rules</div></div>
+    <div class="stat-divider"></div>
+    <div class="stat-item"><div class="stat-num">16+</div><div class="stat-label">Skills</div></div>
+    <div class="stat-divider"></div>
+    <div class="stat-item"><div class="stat-num">13</div><div class="stat-label">MCP серверов</div></div>
+    <div class="stat-divider"></div>
+    <div class="stat-item"><div class="stat-num">12</div><div class="stat-label">Ролей</div></div>
+    <div class="stat-divider"></div>
+    <div class="stat-item"><div class="stat-num">22</div><div class="stat-label">Hook Groups</div></div>
+    <div class="stat-divider"></div>
+    <div class="stat-item"><div class="stat-num">1,569</div><div class="stat-label">Observations</div></div>
+    <div class="stat-divider"></div>
+    <div class="stat-item"><div class="stat-num">14,955</div><div class="stat-label">XP</div></div>
+    <div class="stat-divider"></div>
+    <div class="stat-item"><div class="stat-num">420+</div><div class="stat-label">Файлов</div></div>
+  </div>
 
-<h3>Качество и верификация</h3>
-<table>
-<tr><th>Компонент</th><th>Файл</th><th>Что делает</th></tr>
-<tr><td>Result Verifier</td><td>~/.claude/hooks/result-verifier.sh</td><td>Блокирует "готово" без тестов/E2E</td></tr>
-<tr><td>E2E on Deploy</td><td>~/.claude/hooks/e2e-on-deploy.py</td><td>Health check после docker compose up</td></tr>
-<tr><td>Auto-Doc</td><td>~/.claude/hooks/auto-doc.py</td><td>Changelog в MEMORY.md при feat:/refactor:</td></tr>
-<tr><td>MCP Health Check</td><td>~/.claude/hooks/mcp-health-check.py</td><td>Проверка 14 MCP серверов при старте</td></tr>
-<tr><td>Process Watchdog</td><td>~/.claude/hooks/process-watchdog.py</td><td>Находит zombie процессы</td></tr>
-<tr><td>Quality Sentinel</td><td>~/.claude/hooks/quality-sentinel.sh</td><td>Проверяет bare except, raw SQL</td></tr>
-</table>
+  <div class="level-bar-wrap">
+    <div class="level-bar-header">
+      <div class="level-label">⚡ Уровень 5 — Лид (Lead)</div>
+      <div class="level-xp">14,955 / 20,000 XP — до Принципала</div>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill"></div>
+    </div>
+    <div class="level-milestones">
+      <span>Лид 10,000</span>
+      <span>49% пройдено</span>
+      <span>Принципал 20,000</span>
+    </div>
+  </div>
+</header>
 
-<h3>Rules (16 файлов)</h3>
-<table>
-<tr><th>Rule</th><th>Что делает</th></tr>
-<tr><td>research-before-code</td><td>Context7 + Exa ПЕРЕД кодом</td></tr>
-<tr><td>data-correctness</td><td>Ориентация на конечный результат</td></tr>
-<tr><td>think-ahead</td><td>Думать на 10 шагов вперёд</td></tr>
-<tr><td>spec-first</td><td>Спецификация ДО кода для задач >3 файлов</td></tr>
-<tr><td>security-baseline</td><td>OWASP, secrets, CORS, rate limiting</td></tr>
-<tr><td>auto-coaching</td><td>AI дотягивает до Elite уровня</td></tr>
-<tr><td>time-estimation</td><td>Часы с AI агентами, не дни</td></tr>
-<tr><td>quality-gates</td><td>Pre-code checklist, commit standards</td></tr>
-<tr><td>ci-cd-templates</td><td>GitHub Actions шаблоны</td></tr>
-<tr><td>vps-deploy</td><td>SSH deploy на 94.198.219.232</td></tr>
-<tr><td>self-healing</td><td>Health endpoints, auto-restart</td></tr>
-<tr><td>marketplace-ops</td><td>WB/Ozon API правила</td></tr>
-<tr><td>project-bootstrap</td><td>Стандарт новых проектов</td></tr>
-<tr><td>outreach-automation</td><td>B2B pipeline</td></tr>
-<tr><td>seo-automation</td><td>SEO pipeline</td></tr>
-<tr><td>skolkovo-product</td><td>Требования Сколково</td></tr>
-</table>
+<!-- CONTENT -->
+<div class="content">
 
-<h3>Skills (10 custom)</h3>
-<table>
-<tr><th>Skill</th><th>Команда</th><th>Что делает</th></tr>
-<tr><td>Do Router</td><td>/do-router</td><td>Автоклассификация задач по 4 тирам</td></tr>
-<tr><td>Daily Review</td><td>/daily-review</td><td>Вечерний анализ дня</td></tr>
-<tr><td>Good Morning</td><td>/good-morning</td><td>Утренний брифинг</td></tr>
-<tr><td>Growth Coach</td><td>/growth-coach</td><td>Board of Mentors, прокачка до Top-0.1%</td></tr>
-<tr><td>Improver</td><td>/improver</td><td>Мета-агент самоулучшения системы</td></tr>
-<tr><td>RFC</td><td>/rfc</td><td>Request for Comments для крупных решений</td></tr>
-<tr><td>Tech Radar</td><td>/tech-radar</td><td>Квартальный обзор стека</td></tr>
-<tr><td>QA Verifier</td><td>/qa-verify</td><td>4-step quality scoring (1-10)</td></tr>
-<tr><td>Mega Research</td><td>/mega-research</td><td>Deep research, 100+ источников</td></tr>
-<tr><td>CL v2.1</td><td>/instinct-status</td><td>Continuous Learning engine</td></tr>
-</table>
+<!-- РАЗДЕЛ 0: Обзор -->
+<section class="section" id="section-0">
+  <div class="section-header">
+    <div class="section-icon icon-purple">📊</div>
+    <div>
+      <h2>Метрики системы</h2>
+      <p style="margin:0;font-size:12px;color:var(--text-muted)">Состояние инфраструктуры на 27 марта 2026</p>
+    </div>
+    <span class="section-num">§0</span>
+  </div>
 
-<h3>Геймификация</h3>
-<table>
-<tr><th>Компонент</th><th>Описание</th></tr>
-<tr><td>XP Engine</td><td>30+ действий дают XP (коммиты, тесты, деплои, агенты)</td></tr>
-<tr><td>Competitive Rankings</td><td>Percentile vs DORA/GitHub benchmarks</td></tr>
-<tr><td>Growth Engine</td><td>Skill Tree 1-5, план прокачки, Board of Mentors</td></tr>
-<tr><td>Daily Challenge</td><td>Ежедневная задача на слабую метрику</td></tr>
-<tr><td>23 Achievements</td><td>От "First Blood" до "Empire Builder"</td></tr>
-<tr><td>9 Weekly Quests</td><td>Ship It, Bug Hunter, E2E Warrior...</td></tr>
-<tr><td>Telegram Dashboard</td><td>Ранг + прогресс + challenge на русском</td></tr>
-</table>
+  <div class="cards-grid">
+    <div class="card">
+      <div class="card-stat">420+</div>
+      <div class="card-title">Файлов в template</div>
+      <div class="card-desc">Полный набор конфигов, скиллов, хуков, правил и скриптов в ~/.claude/</div>
+    </div>
+    <div class="card">
+      <div class="card-stat">17</div>
+      <div class="card-title">Rules файлов</div>
+      <div class="card-desc">Автоматически применяемые правила для каждого типа задачи</div>
+    </div>
+    <div class="card">
+      <div class="card-stat">22</div>
+      <div class="card-title">Hook Groups</div>
+      <div class="card-desc">PreToolUse, PostToolUse, Stop, SessionStart — автоматизация на каждый шаг</div>
+    </div>
+    <div class="card">
+      <div class="card-stat">16+</div>
+      <div class="card-title">Skills / Commands</div>
+      <div class="card-desc">Кастомные slash-команды от /good-morning до /mega-research</div>
+    </div>
+    <div class="card">
+      <div class="card-stat">1,569</div>
+      <div class="card-title">Observations (CL v2.1)</div>
+      <div class="card-desc">Накопленные наблюдения о паттернах работы Дмитрия в системе самообучения</div>
+    </div>
+    <div class="card">
+      <div class="card-stat">15</div>
+      <div class="card-title">Instincts из FlowWhisper</div>
+      <div class="card-desc">1.25M символов голосовых логов → выявленные паттерны поведения</div>
+    </div>
+  </div>
 
-<h3>Расписание (автоматическое)</h3>
-<table>
-<tr><th>Задача</th><th>Время</th><th>Что делает</th></tr>
-<tr><td>Good Morning</td><td>09:00 ежедневно</td><td>Приоритеты, ошибки, алерты</td></tr>
-<tr><td>Daily Review</td><td>23:00 ежедневно</td><td>Анализ дня, предложения</td></tr>
-<tr><td>Improver</td><td>ВС 20:00</td><td>Самоулучшение системы</td></tr>
-</table>
+  <div class="highlight-box">
+    <p style="color:var(--text);font-size:13px;margin-bottom:6px;"><strong>Что это за система?</strong></p>
+    <p style="font-size:13px;margin:0;">Claude Code Infrastructure — это полный стек конфигурации AI-ассистента для Aragant.group. Система превращает Claude из чат-бота в настоящего CTO: с памятью, правилами, автоматическими ролями, геймификацией и самообучением. Результат — AI, который думает на уровне Principal Engineer и действует как elite full-stack developer.</p>
+  </div>
+</section>
 
-<h2>🏢 Оргструктура виртуальной IT компании</h2>
-<table>
-<tr><th>Роль</th><th>Реализация</th><th>Автоматически?</th></tr>
-<tr><td>🧠 CTO</td><td>CLAUDE.md + CTO workflow</td><td>✅ Да</td></tr>
-<tr><td>🏗️ Architect</td><td>think-ahead + /rfc + /plan</td><td>✅ Да (rule)</td></tr>
-<tr><td>🔬 Researcher</td><td>/mega-research + research rule</td><td>✅ Да (rule)</td></tr>
-<tr><td>📐 Designer</td><td>spec-first + mind maps</td><td>✅ Да (rule)</td></tr>
-<tr><td>🛡️ Security</td><td>security-baseline + hooks</td><td>✅ Да</td></tr>
-<tr><td>⚡ Dev Lead</td><td>/do router + Agent Teams</td><td>✅ Да (hook)</td></tr>
-<tr><td>💻 Coders</td><td>Sonnet agents (parallel)</td><td>По запросу</td></tr>
-<tr><td>🧪 QA</td><td>result-verifier + /qa-verify</td><td>✅ Да (hook)</td></tr>
-<tr><td>🚀 DevOps</td><td>CI/CD + deploy hooks</td><td>✅ Да</td></tr>
-<tr><td>📊 Analytics</td><td>Gamification + rankings</td><td>✅ Да</td></tr>
-<tr><td>🎓 Coach</td><td>/growth-coach + CL v2.1</td><td>По расписанию</td></tr>
-<tr><td>🌙 Night Worker</td><td>Sleepless daemon</td><td>По запросу</td></tr>
-</table>
+<!-- РАЗДЕЛ 1: CTO-слой -->
+<section class="section" id="section-1">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🧠</div>
+    <div><h2>CTO-слой — Умный AI-CTO</h2></div>
+    <span class="section-num">§1</span>
+  </div>
 
-<h2>🚀 Как развернуть на новом компе</h2>
-<pre>
-git clone https://github.com/DmitriyMutagen/claude-code-template.git
+  <p>Claude = CTO. Дмитрий = Founder. Система принудительно думает <strong>сверху вниз</strong>: стратегия → архитектура → дизайн → код. Запрещён прыжок сразу в код.</p>
+
+  <div class="info-box">
+    <div class="box-title">Главный принцип</div>
+    Прежде чем думать КАК — ответь ЗАЧЕМ. Бизнес-цель первична.
+  </div>
+
+  <h3>Классификация задач (автоматическая)</h3>
+  <div class="cards-grid-3">
+    <div class="card">
+      <div class="card-title"><span class="badge badge-green">Мелочь</span></div>
+      <div class="card-desc" style="margin-top:8px;">1 файл, до 5 минут — делать сразу без фаз. Типичные примеры: переименовать переменную, добавить строку в конфиг, исправить опечатку.</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="badge badge-gold">Задача</span></div>
+      <div class="card-desc" style="margin-top:8px;">Фича или баг, 1-3 дня. Обязательны Фазы 1 и 2 (стратегия + архитектура), потом код.</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="badge badge-red">Проект</span></div>
+      <div class="card-desc" style="margin-top:8px;">Новый модуль, архитектура, больше 3 дней. Все фазы обязательны. Без согласования архитектуры — стоп.</div>
+    </div>
+  </div>
+
+  <h3>Фазы работы (0–4)</h3>
+  <div class="phases">
+    <div class="phase">
+      <div class="phase-num">Фаза 0</div>
+      <div class="phase-name">Понимание</div>
+      <div class="phase-desc">Интерпретация намерения, классификация масштаба</div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">Фаза 1</div>
+      <div class="phase-name">Стратегия</div>
+      <div class="phase-desc">Зачем? Для кого? Метрика? Бизнес-цель?</div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">Фаза 2</div>
+      <div class="phase-name">Архитектура</div>
+      <div class="phase-desc">Модули, интерфейсы, варианты, согласование</div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">Фаза 3</div>
+      <div class="phase-name">Реализация</div>
+      <div class="phase-desc">Код после ок на архитектуру</div>
+    </div>
+    <div class="phase">
+      <div class="phase-num">Фаза 4</div>
+      <div class="phase-name">Верификация</div>
+      <div class="phase-desc">Тесты, lint, Sentry, Definition of Done</div>
+    </div>
+  </div>
+
+  <h3>Фаза 2: Обязательный шаблон документа</h3>
+  <pre>Цель:          [что и зачем]
+Архитектура:   [модули, связи, data flow]
+Структура:     [новые файлы/директории, изменения в существующих]
+Зависимости:   [библиотеки, инструменты, MCP, API]
+Модели данных: [схемы, миграции если нужно]
+API контракты: [эндпоинты, input/output если применимо]
+Рекомендация:  [вариант + обоснование]
+Риски:         [что может пойти не так + митигация]
+DoD:           [конкретные критерии готовности]</pre>
+
+  <h3>3 варианта решения (обязательно для задач &gt;1 дня)</h3>
+  <div class="cards-grid-3">
+    <div class="card" style="border-color:rgba(45,106,79,0.4);">
+      <div class="card-title"><span class="badge badge-green">Быстрый</span></div>
+      <div class="card-desc" style="margin-top:8px;">Минимум кода, максимум готового. Когда нужно сдать вчера. Trade-off: технический долг.</div>
+    </div>
+    <div class="card" style="border-color:rgba(244,162,97,0.4);">
+      <div class="card-title"><span class="badge badge-gold">Сбалансированный</span></div>
+      <div class="card-desc" style="margin-top:8px;">Рекомендация в большинстве случаев. Баланс скорости и качества.</div>
+    </div>
+    <div class="card" style="border-color:rgba(230,57,70,0.4);">
+      <div class="card-title"><span class="badge badge-red">Идеальный</span></div>
+      <div class="card-desc" style="margin-top:8px;">Оверинжиниринг — только когда реально нужно масштабирование ×100.</div>
+    </div>
+  </div>
+
+  <h3>Антипаттерны — стоп-сигналы</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Фраза</th><th>Проблема</th><th>Действие</th></tr></thead>
+      <tbody>
+        <tr><td><code>"Сейчас быстро закодим"</code></td><td>Фаза 1 пропущена</td><td>СТОП → Бизнес-цель?</td></tr>
+        <tr><td><code>"Давай ещё добавим X"</code></td><td>Scope creep</td><td>СТОП → Что в MVP, что потом?</td></tr>
+        <tr><td><code>"Тут надо переписать всё"</code></td><td>Максимализм</td><td>СТОП → Минимальное изменение?</td></tr>
+        <tr><td><code>"Это же очевидно"</code></td><td>Нет документации</td><td>СТОП → Покажи варианты &gt;1 дня</td></tr>
+        <tr><td><code>Код без плана</code></td><td>Фаза 2 пропущена</td><td>СТОП → Вернись к архитектуре</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- РАЗДЕЛ 2: Rules -->
+<section class="section" id="section-2">
+  <div class="section-header">
+    <div class="section-icon icon-red">📋</div>
+    <div><h2>Система Rules (17 файлов)</h2></div>
+    <span class="section-num">§2</span>
+  </div>
+
+  <p>Все rules хранятся в <code>~/.claude/rules/</code> и применяются автоматически ко всем проектам. Локальные rules в <code>.claude/rules/</code> переопределяют глобальные.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Файл</th>
+          <th>Когда активен</th>
+          <th>Ключевые правила</th>
+          <th>Статус</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>research-before-code.md</code></td>
+          <td>Любая нетривиальная задача</td>
+          <td>Context7 + Exa перед кодом. Купить vs Построить. 3 варианта.</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>data-correctness.md</code></td>
+          <td>Работа с API/БД/маркетплейсами</td>
+          <td>Реальные данные, не mock. Сверять числа с источником. Скриншот = доказательство.</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>think-ahead.md</code></td>
+          <td>Архитектурные решения</td>
+          <td>×10/×100 нагрузка. Edge cases. Обратная совместимость. API checklist.</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>spec-first.md</code></td>
+          <td>Задача &gt;3 файлов</td>
+          <td>spec.md до кода. Acceptance Criteria. Edge cases. Согласование с Дмитрием.</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>security-baseline.md</code></td>
+          <td>Любой API или деплой</td>
+          <td>OWASP Top 10. Secrets в .env. JWT expiration. Rate limiting. Input validation.</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>auto-coaching.md</code></td>
+          <td>/good-morning, /daily-review</td>
+          <td>Метрики ниже Senior → конкретные действия. Регрессии → предупреждение.</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>time-estimation.md</code></td>
+          <td>Любая оценка трудозатрат</td>
+          <td>Никогда "дни". Только часы × параллельные агенты. Формула: человек÷5÷агентов.</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>quality-gates.md</code></td>
+          <td>Перед любым кодом</td>
+          <td>MEMORY.md → Sentry → тесты → Serena. Conventional Commits. No force push.</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>ci-cd-templates.md</code></td>
+          <td>Новый проект или деплой</td>
+          <td>GitHub Actions для Python/TypeScript. Pre-commit config. Deploy script pattern.</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>vps-deploy.md</code></td>
+          <td>Деплой на production</td>
+          <td>SSH к 94.198.219.232. Docker compose. Nginx config. SSL certbot. Health check.</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>self-healing.md</code></td>
+          <td>Каждый production сервис</td>
+          <td>/health endpoint обязателен. Docker HEALTHCHECK. Auto-recovery pattern. Telegram alert.</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>marketplace-ops.md</code></td>
+          <td>WB/Ozon/YM операции</td>
+          <td>MCP вместо raw HTTP. Тест на 1-3 товарах. Никогда цены без подтверждения.</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>project-bootstrap.md</code></td>
+          <td>/new-project команда</div></td>
+          <td>Структура директорий. CLAUDE.md шаблон. Sentry с первого дня. CI/CD сразу.</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>outreach-automation.md</code></td>
+          <td>B2B аутрич задачи</td>
+          <td>Pipeline: сбор → обогащение → скоринг → персонализация → отправка → CRM.</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>seo-automation.md</code></td>
+          <td>Сайты, контент, SEO</td>
+          <td>Yandex.Webmaster API. Wordstat. IndexNow. WordPress REST API. Schema markup.</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>skolkovo-product.md</code></td>
+          <td>Bionovacia / Сколково</td>
+          <td>AI/ML обязательно. C4 диаграммы. ADR. Unit economics. TAM/SAM/SOM.</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>virtual-company.md</code></td>
+          <td>Каждый промпт</td>
+          <td>Автороутинг по ключевым словам. 12 ролей. CTO Layer обязателен всегда.</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>safe-ops.md</code></td>
+          <td>Критические изменения</td>
+          <td>backup.sh перед перезаписью CLAUDE.md, settings.json, rules/, gamification/.</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>📊 Актуальный список (авто)</h3>
+  <!-- AUTO:rules START -->
+<table class="data-table">
+      <thead><tr><th>Файл</th><th>Название</th><th>Описание</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>~/.claude/rules/auto-coaching</code></td>
+          <td>Auto-Coaching — AI дотягивает до Elite уровня (ОБЯЗАТЕЛЬНО)</td>
+          <td>- В /good-morning и /daily-review — секция коучинга</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/chain-thinking</code></td>
+          <td>Chain Thinking — Думай по цепочке, не по файлу (ОБЯЗАТЕЛЬНО)</td>
+          <td>НИКОГДА не говори "код правильный" если не проверил ВЕСЬ pipeline:</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/ci-cd-templates</code></td>
+          <td>CI/CD Templates — Global Standards</td>
+          <td>name: CI</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/context7-mandatory</code></td>
+          <td>Context7 Mandatory — ВСЕГДА перед новой библиотекой</td>
+          <td>ЗАПРЕЩЕНО писать код с любой библиотекой без Context7:</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/data-correctness</code></td>
+          <td>Data Correctness (ОБЯЗАТЕЛЬНО)</td>
+          <td>Конечный результат = то что видит ПОЛЬЗОВАТЕЛЬ. Не код, не тесты — реальные данные на экране.</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/docs-always</code></td>
+          <td>Docs Always — Docstrings and Documentation (MANDATORY)</td>
+          <td>Every piece of Python code MUST be documented. "Done" is BLOCKED if docstrings are missing.</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/git-workflow-enforcement</code></td>
+          <td>Git Workflow Enforcement — BLOCKING (все проекты)</td>
+          <td>- `git push origin main` — BLOCKED by hook</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/marketplace-ops</code></td>
+          <td>Marketplace Operations Rules (WB / Ozon / YM)</td>
+          <td>- **Ozon**: Client ID 2003894</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/modular-architecture</code></td>
+          <td>Modular Architecture — ОБЯЗАТЕЛЬНО для проектов >30 файлов</td>
+          <td>Три уровня:</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/outreach-automation</code></td>
+          <td>B2B Outreach Automation Rules</td>
+          <td>Полностью автоматический аутрич для селлеров маркетплейсов.</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/project-bootstrap</code></td>
+          <td>Project Bootstrap — Standards for NEW Projects</td>
+          <td>project-root/</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/quality-gates</code></td>
+          <td>Quality Gates — Global Rules (ALL Projects)</td>
+          <td>1. Read MEMORY.md — understand project context and past decisions</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/research-before-code</code></td>
+          <td>Research Before Code (ОБЯЗАТЕЛЬНО)</td>
+          <td>Любая нетривиальная задача (>1 файла, новая фича, новая интеграция).</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/safe-ops</code></td>
+          <td>Safe Operations — Backup Before Critical Changes (ОБЯЗАТЕЛЬН</td>
+          <td>Перед ЛЮБЫМ из следующих действий — СНАЧАЛА бэкап:</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/security-baseline</code></td>
+          <td>Security Baseline — Автоматический security на каждом шаге (</td>
+          <td>- [ ] Секреты в .env, не в коде (detect-secrets в pre-commit)</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/self-healing</code></td>
+          <td>Self-Healing Infrastructure Rules</td>
+          <td>Every deployed service MUST have:</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/sentry-first</code></td>
+          <td>Sentry First — ВСЕГДА смотри Sentry перед фиксом</td>
+          <td>ЗАПРЕЩЕНО фиксить баг без:</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/seo-automation</code></td>
+          <td>SEO Automation Rules</td>
+          <td>Автоматизация SEO для 3-4 сайтов: bio-stm.ru (WordPress), SoulWay (Tilda), самописные.</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/serena-sentry-enforcement</code></td>
+          <td>Serena + Sentry Enforcement — БЛОКИРУЮЩЕЕ ПРАВИЛО (ВСЕ ПРОЕК</td>
+          <td>---</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/skolkovo-product</code></td>
+          <td>Skolkovo IT Product Rules</td>
+          <td>Резидентство в Сколково. Нужен IT-продукт уровня Сколково:</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/spec-first</code></td>
+          <td>Spec-First — Спецификация ДО кода (ОБЯЗАТЕЛЬНО для задач >3 </td>
+          <td>Любая задача затрагивающая >3 файлов ИЛИ новая фича ИЛИ новый API.</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/testing-always</code></td>
+          <td>Testing Always — ОБЯЗАТЕЛЬНЫЕ тесты на КАЖДОЕ изменение (Qua</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/testing-mandatory</code></td>
+          <td>Testing Mandatory — ВСЕГДА настраивай тесты (ОБЯЗАТЕЛЬНО)</td>
+          <td>ДЛЯ КАЖДОГО проекта — тесты по ТЗ из ~/Documents/PROMPT_TESTING_TZ.md</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/think-ahead</code></td>
+          <td>Think Ahead — 10 шагов вперёд (ОБЯЗАТЕЛЬНО)</td>
+          <td>- Что будет при ×10 нагрузке? ×100?</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/time-estimation</code></td>
+          <td>Time Estimation — AI-Speed (ОБЯЗАТЕЛЬНО)</td>
+          <td>AI с параллельными агентами работает в 10-20× быстрее человека.</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/verify-before-done</code></td>
+          <td>Verify Before Done — ОБЯЗАТЕЛЬНАЯ верификация (БЛОКИРУЮЩЕЕ)</td>
+          <td>- Код написан = НЕ готово</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/virtual-company</code></td>
+          <td>Virtual Elite IT Company — Auto-Routing Rules</td>
+          <td>Claude = CTO. Думаешь как Werner Vogels / Patrick Collison:</td>
+        </tr>
+        <tr>
+          <td><code>~/.claude/rules/vps-deploy</code></td>
+          <td>VPS Deploy & CI/CD — Global Rules (ALL Projects)</td>
+          <td>- **IP**: 94.198.219.232</td>
+        </tr>
+      </tbody>
+    </table>
+<!-- AUTO:rules END -->
+</section>
+
+<!-- РАЗДЕЛ 3: Hooks -->
+<section class="section" id="section-3">
+  <div class="section-header">
+    <div class="section-icon icon-blue">⚡</div>
+    <div><h2>Hooks система — Автоматизация</h2></div>
+    <span class="section-num">§3</span>
+  </div>
+
+  <p>Хуки — это автоматические действия на события Claude Code. 22 группы хуков покрывают весь жизненный цикл сессии.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Хук</th>
+          <th>Тип</th>
+          <th>Что делает</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>session-bootstrap</code></td>
+          <td><span class="badge badge-blue">SessionStart</span></td>
+          <td>Загружает GLOBAL_MEMORY.md + MEMORY.md + git log — автоматический контекст</td>
+        </tr>
+        <tr>
+          <td><code>gamification-boot</code></td>
+          <td><span class="badge badge-blue">SessionStart</span></td>
+          <td>Показывает текущий уровень, XP, стрик — мотивация с первой строки</td>
+        </tr>
+        <tr>
+          <td><code>mcp-health-check</code></td>
+          <td><span class="badge badge-blue">SessionStart</span></td>
+          <td>Проверяет доступность ключевых MCP серверов (marketplace-api, sentry, playwright)</td>
+        </tr>
+        <tr>
+          <td><code>block-force-push-main</code></td>
+          <td><span class="badge badge-purple">PreToolUse</span></td>
+          <td>Блокирует <code>git push --force</code> в main/master с объяснением почему</td>
+        </tr>
+        <tr>
+          <td><code>block-env-write</code></td>
+          <td><span class="badge badge-purple">PreToolUse</span></td>
+          <td>Блокирует запись в .env, .pem, .key файлы — security baseline</td>
+        </tr>
+        <tr>
+          <td><code>block-bare-except</code></td>
+          <td><span class="badge badge-purple">PreToolUse</span></td>
+          <td>Блокирует паттерн <code>except:</code> без типа исключения — quality sentinel</td>
+        </tr>
+        <tr>
+          <td><code>block-raw-sql</code></td>
+          <td><span class="badge badge-purple">PreToolUse</span></td>
+          <td>Предупреждает при обнаружении f-string в SQL запросах — SQL injection prevention</td>
+        </tr>
+        <tr>
+          <td><code>auto-doc-memory</code></td>
+          <td><span class="badge badge-gold">PostToolUse</span></td>
+          <td>При feat/fix коммитах автоматически обновляет MEMORY.md с кратким описанием</td>
+        </tr>
+        <tr>
+          <td><code>sentry-post-deploy</code></td>
+          <td><span class="badge badge-gold">PostToolUse</span></td>
+          <td>После git push запускает проверку новых ошибок в Sentry (org: aragant)</td>
+        </tr>
+        <tr>
+          <td><code>observation-logger</code></td>
+          <td><span class="badge badge-gold">PostToolUse</span></td>
+          <td>Логирует паттерны использования инструментов в CL v2.1 observations.json</td>
+        </tr>
+        <tr>
+          <td><code>result-verifier</code></td>
+          <td><span class="badge badge-red">Stop</span></td>
+          <td>Блокирует "готово" без тестов или скриншота для задач &gt;3 файлов</td>
+        </tr>
+        <tr>
+          <td><code>quality-sentinel</code></td>
+          <td><span class="badge badge-red">Stop</span></td>
+          <td>Проверяет TODO/FIXME/хаки в коде — технический долг не пропускает</td>
+        </tr>
+        <tr>
+          <td><code>session-summarizer</code></td>
+          <td><span class="badge badge-red">Stop</span></td>
+          <td>Сохраняет итоги сессии в decay-7d/session-YYYY-MM-DD-N.md автоматически</td>
+        </tr>
+        <tr>
+          <td><code>auto-checkpoint</code></td>
+          <td><span class="badge badge-dark">PreCompact</span></td>
+          <td>Перед потерей контекста (compact) автоматически сохраняет прогресс в MEMORY.md</td>
+        </tr>
+        <tr>
+          <td><code>process-watchdog</code></td>
+          <td><span class="badge badge-dark">Watchdog</span></td>
+          <td>Убивает zombie-процессы Python/Node которые работают &gt;30 минут без активности</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>📊 Актуальный статус хуков (авто)</h3>
+  <!-- AUTO:hooks START -->
+<table class="data-table">
+      <thead><tr><th>Событие</th><th>Кол-во</th><th>Назначение</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>PreToolUse</code></td>
+          <td class="badge">4 хуков</td>
+          <td>Блокировка опасных операций (push main, .env запись)</td>
+        </tr>
+        <tr>
+          <td><code>PostToolUse</code></td>
+          <td class="badge">6 хуков</td>
+          <td>Трекинг XP, CL v2.1 наблюдения, auto-commit</td>
+        </tr>
+        <tr>
+          <td><code>Notification</code></td>
+          <td class="badge">1 хуков</td>
+          <td>Уведомления о долгих операциях</td>
+        </tr>
+        <tr>
+          <td><code>Stop</code></td>
+          <td class="badge">6 хуков</td>
+          <td>Сохранение сессии, геймификация итоги, Telegram уведомление</td>
+        </tr>
+        <tr>
+          <td><code>UserPromptSubmit</code></td>
+          <td class="badge">2 хуков</td>
+          <td>Preflight check: Context7, Exa, tier classification</td>
+        </tr>
+        <tr>
+          <td><code>SessionStart</code></td>
+          <td class="badge">5 хуков</td>
+          <td>Инициализация сессии: баннер, XP снапшот, CL v2.1</td>
+        </tr>
+        <tr>
+          <td><code>PreCompact</code></td>
+          <td class="badge">1 хуков</td>
+          <td>Auto-checkpoint перед сжатием контекста</td>
+        </tr>
+      </tbody>
+    </table>
+<!-- AUTO:hooks END -->
+</section>
+
+<!-- РАЗДЕЛ 4: Skills -->
+<section class="section" id="section-4">
+  <div class="section-header">
+    <div class="section-icon icon-green">🎮</div>
+    <div><h2>Skills / Кастомные команды</h2></div>
+    <span class="section-num">§4</span>
+  </div>
+
+  <p>Slash-команды в <code>~/.claude/skills/</code>. Вызываются через <code>/команда</code> в чате с Claude.</p>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// Ежедневные ритуалы</div>
+    <div class="cmd-item">
+      <div class="cmd-name">/good-morning</div>
+      <div class="cmd-desc">Утренний брифинг: приоритеты дня + Sentry errors + coaching + метрики + стрик</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/daily-review</div>
+      <div class="cmd-desc">Вечерний анализ: XP заработано, метрики за день, рост, что улучшить</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/growth-coach</div>
+      <div class="cmd-desc">Elite Benchmarks + Gap Analysis + 12 менторов + конкретные шаги к Принципалу</div>
+    </div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// Контекст и память</div>
+    <div class="cmd-item">
+      <div class="cmd-name">/continue</div>
+      <div class="cmd-desc">Восстановить контекст: читает GLOBAL_MEMORY + MEMORY.md + git log — главная команда при старте</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/checkpoint</div>
+      <div class="cmd-desc">Сохранить прогресс: MEMORY.md + git commit + GitHub sync — вызывать после крупных задач</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/new-project</div>
+      <div class="cmd-desc">Инициализировать проект: структура директорий + CLAUDE.md + Sentry + CI/CD + pre-commit</div>
+    </div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// Разработка</div>
+    <div class="cmd-item">
+      <div class="cmd-name">/spec</div>
+      <div class="cmd-desc">Spec-Driven Development: создаёт spec.md + prompt_plan.md + todo.md в docs/plans/</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/review</div>
+      <div class="cmd-desc">Строгий code review: security + logic + quality + anti-patterns + оценка 1-10</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/audit</div>
+      <div class="cmd-desc">Полный security аудит: OWASP Top 10 + secrets + зависимости + permissions</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/deploy-check</div>
+      <div class="cmd-desc">Предеплойная проверка: тесты + lint + health + env vars + rollback plan</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/parallel</div>
+      <div class="cmd-desc">Запуск Agent Teams параллельно: архитектор || кодер || тестировщик через tmux</div>
+    </div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// Исследование</div>
+    <div class="cmd-item">
+      <div class="cmd-name">/mega-research</div>
+      <div class="cmd-desc">Глубокое исследование 100+ источников: Context7 + Exa + Brave + PubMed + синтез</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/rfc</div>
+      <div class="cmd-desc">Request for Comments: создать RFC документ для архитектурного решения с вариантами</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/tech-radar</div>
+      <div class="cmd-desc">Квартальный обзор стека: что устарело, что принять, что попробовать</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/brainstorming</div>
+      <div class="cmd-desc">Структурированный брейнсторм: 20+ идей → фильтрация → топ-3 → детальный план</div>
+    </div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// Маркетплейсы</div>
+    <div class="cmd-item">
+      <div class="cmd-name">/wb-enrich</div>
+      <div class="cmd-desc">WB Content Factory enrichment pipeline: загрузить артикулы → AI → XLSX</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/wb-qa</div>
+      <div class="cmd-desc">QA-проверка карточек товаров: скоринг 0-10 по качеству контента</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/market-analytics</div>
+      <div class="cmd-desc">Аналитика маркетплейсов: WB + Ozon + YM dashboard из PostgreSQL</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/org-structure</div>
+      <div class="cmd-desc">Показать 12 ролей + Auto-Routing Matrix + текущего активного агента</div>
+    </div>
+  </div>
+
+  <h3>📊 Кастомные скиллы — актуальный список (авто)</h3>
+  <!-- AUTO:skills START -->
+<table class="data-table">
+      <thead><tr><th>Команда</th><th>Описание</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>/daily-review</code></td>
+          <td>Analyze today's work across all projects, identify patterns, generate improvement suggestions. Use a</td>
+        </tr>
+        <tr>
+          <td><code>/good-morning</code></td>
+          <td>Morning briefing — priorities, errors, alerts, plan for the day. Use at start of day or via schedule</td>
+        </tr>
+        <tr>
+          <td><code>/growth-coach</code></td>
+          <td>Elite CTO наставник. Оценивает уровень, учит паттернам топ-разработчиков, предлагает конкретные инст</td>
+        </tr>
+        <tr>
+          <td><code>/org-structure</code></td>
+          <td>Virtual Elite IT Company — автоматический роутинг задач по ролям уровня Top-100 мировых IT компаний.</td>
+        </tr>
+      </tbody>
+    </table>
+<!-- AUTO:skills END -->
+</section>
+
+<!-- РАЗДЕЛ 5: Virtual Company -->
+<section class="section" id="section-5">
+  <div class="section-header">
+    <div class="section-icon icon-gold">🏢</div>
+    <div><h2>Virtual Elite IT Company — 12 ролей</h2></div>
+    <span class="section-num">§5</span>
+  </div>
+
+  <p>При каждом запросе Claude автоматически активирует нужные роли. Роли работают как специализированные агенты внутри одной сессии.</p>
+
+  <div class="roles-grid">
+    <div class="role-card" style="border-top:3px solid var(--purple);">
+      <span class="role-emoji">🧠</span>
+      <div class="role-name">CTO</div>
+      <div class="role-when">Всегда активен</div>
+      <div class="role-mentor">Werner Vogels</div>
+    </div>
+    <div class="role-card" style="border-top:3px solid var(--blue);">
+      <span class="role-emoji">🏗️</span>
+      <div class="role-name">Chief Architect</div>
+      <div class="role-when">Задача &gt;1 дня</div>
+      <div class="role-mentor">Martin Fowler</div>
+    </div>
+    <div class="role-card" style="border-top:3px solid var(--green-light);">
+      <span class="role-emoji">🔬</span>
+      <div class="role-name">Research Lead</div>
+      <div class="role-when">Новая технология</div>
+      <div class="role-mentor">Andrej Karpathy</div>
+    </div>
+    <div class="role-card" style="border-top:3px solid var(--gold);">
+      <span class="role-emoji">📐</span>
+      <div class="role-name">Product Designer</div>
+      <div class="role-when">&gt;3 файлов в задаче</div>
+      <div class="role-mentor">DHH</div>
+    </div>
+    <div class="role-card" style="border-top:3px solid var(--red);">
+      <span class="role-emoji">🛡️</span>
+      <div class="role-name">Security Officer</div>
+      <div class="role-when">Любой API/деплой</div>
+      <div class="role-mentor">OWASP</div>
+    </div>
+    <div class="role-card" style="border-top:3px solid var(--purple-light);">
+      <span class="role-emoji">⚡</span>
+      <div class="role-name">Dev Lead</div>
+      <div class="role-when">Реализация</div>
+      <div class="role-mentor">Patrick Collison</div>
+    </div>
+    <div class="role-card">
+      <span class="role-emoji">💻</span>
+      <div class="role-name">Engineers</div>
+      <div class="role-when">Код (параллельно)</div>
+      <div class="role-mentor">—</div>
+    </div>
+    <div class="role-card" style="border-top:3px solid var(--green);">
+      <span class="role-emoji">🧪</span>
+      <div class="role-name">QA Engineer</div>
+      <div class="role-when">После кода</div>
+      <div class="role-mentor">Kent Beck</div>
+    </div>
+    <div class="role-card" style="border-top:3px solid var(--red);">
+      <span class="role-emoji">🐛</span>
+      <div class="role-name">Debugger</div>
+      <div class="role-when">Баг/ошибка</div>
+      <div class="role-mentor">Sentry первый</div>
+    </div>
+    <div class="role-card" style="border-top:3px solid var(--blue-light);">
+      <span class="role-emoji">🚀</span>
+      <div class="role-name">DevOps</div>
+      <div class="role-when">Деплой/инфра</div>
+      <div class="role-mentor">Kelsey Hightower</div>
+    </div>
+    <div class="role-card" style="border-top:3px solid var(--gold-dark);">
+      <span class="role-emoji">📈</span>
+      <div class="role-name">SEO Engineer</div>
+      <div class="role-when">Сайт/контент</div>
+      <div class="role-mentor">Rand Fishkin</div>
+    </div>
+    <div class="role-card" style="border-top:3px solid var(--gold);">
+      <span class="role-emoji">🎓</span>
+      <div class="role-name">Growth Coach</div>
+      <div class="role-when">/growth-coach</div>
+      <div class="role-mentor">Pieter Levels</div>
+    </div>
+  </div>
+
+  <h3>Auto-Routing Matrix</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Ключевые слова запроса</th>
+          <th>Роли (в порядке активации)</th>
+          <th>Ключевые действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag">сделай</span><span class="tag">создай</span><span class="tag">добавь</span><span class="tag">реализуй</span></td>
+          <td>CTO → Designer → DevLead → Engineers → QA</td>
+          <td>Spec → согласование → параллельная разработка → тесты</td>
+        </tr>
+        <tr>
+          <td><span class="tag">баг</span><span class="tag">ошибка</span><span class="tag">не работает</span><span class="tag">сломалось</span></td>
+          <td>CTO → Debugger (Sentry first) → Fix → QA</td>
+          <td>list_issues → root cause → regression test → fix</td>
+        </tr>
+        <tr>
+          <td><span class="tag">задеплой</span><span class="tag">релиз</span><span class="tag">продакшн</span><span class="tag">выложи</span></td>
+          <td>CTO → Security → DevOps → QA → Telegram notify</td>
+          <td>OWASP check → Docker → health check → Sentry verify</td>
+        </tr>
+        <tr>
+          <td><span class="tag">новая библиотека</span><span class="tag">технология</span><span class="tag">инструмент</span></td>
+          <td>Research Lead → Context7 → 3 варианта → CTO</td>
+          <td>Документация → сравнение → "купить vs построить"</td>
+        </tr>
+        <tr>
+          <td><span class="tag">SEO</span><span class="tag">контент</span><span class="tag">сайт</span><span class="tag">статья</span></td>
+          <td>SEO Engineer → Research → Content factory</td>
+          <td>Keywords → schema markup → WordPress API</td>
+        </tr>
+        <tr>
+          <td><span class="tag">архитектура</span><span class="tag">рефактор</span><span class="tag">переписать</span></td>
+          <td>Chief Architect → ADR → RFC → согласование</td>
+          <td>C4 диаграммы → варианты → документация решения</td>
+        </tr>
+        <tr>
+          <td><span class="tag">безопасность</span><span class="tag">уязвимость</span><span class="tag">взломали</span></td>
+          <td>Security Officer → Audit → Fix → Deploy</td>
+          <td>OWASP Top 10 → semgrep → detect-secrets → patch</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- РАЗДЕЛ 6: Геймификация -->
+<section class="section" id="section-6">
+  <div class="section-header">
+    <div class="section-icon icon-gold">🏆</div>
+    <div><h2>Геймификация — Elite Edition</h2></div>
+    <span class="section-num">§6</span>
+  </div>
+
+  <p>Система мотивации через XP, уровни и ранги. Работает через <code>python3 ~/.claude/gamification/engine.py</code>. Автоматически запускается после крупных задач.</p>
+
+  <h3>Уровни (1–12)</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Уровень</th><th>XP порог</th><th>Описание</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Новичок</td><td>0 XP</td><td>Первые шаги</td></tr>
+        <tr><td>2</td><td>Джуниор</td><td>1,000 XP</td><td>Базовые навыки</td></tr>
+        <tr><td>3</td><td>Мид</td><td>3,000 XP</td><td>Самостоятельная работа</td></tr>
+        <tr><td>4</td><td>Сеньор</td><td>6,000 XP</td><td>Ментор для других</td></tr>
+        <tr class="level-row current"><td>5</td><td>⚡ Лид (CURRENT)</td><td>10,000 XP</td><td>Текущий уровень — 14,955 XP (49% до следующего)</td></tr>
+        <tr class="level-row next"><td>6</td><td>→ Принципал (NEXT)</td><td>20,000 XP</td><td>Нужно ещё 5,045 XP</td></tr>
+        <tr><td>7</td><td>Архитектор</td><td>25,000 XP</td><td>Системное мышление</td></tr>
+        <tr><td>8</td><td>CTO</td><td>40,000 XP</td><td>Стратегия + технология</td></tr>
+        <tr><td>9</td><td>Principal Engineer</td><td>70,000 XP</td><td>Лидер отрасли</td></tr>
+        <tr><td>10</td><td>Founder/Visionary</td><td>120,000 XP</td><td>Меняет рынок</td></tr>
+        <tr><td>11</td><td>Top 0.1%</td><td>200,000 XP</td><td>Элита планеты</td></tr>
+        <tr><td>12</td><td>Legendary</td><td>350,000 XP</td><td>Технологическая легенда</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Elite XP Rules — За что начисляется</h3>
+  <div class="table-wrap">
+    <table class="xp-row">
+      <thead><tr><th>Действие</th><th>XP</th><th>Почему важно</th></tr></thead>
+      <tbody>
+        <tr><td>feat: commit (новая фича)</td><td>+50 XP</td><td>Реальная поставка ценности</td></tr>
+        <tr><td>fix: commit (баг исправлен)</td><td>+30 XP</td><td>Качество продукта</td></tr>
+        <tr><td>Создал ADR</td><td>+50 XP</td><td>Документирование решений</td></tr>
+        <tr><td>CI/CD pipeline настроен</td><td>+100 XP</td><td>Инфраструктура качества</td></tr>
+        <tr><td>Deploy under 4 hours</td><td>+100 XP</td><td>Ship speed — ключевой ориентир</td></tr>
+        <tr><td>Revenue feature shipped</td><td>+300 XP</td><td>Прямой вклад в бизнес</td></tr>
+        <tr><td>RFC created</td><td>+100 XP</td><td>Архитектурное лидерство</td></tr>
+        <tr><td>C4 diagram created</td><td>+75 XP</td><td>Визуализация архитектуры</td></tr>
+        <tr><td>E2E tests написаны</td><td>+60 XP</td><td>Надёжность продукта</td></tr>
+        <tr><td>Context7 использован</td><td>+5 XP</td><td>Привычка проверять документацию</td></tr>
+        <tr><td>Security audit пройден</td><td>+80 XP</td><td>Безопасность продакшена</td></tr>
+        <tr><td>Sentry issue fixed</td><td>+40 XP</td><td>Реальный баг в продакшене</td></tr>
+        <tr><td>7-day streak</td><td>+200 XP</td><td>Регулярность работы</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Показатели прогресса</h3>
+  <pre>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ЗАДАЧА ВЫПОЛНЕНА
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+N файлов создано/изменено
+N тестов (если запускались)
+N коммитов (если были)
+N агентов (если запускались)</pre>
+
+  <h3>📊 Текущий прогресс (авто)</h3>
+  <!-- AUTO:gamification START -->
+<div class="gm-stats">
+      <div class="gm-level">🏛️ Архитектор</div>
+      <div class="gm-xp">⚡ 13,440 XP | Streak: 🔥3д</div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-label">0% до Level 8 (75,000 XP)</div>
+    </div>
+    <h3>Ачивки (топ-12)</h3>
+    <div class="achievements-grid">
+<div class="achievement" title="Первый файл создан">
+          <span>🎯 First Blood</span>
+          <span class="xp-badge">+50 XP</span>
+        </div>
+<div class="achievement" title="3 дня подряд в коде">
+          <span>🔥 Hot Streak ×3</span>
+          <span class="xp-badge">+30 XP</span>
+        </div>
+<div class="achievement" title="7 дней подряд — ты машина!">
+          <span>🔥 Hot Streak ×7</span>
+          <span class="xp-badge">+100 XP</span>
+        </div>
+<div class="achievement" title="30 дней подряд. Ты Бог.">
+          <span>🌋 Unstoppable</span>
+          <span class="xp-badge">+500 XP</span>
+        </div>
+<div class="achievement" title="Коммит после 23:00">
+          <span>🌙 Night Owl</span>
+          <span class="xp-badge">+20 XP</span>
+        </div>
+<div class="achievement" title="Коммит до 07:00">
+          <span>🌅 Early Bird</span>
+          <span class="xp-badge">+20 XP</span>
+        </div>
+<div class="achievement" title="100+ тестов в сессии">
+          <span>🧪 Test Master</span>
+          <span class="xp-badge">+100 XP</span>
+        </div>
+<div class="achievement" title="Первый деплой в production">
+          <span>🚀 Ship It</span>
+          <span class="xp-badge">+200 XP</span>
+        </div>
+<div class="achievement" title="Починил 10 Sentry issues">
+          <span>🐛 Bug Slayer</span>
+          <span class="xp-badge">+150 XP</span>
+        </div>
+<div class="achievement" title="1000+ строк за сессию">
+          <span>⚡ Speed Demon</span>
+          <span class="xp-badge">+100 XP</span>
+        </div>
+<div class="achievement" title="Удалил 500+ строк за раз">
+          <span>🧹 Refactor King</span>
+          <span class="xp-badge">+75 XP</span>
+        </div>
+<div class="achievement" title="Запустил 10+ параллельных агентов">
+          <span>🤖 Agent Master</span>
+          <span class="xp-badge">+75 XP</span>
+        </div>
+    </div>
+<!-- AUTO:gamification END -->
+</section>
+
+<!-- РАЗДЕЛ 7: Elite Benchmarks -->
+<section class="section" id="section-7">
+  <div class="section-header">
+    <div class="section-icon icon-gold">📈</div>
+    <div><h2>Elite Benchmarks — Top-100 Creators</h2></div>
+    <span class="section-num">§7</span>
+  </div>
+
+  <h3>Метрики vs топ компании</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Метрика</th><th>Текущий результат</th><th>Цель Elite</th><th>Ориентир</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Commits/day</td>
+          <td><span class="badge badge-gold">8</span></td>
+          <td>25+</td>
+          <td>Anthropic Engineering</td>
+        </tr>
+        <tr>
+          <td>Tests/day</td>
+          <td><span class="badge badge-red">3</span></td>
+          <td>40+</td>
+          <td>Google TDD standards</td>
+        </tr>
+        <tr>
+          <td>Deploys/week</td>
+          <td><span class="badge badge-red">1</span></td>
+          <td>14+</td>
+          <td>Stripe DORA metrics</td>
+        </tr>
+        <tr>
+          <td>ADR coverage</td>
+          <td><span class="badge badge-red">0%</span></td>
+          <td>100%</td>
+          <td>Netflix Architecture</td>
+        </tr>
+        <tr>
+          <td>Ship speed</td>
+          <td><span class="badge badge-red">72h</span></td>
+          <td>4h</td>
+          <td>Pieter Levels</td>
+        </tr>
+        <tr>
+          <td>Sentry coverage</td>
+          <td><span class="badge badge-gold">2/7</span></td>
+          <td>7/7</td>
+          <td>All projects monitored</td>
+        </tr>
+        <tr>
+          <td>CI/CD coverage</td>
+          <td><span class="badge badge-gold">3/7</span></td>
+          <td>7/7</td>
+          <td>GitHub Actions on all</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Top-100 Creators Database</h3>
+  <div class="cards-grid-2">
+    <div class="card">
+      <div class="card-title">top100_creators.json</div>
+      <div class="card-desc" style="margin-top:8px;">40+ профилей, 56KB. 7 категорий: solo_builders, world_class_cto, architects, seo_growth, ai_pioneers, open_source, startup_founders. Для каждого: philosophy, what_to_copy, key_metrics, quotes.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">creator_coaching.py</div>
+      <div class="card-desc" style="margin-top:8px;"><code>python3 creator_coaching.py deploy</code> — найти лучшего по метрике. <code>python3 creator_coaching.py gap</code> — gap analysis. <code>python3 creator_coaching.py random</code> — случайный ментор дня.</div>
+    </div>
+  </div>
+
+  <h3>Board of Mentors (12 персон)</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Ментор</th><th>Специализация</th><th>Главный принцип</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Andrej Karpathy</strong></td><td>AI/ML, Neural Networks</td><td>"Build from scratch to truly understand"</td></tr>
+        <tr><td><strong>Kent Beck</strong></td><td>TDD, Extreme Programming</td><td>"Red → Green → Refactor"</td></tr>
+        <tr><td><strong>Linus Torvalds</strong></td><td>OS, Systems Programming</td><td>"Talk is cheap, show me the code"</td></tr>
+        <tr><td><strong>Patrick Collison</strong></td><td>Payments, Fintech, Scale</td><td>"Don't break things, but ship fast"</td></tr>
+        <tr><td><strong>DHH</strong></td><td>Rails, Convention over Config</td><td>"Opinionated software is better software"</td></tr>
+        <tr><td><strong>Werner Vogels</strong></td><td>Distributed Systems, AWS</td><td>"Everything fails, all the time"</td></tr>
+        <tr><td><strong>Martin Fowler</strong></td><td>Refactoring, Patterns</td><td>"Make implicit explicit"</td></tr>
+        <tr><td><strong>Sam Newman</strong></td><td>Microservices, Architecture</td><td>"Design for independent deployability"</td></tr>
+        <tr><td><strong>Gregor Hohpe</strong></td><td>Enterprise Integration</td><td>"Architect Elevator — board and engine room"</td></tr>
+        <tr><td><strong>Kelsey Hightower</strong></td><td>Kubernetes, DevOps</td><td>"Kubernetes is infrastructure, not destination"</td></tr>
+        <tr><td><strong>Rand Fishkin</strong></td><td>SEO, Content Marketing</td><td>"Be the best answer to any question"</td></tr>
+        <tr><td><strong>Pieter Levels</strong></td><td>Solo Builder, Ship Speed</td><td>"Build, ship, repeat. Revenue beats funding."</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- РАЗДЕЛ 8: Самообучение -->
+<section class="section" id="section-8">
+  <div class="section-header">
+    <div class="section-icon icon-blue">🔬</div>
+    <div><h2>Самообучающаяся система — CL v2.1</h2></div>
+    <span class="section-num">§8</span>
+  </div>
+
+  <p>Claude Continuous Learning v2.1 — система, которая учится на каждой сессии и становится умнее с каждым взаимодействием.</p>
+
+  <div class="cards-grid-2">
+    <div class="card">
+      <div class="card-title">Observation Logger</div>
+      <div class="card-desc" style="margin-top:8px;"><strong>1,569 наблюдений</strong> накоплено. PostToolUse hook логирует каждое использование инструментов. Файл: <code>~/.claude/memory/observations.json</code>. Анализирует паттерны использования MCP, успешные/неуспешные подходы.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">FlowWhisper Instincts</div>
+      <div class="card-desc" style="margin-top:8px;"><strong>1.25M символов</strong> голосовых логов → <strong>15 instincts</strong>. Файл: <code>~/.claude/homunculus/instincts.md</code>. Выявленные паттерны: многозадачность, визуальные результаты, N8N → Python предпочтение.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Memory Decay System</div>
+      <div class="card-desc" style="margin-top:8px;"><strong>3 уровня памяти:</strong><br>• Session: 7 дней (decay-7d/)<br>• Daily: 30 дней (decay-30d/)<br>• Permanent: без срока (permanent/)<br>Auto-cleanup старых сессий.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Session Summarizer</div>
+      <div class="card-desc" style="margin-top:8px;">Stop hook → автосохранение в <code>decay-7d/session-YYYY-MM-DD-N.md</code>. Формат: что сделано, какие файлы затронуты, открытые вопросы, следующий шаг.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Auto-Checkpoint</div>
+      <div class="card-desc" style="margin-top:8px;">PreCompact hook → сохраняет прогресс перед потерей контекста (compact). Никогда не потеряешь работу из-за превышения контекстного окна.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Homunculus Identity</div>
+      <div class="card-desc" style="margin-top:8px;"><code>~/.claude/homunculus/</code> — identity.md (кто такой Claude для Дмитрия) + instincts.md (выученные паттерны) + reflexion.md (анализ ошибок).</div>
+    </div>
+  </div>
+
+  <h3>Learning Coach</h3>
+  <pre>python3 ~/.claude/gamification/learning_coach.py
+
+# Показывает:
+- RPG Skill Tree (6 навыков + уровни 1-5)
+- Gap Analysis: что прокачать для следующего уровня
+- Конкретные задачи на неделю
+- Сравнение с менторами Board of Mentors</pre>
+
+  <h3>Структура памяти</h3>
+  <pre>~/.claude/memory/
+├── GLOBAL_MEMORY.md        # Все проекты, решения, статусы
+├── observations.json       # 1,569 наблюдений CL v2.1
+├── decay-7d/               # Сессионная память (7 дней)
+│   └── session-2026-03-27-1.md
+├── decay-30d/              # Ежедневная память (30 дней)
+│   └── daily-2026-03-27.md
+└── permanent/              # Постоянная память
+    └── architecture-decisions.md</pre>
+</section>
+
+<!-- РАЗДЕЛ 9: MCP Серверы -->
+<section class="section" id="section-9">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🔌</div>
+    <div><h2>MCP Серверы (13 активных)</h2></div>
+    <span class="section-num">§9</span>
+  </div>
+
+  <p>Model Context Protocol серверы расширяют возможности Claude. Настроены в <code>~/.claude/settings.json</code>. Всего доступно 109+ MCP инструментов.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>MCP</th><th>Инструментов</th><th>Назначение</th><th>Статус</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>marketplace-api</code></td>
+          <td>47+</td>
+          <td>Unified gateway WB/Ozon/YM — цены, остатки, карточки, аналитика</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>wildberries</code></td>
+          <td>20+</td>
+          <td>WB API напрямую: seller 544455, OOO 4117589 — отзывы, вопросы, карточки</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>context7</code></td>
+          <td>2</td>
+          <td>Актуальная документация любых библиотек — resolve-library-id + query-docs</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>playwright (3 версии)</code></td>
+          <td>30+</td>
+          <td>headless, headed, Firefox — браузерная автоматизация, скриншоты, тесты</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>github-mcp</code></td>
+          <td>15+</td>
+          <td>GitHub API: PR, issues, commits, repositories — токен настроен</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>postgres</code></td>
+          <td>5+</td>
+          <td>SQL к b2b_intelligence: localhost:5432, user marketai/marketai</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>sentry</code></td>
+          <td>10+</td>
+          <td>Ошибки продакшена: org aragant, list_issues, get_issue_details, analyze_with_seer</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>telegram-notify</code></td>
+          <td>3</td>
+          <td>Уведомления Дмитрию: @Dimavertut (ID: 926967075) — human-in-the-loop</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>exa</code></td>
+          <td>8</td>
+          <td>Web search: web_search, get_code_context, company_research, deep_researcher, crawling</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>brave-search</code></td>
+          <td>2</td>
+          <td>Веб поиск через Brave — альтернатива Exa</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>fetch</code></td>
+          <td>1</td>
+          <td>HTTP запросы — для API без MCP сервера</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>docker</code></td>
+          <td>10+</td>
+          <td>Управление Docker контейнерами, build, logs, exec</td>
+          <td><span class="badge badge-green">Активен</span></td>
+        </tr>
+        <tr>
+          <td><code>google-workspace</code></td>
+          <td>130</td>
+          <td>Gmail/Calendar/Drive — нужен Google OAuth refresh token</td>
+          <td><span class="badge badge-blue">Настройка</span></td>
+        </tr>
+        <tr>
+          <td><code>n8n</code></td>
+          <td>20+</td>
+          <td>N8N workflows: http://72.56.121.84, JWT expires 2026-05-22</td>
+          <td><span class="badge badge-red">Ошибка</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box warn">
+    <div class="box-title">Правило MCP</div>
+    Всегда использовать MCP вместо raw HTTP запросов. marketplace-api вместо прямых вызовов WB/Ozon API. Context7 вместо угадывания документации. Sentry вместо логов в консоли.
+  </div>
+</section>
+
+<!-- РАЗДЕЛ 10: Инфраструктура -->
+<section class="section" id="section-10">
+  <div class="section-header">
+    <div class="section-icon icon-blue">🖥️</div>
+    <div><h2>VPS + Домены + Инфраструктура</h2></div>
+    <span class="section-num">§10</span>
+  </div>
+
+  <div class="cards-grid-2">
+    <div class="card" style="border-left:4px solid var(--green-light);">
+      <div class="card-title">Production VPS</div>
+      <div style="margin-top:10px;font-size:12px;line-height:1.8;">
+        <div><strong>IP:</strong> <code>94.198.219.232</code></div>
+        <div><strong>SSH:</strong> <code>ssh root@94.198.219.232</code></div>
+        <div><strong>OS:</strong> Ubuntu 24.04 LTS</div>
+        <div><strong>Specs:</strong> 4 CPU / 8GB RAM / 80GB NVMe</div>
+        <div><strong>Location:</strong> SPB, Russia (ru-1, TimeWeb)</div>
+        <div><strong>TimeWeb ID:</strong> 6695469 (Polite Hoopoe)</div>
+        <div><strong>Swap:</strong> 4GB</div>
+      </div>
+    </div>
+    <div class="card" style="border-left:4px solid var(--blue);">
+      <div class="card-title">VPN VPS (Germany)</div>
+      <div style="margin-top:10px;font-size:12px;line-height:1.8;">
+        <div><strong>IP:</strong> <code>72.56.121.84</code></div>
+        <div><strong>Location:</strong> Frankfurt, DE (de-1, TimeWeb)</div>
+        <div><strong>Purpose:</strong> Amnezia VPN только</div>
+        <div><strong>TimeWeb ID:</strong> 6695569 (Wise Corvus)</div>
+        <div><strong>N8N:</strong> <code>http://72.56.121.84</code> (порт 5678)</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Домены и сервисы</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Домен/Сервис</th><th>URL</th><th>Порт</th><th>Путь</th><th>Статус</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Aragant</td>
+          <td><code>https://aragant.pro</code></td>
+          <td>8000</td>
+          <td>/opt/aragant</td>
+          <td><span class="badge badge-green">LIVE</span></td>
+        </tr>
+        <tr>
+          <td>Bionovacia</td>
+          <td><code>https://bionovacia.ru</code></td>
+          <td>8002</td>
+          <td>/opt/bionovacia</td>
+          <td><span class="badge badge-gold">Dev</span></td>
+        </tr>
+        <tr>
+          <td>Content Factory</td>
+          <td><code>http://localhost:8100</code></td>
+          <td>8100</td>
+          <td>~/Documents/content_factory</td>
+          <td><span class="badge badge-green">Built</span></td>
+        </tr>
+        <tr>
+          <td>PostgreSQL</td>
+          <td><code>localhost:5432</code></td>
+          <td>5432</td>
+          <td>DB: b2b_intelligence</td>
+          <td><span class="badge badge-green">Active</span></td>
+        </tr>
+        <tr>
+          <td>LM Studio (Qwen 2.5)</td>
+          <td><code>http://localhost:1234</code></td>
+          <td>1234</td>
+          <td>Local LLM fallback</td>
+          <td><span class="badge badge-green">Active</span></td>
+        </tr>
+        <tr>
+          <td>N8N</td>
+          <td><code>http://72.56.121.84</code></td>
+          <td>5678</td>
+          <td>Automation flows</td>
+          <td><span class="badge badge-gold">Issues</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Что установлено на Production VPS</h3>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;">
+    <span class="tag">Docker 29.3.1</span>
+    <span class="tag">Docker Compose</span>
+    <span class="tag">Nginx 1.24</span>
+    <span class="tag">Certbot (auto-renew)</span>
+    <span class="tag">UFW firewall</span>
+    <span class="tag">fail2ban</span>
+    <span class="tag">SSH watchdog</span>
+    <span class="tag">QEMU guest agent</span>
+    <span class="tag">Swap 4GB</span>
+    <span class="tag">Ports: 22, 80, 443, 5678, 8000, 8001, 8002, 3001</span>
+  </div>
+
+  <h3>Известные проблемы и решения</h3>
+  <div class="info-box danger">
+    <div class="box-title">OOM при docker build</div>
+    Увеличить swap, остановить неиспользуемые контейнеры перед build.
+  </div>
+  <div class="info-box warn">
+    <div class="box-title">rsync ломает permissions</div>
+    Всегда запускать <code>chmod -R 755 src/</code> после rsync.
+  </div>
+  <div class="info-box success">
+    <div class="box-title">Авторизация</div>
+    Использует Argon2, НЕ bcrypt. bcrypt 4.0.1 pinned в requirements.txt для совместимости с passlib.
+  </div>
+</section>
+
+<!-- РАЗДЕЛ 11: Активные проекты -->
+<section class="section" id="section-11">
+  <div class="section-header">
+    <div class="section-icon icon-green">📁</div>
+    <div><h2>Активные проекты (7 проектов)</h2></div>
+    <span class="section-num">§11</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Проект</th><th>Путь</th><th>Стек</th><th>Описание</th><th>Статус</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Aragant</strong></td>
+          <td><code>~/Documents/marketai/marketai</code></td>
+          <td>Python, FastAPI, PostgreSQL, Docker</td>
+          <td>MarketAI — автоответы на отзывы WB/Ozon, B2B Intelligence, аналитика</td>
+          <td><span class="badge badge-green">LIVE</span></td>
+        </tr>
+        <tr>
+          <td><strong>Bionovacia</strong></td>
+          <td><code>~/Documents/skolkovo</code></td>
+          <td>FastAPI, React, Neo4j, Docker</td>
+          <td>Сколково IT-продукт: AI-платформа научных исследований добавок</td>
+          <td><span class="badge badge-gold">Dev</span></td>
+        </tr>
+        <tr>
+          <td><strong>SoulWay B2B</strong></td>
+          <td><code>~/Documents/soulway-b2b</code></td>
+          <td>HTML, Three.js, Netlify</td>
+          <td>Лендинг B2B продаж SoulWay с 3D визуализацией</td>
+          <td><span class="badge badge-green">LIVE</span></td>
+        </tr>
+        <tr>
+          <td><strong>B2B Outreach</strong></td>
+          <td><code>~/Documents/Orchestrator/b2b_outreach</code></td>
+          <td>Python, React, PostgreSQL, Redis</td>
+          <td>Автоматический аутрич для селлеров маркетплейсов</td>
+          <td><span class="badge badge-gold">Dev</span></td>
+        </tr>
+        <tr>
+          <td><strong>WB Content Factory</strong></td>
+          <td><code>~/Documents/агенты/wb_content_factory</code></td>
+          <td>Python, WB API, OpenRouter</td>
+          <td>Генерация карточек товаров для WB — артикул → AI → XLSX</td>
+          <td><span class="badge badge-green">Active</span></td>
+        </tr>
+        <tr>
+          <td><strong>Content Factory</strong></td>
+          <td><code>~/Documents/content_factory</code></td>
+          <td>Python, FastAPI, :8100</td>
+          <td>Контент для Bio-STM, SoulWay, BioNordiq — RAG + научные ссылки</td>
+          <td><span class="badge badge-green">Built</span></td>
+        </tr>
+        <tr>
+          <td><strong>MCP Servers</strong></td>
+          <td><code>~/Documents/mcp servers</code></td>
+          <td>Node.js, TypeScript</td>
+          <td>Кастомные MCP серверы для маркетплейсов и workflow</td>
+          <td><span class="badge badge-green">Active</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>📊 Статус проектов (авто из GLOBAL_MEMORY)</h3>
+  <!-- AUTO:projects START -->
+<div class="projects-grid">
+      <div class="project-card" style="border-left-color:#10B981">
+        <div class="project-name">MCP Servers</div>
+        <div class="project-path">~/Documents/mcp servers</div>
+        <div class="project-status">🟢 ACTIVE</div>
+        <div class="project-last">2026-03-24 — WB Oracle KB 16 JSON 276KB, 4 unpushed</div>
+      </div>
+      <div class="project-card" style="border-left-color:#10B981">
+        <div class="project-name">SoulWay B2B Hub</div>
+        <div class="project-path">~/Documents/soulway-b2b</div>
+        <div class="project-status">🟢 ACTIVE</div>
+        <div class="project-last">2026-03-19 — 3D сайт, Netlify, CTO rules + testing deployed</div>
+      </div>
+      <div class="project-card" style="border-left-color:#10B981">
+        <div class="project-name">Aragant (ex-MarketAI)</div>
+        <div class="project-path">~/Documents/marketai/marketai</div>
+        <div class="project-status">🟢 LIVE ✅</div>
+        <div class="project-last">v1.8.0, 4 infra bugs fixed, testing stack deployed, WB rate limit fixed, 131 pro</div>
+      </div>
+      <div class="project-card" style="border-left-color:#F59E0B">
+        <div class="project-name">B2B Outreach</div>
+        <div class="project-path">~/Documents/Orchestrator/b2b_outreach</div>
+        <div class="project-status">🟡 IN PROGRESS</div>
+        <div class="project-last">CTO rules + testing stack deployed</div>
+      </div>
+      <div class="project-card" style="border-left-color:#F59E0B">
+        <div class="project-name">WB Content Factory</div>
+        <div class="project-path">~/Documents/агенты/wb_content_factory</div>
+        <div class="project-status">🟡 ACTIVE</div>
+        <div class="project-last">CTO rules + testing stack deployed</div>
+      </div>
+      <div class="project-card" style="border-left-color:#10B981">
+        <div class="project-name">Bionovacia (Skolkovo)</div>
+        <div class="project-path">~/Documents/skolkovo</div>
+        <div class="project-status">🟢 BOOSTED</div>
+        <div class="project-last">16 modules built overnight, 47 commits, 16 branches to merge, 80+ new tests, 6 s</div>
+      </div>
+      <div class="project-card" style="border-left-color:#F59E0B">
+        <div class="project-name">Bio-STM</div>
+        <div class="project-path">bio-stm.ru</div>
+        <div class="project-status">🟡 ACTIVE</div>
+        <div class="project-last">WP сайт, научные БАДы</div>
+      </div>
+      <div class="project-card" style="border-left-color:#10B981">
+        <div class="project-name">Content Factory</div>
+        <div class="project-path">~/Documents/content_factory</div>
+        <div class="project-status">🟢 BUILT</div>
+        <div class="project-last">Python, FastAPI :8100, LM Studio, WP+TG publishers</div>
+      </div>
+    </div>
+<!-- AUTO:projects END -->
+</section>
+
+<!-- РАЗДЕЛ 12: Auto-Evolution -->
+<section class="section" id="section-12">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🤖</div>
+    <div><h2>Auto-Evolution — Еженедельный анализ</h2></div>
+    <span class="section-num">§12</span>
+  </div>
+
+  <div class="cards-grid-2">
+    <div class="card">
+      <div class="card-title">auto_evolution.py</div>
+      <div class="card-desc" style="margin-top:8px;">Запускается каждое воскресенье в 20:00 через LaunchAgent. Сканирует 6 проектов на наличие: has_adr, has_ci, has_sentry, has_tests, has_health, has_docker. Текущий coverage: <strong>78%</strong>.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">metrics_collector.py</div>
+      <div class="card-desc" style="margin-top:8px;">Каждый день 09:00 и 21:00 через LaunchAgent. Собирает commits/tests/deploys/ADR из git автоматически. Пишет в metrics.json для gamification engine.</div>
+    </div>
+  </div>
+
+  <h3>Текущий Gap Analysis (Auto-Evolution 27.03.2026)</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Проект</th><th>ADR</th><th>CI</th><th>Sentry</th><th>Tests</th><th>Health</th><th>Docker</th><th>Score</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Aragant</td>
+          <td><span class="badge badge-red">✗</span></td>
+          <td><span class="badge badge-green">✓</span></td>
+          <td><span class="badge badge-green">✓</span></td>
+          <td><span class="badge badge-green">✓</span></td>
+          <td><span class="badge badge-green">✓</span></td>
+          <td><span class="badge badge-green">✓</span></td>
+          <td>5/6</td>
+        </tr>
+        <tr>
+          <td>Bionovacia</td>
+          <td><span class="badge badge-red">✗</span></td>
+          <td><span class="badge badge-green">✓</span></td>
+          <td><span class="badge badge-red">✗</span></td>
+          <td><span class="badge badge-gold">~</span></td>
+          <td><span class="badge badge-green">✓</span></td>
+          <td><span class="badge badge-green">✓</span></td>
+          <td>3/6</td>
+        </tr>
+        <tr>
+          <td>B2B Outreach</td>
+          <td><span class="badge badge-red">✗</span></td>
+          <td><span class="badge badge-red">✗</span></td>
+          <td><span class="badge badge-red">✗</span></td>
+          <td><span class="badge badge-red">✗</span></td>
+          <td><span class="badge badge-red">✗</span></td>
+          <td><span class="badge badge-green">✓</span></td>
+          <td>1/6</td>
+        </tr>
+        <tr>
+          <td>WB Content Factory</td>
+          <td><span class="badge badge-red">✗</span></td>
+          <td><span class="badge badge-red">✗</span></td>
+          <td><span class="badge badge-red">✗</span></td>
+          <td><span class="badge badge-gold">~</span></td>
+          <td><span class="badge badge-red">✗</span></td>
+          <td><span class="badge badge-red">✗</span></td>
+          <td>0/6</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box danger">
+    <div class="box-title">Главный Gap</div>
+    ADR не создан ни в одном проекте. Sentry не настроен в 3+ проектах. Это главная точка роста для перехода на уровень Принципал.
+  </div>
+
+  <h3>LaunchAgent конфиги (macOS cron)</h3>
+  <pre>~/Library/LaunchAgents/
+├── com.aragant.metrics-collector.plist    # 09:00 + 21:00 ежедневно
+├── com.aragant.auto-evolution.plist       # Воскресенье 20:00
+└── com.aragant.session-backup.plist       # При завершении сессии</pre>
+</section>
+
+<!-- РАЗДЕЛ 13: Smart Backup -->
+<section class="section" id="section-13">
+  <div class="section-header">
+    <div class="section-icon icon-gold">💾</div>
+    <div><h2>Smart Backup System</h2></div>
+    <span class="section-num">§13</span>
+  </div>
+
+  <div class="cards-grid-2">
+    <div class="card">
+      <div class="card-title">backup.sh — Умный бэкап</div>
+      <div class="card-desc" style="margin-top:8px;">Бэкапит только критические файлы: <strong>968KB</strong> вместо 3.9GB полного ~/.claude/. Авто-ротация: последние 10 бэкапов. Хранение в <code>~/.claude/backups/</code>. Формат: <code>claude-backup-YYYY-MM-DD_HH-MM-SS-label.tar.gz</code></div>
+    </div>
+    <div class="card">
+      <div class="card-title">restore.sh — Точечное восстановление</div>
+      <div class="card-desc" style="margin-top:8px;">Восстановление по компоненту: settings, rules, gamification, memory, skills, all. Интерактивный выбор даты. Подтверждение для деструктивных операций.</div>
+    </div>
+  </div>
+
+  <h3>Команды backup</h3>
+  <pre>~/.claude/backup.sh "описание-что-меняем"
+
+# Примеры:
+~/.claude/backup.sh "before-settings-change"
+~/.claude/backup.sh "before-growth-coach-rewrite"
+~/.claude/backup.sh "before-gamification-update"
+~/.claude/backup.sh "before-rules-overhaul"</pre>
+
+  <h3>Команды restore</h3>
+  <pre>~/.claude/restore.sh                                    # список бэкапов
+~/.claude/restore.sh "2026-03-27" settings              # только settings.json
+~/.claude/restore.sh "2026-03-27" memory                # только GLOBAL_MEMORY
+~/.claude/restore.sh "2026-03-27" rules                 # только rules/
+~/.claude/restore.sh "2026-03-27" gamification          # только gamification/
+~/.claude/restore.sh "2026-03-27" all                   # полное (с подтверждением)</pre>
+
+  <h3>Правило safe-ops (ОБЯЗАТЕЛЬНО)</h3>
+  <div class="info-box warn">
+    <div class="box-title">Бэкап ПЕРЕД критическими изменениями</div>
+    Перезапись CLAUDE.md (&gt;50%), изменение settings.json, обновление &gt;3 rules файлов, изменение engine.py геймификации, любая операция с --force или деструктивная.
+  </div>
+
+  <h3>Что бэкапится</h3>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;">
+    <span class="tag">CLAUDE.md</span>
+    <span class="tag">settings.json</span>
+    <span class="tag">rules/</span>
+    <span class="tag">skills/</span>
+    <span class="tag">gamification/</span>
+    <span class="tag">memory/GLOBAL_MEMORY.md</span>
+    <span class="tag">homunculus/</span>
+    <span class="tag">hooks/</span>
+    <span class="tag">agents/</span>
+    <span class="tag">teams/</span>
+  </div>
+</section>
+
+<!-- РАЗДЕЛ 14: Quick Reference -->
+<section class="section" id="section-14">
+  <div class="section-header">
+    <div class="section-icon icon-green">⌨️</div>
+    <div><h2>Ежедневные команды — Quick Reference</h2></div>
+    <span class="section-num">§14</span>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// УТРО — старт дня</div>
+    <div class="cmd-item">
+      <div class="cmd-name">/continue</div>
+      <div class="cmd-desc">Восстановить контекст из памяти — первая команда каждой сессии</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/good-morning</div>
+      <div class="cmd-desc">Приоритеты дня + Sentry errors + coaching + метрики</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/growth-coach</div>
+      <div class="cmd-desc">Elite Benchmarks + Gap Analysis + конкретные шаги роста</div>
+    </div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// В РАБОТЕ — активная разработка</div>
+    <div class="cmd-item">
+      <div class="cmd-name">/spec</div>
+      <div class="cmd-desc">Спецификация для задачи &gt;3 файлов (обязательно перед кодом)</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/parallel</div>
+      <div class="cmd-desc">Запустить параллельных агентов (архитектор + кодер + тестировщик)</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/checkpoint</div>
+      <div class="cmd-desc">Сохранить прогресс после крупной задачи</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/review</div>
+      <div class="cmd-desc">Code review перед PR/merge</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/deploy-check</div>
+      <div class="cmd-desc">Предеплойная проверка (тесты + lint + health + env)</div>
+    </div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// ВЕЧЕР — итоги дня</div>
+    <div class="cmd-item">
+      <div class="cmd-name">/daily-review</div>
+      <div class="cmd-desc">Итоги дня + XP заработано + метрики + что улучшить</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/checkpoint</div>
+      <div class="cmd-desc">Финальное сохранение прогресса в MEMORY.md + git + GitHub</div>
+    </div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// ИНФРАСТРУКТУРА — технические операции</div>
+    <div class="cmd-item">
+      <div class="cmd-name">~/.claude/backup.sh "label"</div>
+      <div class="cmd-desc">Бэкап перед критическими изменениями</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">python3 ~/.claude/gamification/metrics_collector.py</div>
+      <div class="cmd-desc">Обновить метрики вручную (git commits, tests)</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">python3 ~/.claude/gamification/auto_evolution.py</div>
+      <div class="cmd-desc">Анализ проектов: ADR/CI/Sentry/Tests coverage</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">python3 ~/.claude/gamification/creator_coaching.py deploy</div>
+      <div class="cmd-desc">Кто лучший по deploy speed среди менторов</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">python3 ~/.claude/gamification/learning_coach.py</div>
+      <div class="cmd-desc">RPG Skill Tree + конкретные задачи для роста</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">python3 ~/.claude/gamification/engine.py</div>
+      <div class="cmd-desc">Обновить XP, уровень, стрик после крупной задачи</div>
+    </div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// МАРКЕТПЛЕЙСЫ — WB/Ozon/YM</div>
+    <div class="cmd-item">
+      <div class="cmd-name">/wb-enrich</div>
+      <div class="cmd-desc">WB Content Factory: артикулы → AI enrichment → XLSX</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/wb-qa</div>
+      <div class="cmd-desc">QA-скоринг карточек товаров (0-10)</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/market-analytics</div>
+      <div class="cmd-desc">Дашборд аналитики WB + Ozon + YM из PostgreSQL</div>
+    </div>
+    <div class="cmd-item">
+      <div class="cmd-name">/n8n-status</div>
+      <div class="cmd-desc">Статус N8N workflows и текущие ошибки</div>
+    </div>
+  </div>
+</section>
+
+<!-- РАЗДЕЛ 15: Установка -->
+<section class="section" id="section-15">
+  <div class="section-header">
+    <div class="section-icon icon-blue">🚀</div>
+    <div><h2>Установка на новый компьютер / проект</h2></div>
+    <span class="section-num">§15</span>
+  </div>
+
+  <h3>Новый компьютер (полная установка)</h3>
+  <pre>git clone https://github.com/DmitriyMutagen/claude-code-template.git
 cd claude-code-template
-bash .claude-setup/install.sh
-# Добавить API ключи в ~/.claude/settings.json
-# Перезапустить Claude Code
-# Готово — 420+ файлов, всё работает
-</pre>
+bash .claude/install.sh</pre>
 
-<h2>📊 Ежедневные команды</h2>
-<pre>
-/do-router           — автоклассификация задачи
-/growth-coach        — что прокачать + план
-/daily-review        — анализ дня
-/good-morning        — утренний брифинг
-/mega-research       — глубокое исследование (100+ источников)
-/qa-verify           — верификация результата (скор 1-10)
-/rfc                 — structured decision making
-/tech-radar          — обзор стека
-/checkpoint          — сохранить прогресс
-/evolve              — кластеризация instincts в skills
+  <h3>Существующий проект (добавить инфраструктуру)</h3>
+  <pre>bash ~/.claude/install.sh /path/to/project "Project Name"</pre>
 
-python3 ~/.claude/gamification/engine.py            — rankings
-python3 ~/.claude/gamification/growth-engine.py      — skill tree
-python3 ~/.claude/gamification/dashboard/competitive.py --telegram
-</pre>
+  <h3>Что создаёт install.sh</h3>
+  <pre>project-root/
+├── .claude/
+│   ├── CLAUDE.md                 # Project-specific instructions
+│   └── rules/                    # Project rules (merge с global)
+├── .serena/
+│   └── project.yml               # Serena LSP config
+├── .github/
+│   └── workflows/
+│       └── ci.yml                # GitHub Actions CI pipeline
+├── src/
+│   ├── core/                     # Business logic, domain
+│   ├── api/                      # HTTP endpoints
+│   ├── connectors/               # External API integrations
+│   ├── models/                   # Data models
+│   └── utils/                    # Shared utilities
+├── tests/
+│   ├── test_core/
+│   ├── test_api/
+│   └── conftest.py
+├── docs/
+│   ├── adr/                      # Architecture Decision Records
+│   │   └── ADR_TEMPLATE.md
+│   └── plans/                    # Active specs
+├── MEMORY.md                     # Project memory for Claude
+├── .env.example                  # Documented env vars
+├── .gitignore                    # Language-specific + .env*
+├── .pre-commit-config.yaml       # ruff + detect-secrets
+├── docker-compose.yml            # Local dev services
+└── pyproject.toml / package.json</pre>
 
-<p style="text-align:center; margin-top:40px; color:#999;">
-<em>Документ будет дополняться по мере развития инфраструктуры.<br>
-Автор: Claude CTO для Дмитрия Гагауза (Aragant.group)<br>
-GitHub: github.com/DmitriyMutagen/claude-code-template</em>
-</p>
+  <h3>SLEEPLESS AGENT — Автономная разработка 24/7</h3>
+  <pre>sleepy start                    # запустить daemon (tmux + caffeinate)
+sleepy add "task" -p project    # добавить задачу
+sleepy status                   # текущий статус всех задач
+sleepy stop                     # остановить daemon
+sleepy queue                    # очередь задач
+sleepy results                  # результаты выполненных задач
 
+# Мониторинг:
+tmux attach -t sleepless-daemon          # логи daemon
+tmux attach -t sleepless-{task-id}       # конкретный worker</pre>
+
+  <div class="info-box">
+    <div class="box-title">Telegram управление ночным агентом</div>
+    Бот принимает команды: /task [описание], /status, /queue, /stop, /results. ID: 926967075 (@Dimavertut).
+  </div>
+
+  <h3>GitHub Sync — Постоянная память</h3>
+  <pre># Автоматический пуш при /checkpoint:
+git push origin main  # github.com/DmitriyMutagen/claude-memory
+
+# Содержит:
+# - ~/.claude/memory/GLOBAL_MEMORY.md
+# - ~/.claude/homunculus/
+# - ~/.claude/gamification/metrics.json
+# - .claude/session-handoff.md (проекты)</pre>
+</section>
+
+<!-- РАЗДЕЛ 16: Changelog -->
+<section class="section" id="section-16">
+  <div class="section-header">
+    <div class="section-icon icon-blue">📜</div>
+    <div><h2>История изменений (Changelog)</h2></div>
+    <span class="section-num">§16</span>
+  </div>
+  <p>Автоматически обновляется при каждом запуске <code>python3 ~/.claude/generate_guide.py</code></p>
+  <!-- AUTO:changelog START -->
+<div class="changelog-entry">
+      <span class="version-badge">v3.246</span>
+      <span class="date">2026-03-28 11:49</span>
+      <ul><li>XP: 13,298 → 13,316 (+18)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.245</span>
+      <span class="date">2026-03-28 11:49</span>
+      <ul><li>Новые правила: git-workflow-enforcement</li><li>XP: 13,267 → 13,298 (+31)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.244</span>
+      <span class="date">2026-03-28 11:47</span>
+      <ul><li>Автообновление статистики</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.243</span>
+      <span class="date">2026-03-28 11:47</span>
+      <ul><li>XP: 13,236 → 13,267 (+31)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.242</span>
+      <span class="date">2026-03-28 11:44</span>
+      <ul><li>XP: 13,150 → 13,236 (+86)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.241</span>
+      <span class="date">2026-03-28 11:27</span>
+      <ul><li>Автообновление статистики</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.240</span>
+      <span class="date">2026-03-28 11:26</span>
+      <ul><li>XP: 13,057 → 13,150 (+93)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.239</span>
+      <span class="date">2026-03-28 11:05</span>
+      <ul><li>Автообновление статистики</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.238</span>
+      <span class="date">2026-03-28 11:04</span>
+      <ul><li>XP: 12,978 → 13,057 (+79)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.237</span>
+      <span class="date">2026-03-28 11:01</span>
+      <ul><li>XP: 12,915 → 12,978 (+63)</li></ul>
+    </div>
+
+<!-- AUTO:changelog END -->
+</section>
+
+<!-- РАЗДЕЛ 17: Полная карта команд -->
+<section class="section" id="section-17">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🗺️</div>
+    <div><h2>Полная карта команд — Когда что использовать</h2></div>
+    <span class="section-num">§17</span>
+  </div>
+
+  <h3>🏢 Virtual Elite IT Company — 12 ролей (авто-активация)</h3>
+  <p style="margin-bottom:16px;color:var(--text-muted)">Каждая роль активируется автоматически по типу задачи. Можно вызвать явно через команды ниже.</p>
+
+  <div style="overflow-x:auto;margin-bottom:24px;max-width:100%;">
+  <table class="data-table">
+    <thead><tr>
+      <th>Роль</th>
+      <th>Автоактивация — ключевые слова</th>
+      <th>Явный вызов</th>
+      <th>Что делает</th>
+    </tr></thead>
+    <tbody>
+      <tr><td><strong>🧠 AI CTO</strong></td><td>Каждый промпт</td><td><code>/cto</code></td><td>Понимает намерение, классифицирует Tier 1-4, стратегия → архитектура</td></tr>
+      <tr><td><strong>🏗️ Chief Architect</strong></td><td>"архитектура", "дизайн", задача &gt;1 дня, новый модуль</td><td><code>/rfc</code> <code>/adr</code> <code>/diagram</code></td><td>3 варианта решения, ADR документ, trade-off анализ</td></tr>
+      <tr><td><strong>🔬 Research Lead</strong></td><td>"что лучше", "как делают", новая интеграция</td><td><code>/mega-research</code></td><td>50+ источников, таблица сравнения, "купить vs построить"</td></tr>
+      <tr><td><strong>📐 Product Designer</strong></td><td>Задача &gt;3 файлов, новый эндпоинт, изменение модели</td><td><code>/spec</code> <code>/plan</code></td><td>Spec в docs/plans/, user stories, API контракт, edge cases</td></tr>
+      <tr><td><strong>🛡️ Security Officer</strong></td><td>Деплой, новый публичный API, user input</td><td><code>/security-audit</code> <code>/hardening</code></td><td>OWASP Top 10, secrets scan, rate limiting — БЛОКИРУЕТ деплой</td></tr>
+      <tr><td><strong>📈 SEO/Growth Engineer</strong></td><td>bio-stm.ru, SoulWay сайт, публичные страницы</td><td><code>/seo-automation</code> <code>/seo-audit</code></td><td>Core Web Vitals, Schema markup, keyword research</td></tr>
+      <tr><td><strong>⚡ Dev Lead</strong></td><td>Архитектура согласована, пора кодить</td><td><code>/parallel</code></td><td>Разбивает на задачи 2-5 мин, параллельные агенты</td></tr>
+      <tr><td><strong>💻 Senior Engineers</strong></td><td>Запускаются Dev Lead</td><td>Task tool субагенты</td><td>Конкретный код по spec, каждый коммит = working code + тест</td></tr>
+      <tr><td><strong>🧪 QA Lead</strong></td><td>Код написан</td><td><code>/qa-verify</code> <code>/e2e</code></td><td>pytest + Playwright, E2E — БЛОКИРУЕТ "готово" без тестов</td></tr>
+      <tr><td><strong>🐛 Debugger</strong></td><td>"баг", "ошибка", "не работает"</td><td><code>/systematic-debugging</code></td><td>Sentry MCP → root cause → regression test</td></tr>
+      <tr><td><strong>🚀 DevOps</strong></td><td>"задеплой", Docker, CI/CD</td><td><code>/deploy</code> <code>/ci-pipeline</code> <code>/dockerfile</code></td><td>GitHub Actions, healthcheck, Telegram notify</td></tr>
+      <tr><td><strong>🎓 Coach</strong></td><td>Еженедельно, при старте задачи</td><td><code>/growth-coach</code> <code>/daily-review</code></td><td>Skill tree, Elite gap analysis, топ-3 шаги роста</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>⌨️ Slash-команды по ситуации</h3>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// НАЧАЛО РАБОТЫ</div>
+    <div class="cmd-item"><div class="cmd-name">/continue</div><div class="cmd-desc">▶ Первая команда сессии. Читает GLOBAL_MEMORY + MEMORY.md + git → что делали, что дальше</div></div>
+    <div class="cmd-item"><div class="cmd-name">/good-morning</div><div class="cmd-desc">▶ Утренний брифинг: приоритеты дня + Sentry errors + Elite coaching + XP streak</div></div>
+    <div class="cmd-item"><div class="cmd-name">/onboard</div><div class="cmd-desc">▶ Первое открытие нового проекта: анализ структуры, MEMORY.md, Serena activate</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// ПЛАНИРОВАНИЕ (перед кодом)</div>
+    <div class="cmd-item"><div class="cmd-name">/spec "фича"</div><div class="cmd-desc">▶ Обязательно для &gt;3 файлов. docs/plans/YYYY-MM-DD-*.md + user stories + API контракт</div></div>
+    <div class="cmd-item"><div class="cmd-name">/rfc "вопрос"</div><div class="cmd-desc">▶ 3 варианта решения с pros/cons. Для выбора стека/паттерна/архитектуры</div></div>
+    <div class="cmd-item"><div class="cmd-name">/adr "решение"</div><div class="cmd-desc">▶ Architecture Decision Record в docs/adr/ — фиксирует "почему выбрали X а не Y"</div></div>
+    <div class="cmd-item"><div class="cmd-name">/diagram "что"</div><div class="cmd-desc">▶ Mermaid диаграмма: flowchart, sequence, C4, ERD → сохраняет в docs/maps/</div></div>
+    <div class="cmd-item"><div class="cmd-name">/mega-research "тема"</div><div class="cmd-desc">▶ Context7 + Exa + Brave → 50+ источников → таблица сравнения → рекомендация</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// РАЗРАБОТКА</div>
+    <div class="cmd-item"><div class="cmd-name">/parallel "задача"</div><div class="cmd-desc">▶ Architect + Coder(s) + Tester параллельно через Agent Teams + tmux</div></div>
+    <div class="cmd-item"><div class="cmd-name">/ci-pipeline</div><div class="cmd-desc">▶ Создаёт .github/workflows/ci.yml: lint + tests + security scan + AI review на PR</div></div>
+    <div class="cmd-item"><div class="cmd-name">/tdd "фича"</div><div class="cmd-desc">▶ Red (тест) → Green (код) → Refactor. Test-Driven Development</div></div>
+    <div class="cmd-item"><div class="cmd-name">/checkpoint</div><div class="cmd-desc">▶ MEMORY.md + git commit + GitHub sync. После каждой крупной задачи!</div></div>
+    <div class="cmd-item"><div class="cmd-name">/review</div><div class="cmd-desc">▶ Code review перед merge: security + logic + quality + performance</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// ОТЛАДКА</div>
+    <div class="cmd-item"><div class="cmd-name">/systematic-debugging</div><div class="cmd-desc">▶ Sentry → root cause → минимальный fix → regression test → verify</div></div>
+    <div class="cmd-item"><div class="cmd-name">/fix-issue "описание"</div><div class="cmd-desc">▶ GitHub Issue → Sentry → фикс → тест → PR. Полный цикл починки</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// КАЧЕСТВО И ДЕПЛОЙ</div>
+    <div class="cmd-item"><div class="cmd-name">/e2e</div><div class="cmd-desc">▶ End-to-end тесты Playwright: все критические user flows + скриншоты + видео</div></div>
+    <div class="cmd-item"><div class="cmd-name">/qa-verify</div><div class="cmd-desc">▶ QA скоринг 1-10. Блокирует "готово" если &lt;7</div></div>
+    <div class="cmd-item"><div class="cmd-name">/deploy-check</div><div class="cmd-desc">▶ Pre-deploy: тесты ✅ lint ✅ env ✅ health endpoint ✅ secrets scan ✅</div></div>
+    <div class="cmd-item"><div class="cmd-name">/deploy</div><div class="cmd-desc">▶ Полный деплой: Security check → docker build → SSH → healthcheck → Telegram notify</div></div>
+    <div class="cmd-item"><div class="cmd-name">/security-audit</div><div class="cmd-desc">▶ OWASP Top 10 + detect-secrets + semgrep SAST + JWT/CORS check</div></div>
+    <div class="cmd-item"><div class="cmd-name">/hardening</div><div class="cmd-desc">▶ Security hardening: fail2ban, UFW, SSH keys, no-root Docker, SSL headers</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// РОСТ И ПРОГРЕСС</div>
+    <div class="cmd-item"><div class="cmd-name">/xp</div><div class="cmd-desc">▶ XP дашборд: уровень, достижения, стрик, прогресс до следующего уровня</div></div>
+    <div class="cmd-item"><div class="cmd-name">/growth-coach</div><div class="cmd-desc">▶ Elite gap analysis vs Anthropic/Google/Stripe/Pieter + RPG Skill Tree + топ-3 действия</div></div>
+    <div class="cmd-item"><div class="cmd-name">/daily-review</div><div class="cmd-desc">▶ Итоги дня: коммиты + instincts + паттерны + coaching → отчёт в Telegram</div></div>
+  </div>
+
+  <div class="cmd-group">
+    <div class="cmd-group-title">// МАРКЕТПЛЕЙСЫ</div>
+    <div class="cmd-item"><div class="cmd-name">/wb-enrich</div><div class="cmd-desc">▶ WB Content Factory: артикулы → AI enrichment → SEO-оптимизация → XLSX</div></div>
+    <div class="cmd-item"><div class="cmd-name">/wb-qa</div><div class="cmd-desc">▶ QA-скоринг карточек WB/Ozon (0-10): заголовок + описание + характеристики</div></div>
+    <div class="cmd-item"><div class="cmd-name">/market-analytics</div><div class="cmd-desc">▶ Аналитика WB + Ozon + YM из PostgreSQL: выручка, отзывы, рейтинг</div></div>
+    <div class="cmd-item"><div class="cmd-name">/n8n-status</div><div class="cmd-desc">▶ Статус N8N workflows и текущие ошибки</div></div>
+  </div>
+
+  <h3>🔌 MCP — какой и когда использовать</h3>
+  <div style="overflow-x:auto;margin-bottom:24px;max-width:100%;">
+  <table class="data-table">
+    <thead><tr><th>Задача</th><th>MCP</th><th>Ключевые инструменты</th></tr></thead>
+    <tbody>
+      <tr><td>Навигация по коду, рефакторинг</td><td><strong>Serena</strong></td><td><code>find_symbol</code>, <code>find_referencing_symbols</code>, <code>replace_symbol_body</code></td></tr>
+      <tr><td>Ошибки в продакшене</td><td><strong>Sentry</strong></td><td><code>list_issues</code>, <code>get_issue_details</code>, <code>analyze_issue_with_seer</code></td></tr>
+      <tr><td>Документация библиотек (ВСЕГДА)</td><td><strong>Context7</strong></td><td><code>resolve-library-id</code> → <code>query-docs</code></td></tr>
+      <tr><td>Веб-поиск, исследование</td><td><strong>Exa / Brave</strong></td><td><code>web_search</code>, <code>deep_researcher</code></td></tr>
+      <tr><td>Скрапинг, парсинг сайтов</td><td><strong>Firecrawl</strong></td><td><code>firecrawl_scrape</code>, <code>firecrawl_search</code></td></tr>
+      <tr><td>Браузер с anti-bot защитой</td><td><strong>Playwright / BrowserMCP</strong></td><td><code>browser_navigate</code>, <code>browser_take_screenshot</code></td></tr>
+      <tr><td>SQL к PostgreSQL b2b_intelligence</td><td><strong>postgres MCP</strong></td><td>Прямой SQL запрос</td></tr>
+      <tr><td>WB API (товары, отзывы, остатки)</td><td><strong>wildberries MCP</strong></td><td>Все WB API tools (токен активен)</td></tr>
+      <tr><td>GitHub (PR, issues, repo)</td><td><strong>github-mcp</strong></td><td><code>create_pull_request</code>, <code>create_issue</code>, <code>list_issues</code></td></tr>
+      <tr><td>N8N workflows управление</td><td><strong>n8n MCP</strong></td><td><code>list_workflows</code>, <code>execute_workflow</code></td></tr>
+      <tr><td>Notion база знаний</td><td><strong>claude_ai_Notion</strong></td><td><code>notion-search</code>, <code>notion-create-pages</code></td></tr>
+      <tr><td>Telegram уведомления</td><td><strong>telegram-notify</strong></td><td><code>send_message</code></td></tr>
+      <tr><td>Docker управление контейнерами</td><td><strong>docker MCP</strong></td><td><code>list_containers</code>, <code>run_container</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>⚡ Матрица: Ситуация → Что делать</h3>
+  <div style="overflow-x:auto;margin-bottom:24px;max-width:100%;">
+  <table class="data-table">
+    <thead><tr><th>Если хочешь...</th><th>Активируй роль</th><th>Команда</th><th>⏱️</th></tr></thead>
+    <tbody>
+      <tr><td>Разобраться что делать сегодня</td><td>🎓 Coach</td><td><code>/good-morning</code> / <code>/continue</code></td><td>2 мин</td></tr>
+      <tr><td>Создать новую фичу правильно</td><td>🧠 CTO → 📐 Designer → ⚡ DevLead</td><td><code>/spec</code> → <code>/parallel</code></td><td>30m + 2-4ч</td></tr>
+      <tr><td>Выбрать технологию/библиотеку</td><td>🔬 Research</td><td><code>/mega-research</code> + Context7</td><td>20 мин</td></tr>
+      <tr><td>Задокументировать решение</td><td>🏗️ Architect</td><td><code>/adr</code> + <code>/diagram</code></td><td>10 мин</td></tr>
+      <tr><td>Починить баг в продакшене</td><td>🐛 Debugger</td><td>Sentry → <code>/systematic-debugging</code></td><td>15-30 мин</td></tr>
+      <tr><td>Задеплоить в продакшен</td><td>🛡️ Security → 🚀 DevOps</td><td><code>/deploy-check</code> → <code>/deploy</code></td><td>30-60 мин</td></tr>
+      <tr><td>Проверить качество кода</td><td>🧪 QA</td><td><code>/e2e</code> → <code>/qa-verify</code></td><td>20-40 мин</td></tr>
+      <tr><td>Ночная разработка (sleep mode)</td><td>🌙 Night Worker</td><td><code>sleepy add "задача"</code> → <code>sleepy start</code></td><td>Overnight</td></tr>
+      <tr><td>Прокачаться / Elite gap</td><td>🎓 Coach</td><td><code>/growth-coach</code></td><td>5 мин</td></tr>
+      <tr><td>Генерировать контент WB</td><td>📈 SEO/Growth</td><td><code>/wb-enrich</code> → <code>/wb-qa</code></td><td>5-10 мин/батч</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>⌨️ Keyboard Shortcuts Claude Code</h3>
+  <div class="cmd-group">
+    <div class="cmd-group-title">// РЕЖИМЫ И КОНТЕКСТ</div>
+    <div class="cmd-item"><div class="cmd-name">Shift+Tab × 2</div><div class="cmd-desc">Plan Mode — только читает, не пишет. Для анализа перед multi-file изменениями</div></div>
+    <div class="cmd-item"><div class="cmd-name">Ctrl+C (2×)</div><div class="cmd-desc">Прервать выполнение агента</div></div>
+    <div class="cmd-item"><div class="cmd-name">/compact</div><div class="cmd-desc">Сжать контекст при 60%+ использовании (сохраняет суть)</div></div>
+    <div class="cmd-item"><div class="cmd-name">/clear</div><div class="cmd-desc">Очистить контекст между задачами → потом /continue для восстановления</div></div>
+    <div class="cmd-item"><div class="cmd-name">~/.claude/backup.sh "label"</div><div class="cmd-desc">🔒 ПЕРЕД изменением settings.json / CLAUDE.md / rules/ (авто-ротация 10 бэкапов)</div></div>
+    <div class="cmd-item"><div class="cmd-name">python3 ~/.claude/generate_guide.py</div><div class="cmd-desc">📄 Обновить этот HTML-гайд вручную (авто — при каждом закрытии сессии)</div></div>
+  </div>
+</section>
+
+
+</div><!-- end content -->
+
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div>
+    <strong>Claude Code Infrastructure v3.0</strong> &nbsp;·&nbsp; Дмитрий Гагауз, Aragant.group &nbsp;·&nbsp; gagauzdmitriy@gmail.com
+  </div>
+  <div>
+    27 марта 2026 &nbsp;·&nbsp; <code>github.com/DmitriyMutagen/claude-code-template</code>
+  </div>
+</footer>
+
+</main><!-- end main -->
+
+<script>
+  // Highlight active section in sidebar
+  const sections = document.querySelectorAll('.section[id]');
+  const navLinks = document.querySelectorAll('.sidebar nav a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector(`.sidebar nav a[href="#${entry.target.id}"]`);
+        if (activeLink) activeLink.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' });
+
+  sections.forEach(section => observer.observe(section));
+
+  // Smooth scroll
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+</script>
 </body>
 </html>

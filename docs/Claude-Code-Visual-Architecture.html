@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code AI Infrastructure — Визуальная Архитектура</title>
+<meta name="description" content="Enterprise-grade AI фреймворк разработки. 28 правил, 31 хук, 15 MCP серверов, 9 кастомных скиллов, 53 команды, 23 агента.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   DESIGN TOKENS
+   ================================================================ */
+:root {
+  --bg-deep: #06080f;
+  --bg: #0a0e1a;
+  --bg-surface: #111827;
+  --bg-surface-2: #1a2235;
+  --bg-surface-3: #222d42;
+  --border: rgba(255,255,255,0.06);
+  --border-light: rgba(255,255,255,0.1);
+  --border-accent: rgba(99,102,241,0.3);
+  --text: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent: #6366f1;
+  --accent-light: #818cf8;
+  --accent-glow: rgba(99,102,241,0.15);
+  --blue: #3b82f6;
+  --cyan: #06b6d4;
+  --green: #10b981;
+  --emerald: #34d399;
+  --yellow: #f59e0b;
+  --amber: #fbbf24;
+  --orange: #f97316;
+  --red: #ef4444;
+  --rose: #f43f5e;
+  --pink: #ec4899;
+  --purple: #a855f7;
+  --violet: #8b5cf6;
+  --sidebar-w: 280px;
+  --header-h: 3px;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-xs: 6px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+  --shadow-lg: 0 4px 24px rgba(0,0,0,0.4), 0 12px 48px rgba(0,0,0,0.3);
+  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:var(--font-sans);background:var(--bg-deep);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:var(--accent-light);text-decoration:none;transition:color var(--transition)}
+a:hover{color:var(--cyan)}
+::selection{background:var(--accent);color:#fff}
+#progress-bar{position:fixed;top:0;left:0;height:var(--header-h);background:linear-gradient(90deg,var(--accent),var(--cyan),var(--emerald));z-index:9999;width:0;transition:width .1s linear}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--bg);border-right:1px solid var(--border);z-index:1000;overflow-y:auto;overflow-x:hidden;padding:24px 0 40px;transition:transform .3s ease;scrollbar-width:thin;scrollbar-color:var(--bg-surface-3) transparent}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-track{background:transparent}.sidebar::-webkit-scrollbar-thumb{background:var(--bg-surface-3);border-radius:2px}
+.sidebar-logo{padding:0 20px 20px;border-bottom:1px solid var(--border);margin-bottom:16px}
+.sidebar-logo h2{font-size:15px;font-weight:700;letter-spacing:-.02em;background:linear-gradient(135deg,var(--accent-light),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sidebar-logo span{font-size:11px;color:var(--text-muted);display:block;margin-top:2px}
+.sidebar-search{margin:0 12px 16px;position:relative}
+.sidebar-search input{width:100%;padding:8px 12px 8px 34px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13px;font-family:var(--font-sans);outline:none;transition:border-color var(--transition)}
+.sidebar-search input::placeholder{color:var(--text-muted)}
+.sidebar-search input:focus{border-color:var(--accent)}
+.sidebar-search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text-muted)}
+.nav-group{margin-bottom:8px}
+.nav-group-title{padding:6px 20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted)}
+.nav-link{display:block;padding:6px 20px 6px 28px;font-size:13px;color:var(--text-secondary);transition:all var(--transition);border-left:2px solid transparent;cursor:pointer}
+.nav-link:hover{color:var(--text);background:var(--accent-glow)}
+.nav-link.active{color:var(--accent-light);border-left-color:var(--accent);background:var(--accent-glow)}
+.sidebar-toggle{display:none;position:fixed;top:12px;left:12px;z-index:1100;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:8px 10px;color:var(--text);cursor:pointer;font-size:18px}
+.main{margin-left:var(--sidebar-w);min-height:100vh}
+.hero{position:relative;overflow:hidden;padding:100px 60px 80px;background:radial-gradient(ellipse 80% 60% at 50% -20%,rgba(99,102,241,.12),transparent),radial-gradient(ellipse 60% 40% at 80% 100%,rgba(6,182,212,.08),transparent),var(--bg-deep)}
+.hero-grid{position:absolute;inset:0;opacity:.03;background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);background-size:60px 60px}
+.hero-glow{position:absolute;width:600px;height:600px;border-radius:50%;filter:blur(120px);opacity:.12;animation:pulse-glow 8s ease-in-out infinite alternate}
+.hero-glow-1{top:-200px;left:20%;background:var(--accent)}.hero-glow-2{bottom:-200px;right:10%;background:var(--cyan);animation-delay:-4s}
+@keyframes pulse-glow{0%{opacity:.08;transform:scale(1)}100%{opacity:.16;transform:scale(1.1)}}
+.hero-content{position:relative;z-index:1;max-width:900px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);font-size:12px;font-weight:600;color:var(--accent-light);margin-bottom:24px}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-size:clamp(36px,5vw,64px);font-weight:900;letter-spacing:-.03em;line-height:1.1;margin-bottom:16px}
+.hero h1 .gradient-text{background:linear-gradient(135deg,#fff 0%,var(--accent-light) 50%,var(--cyan) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-subtitle{font-size:clamp(16px,2vw,20px);color:var(--text-secondary);max-width:700px;line-height:1.6;margin-bottom:40px}
+.hero-stats{display:flex;flex-wrap:wrap;gap:32px}
+.hero-stat{text-align:left}
+.hero-stat-value{font-size:32px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;background:linear-gradient(135deg,var(--text),var(--accent-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-stat-label{font-size:13px;color:var(--text-muted);font-weight:500}
+.hero-actions{margin-top:40px;display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;font-family:var(--font-sans);cursor:pointer;border:none;transition:all var(--transition)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#4f46e5);color:#fff;box-shadow:0 0 20px rgba(99,102,241,.3)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 0 30px rgba(99,102,241,.5)}
+.btn-secondary{background:var(--bg-surface);color:var(--text);border:1px solid var(--border-light)}
+.btn-secondary:hover{border-color:var(--accent);background:var(--bg-surface-2)}
+.section{padding:80px 60px;border-top:1px solid var(--border);position:relative}
+.section-header{margin-bottom:48px}
+.section-label{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent-light);margin-bottom:12px}
+.section-label svg{width:14px;height:14px}
+.section h2{font-size:clamp(28px,3vw,40px);font-weight:800;letter-spacing:-.02em;margin-bottom:12px}
+.section-desc{font-size:16px;color:var(--text-secondary);max-width:700px;line-height:1.7}
+.arch-diagram{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:40px;overflow-x:auto}
+.arch-flow{display:flex;align-items:center;gap:16px;min-width:900px;justify-content:center;flex-wrap:nowrap}
+.arch-node{background:var(--bg-surface-2);border:1px solid var(--border-light);border-radius:var(--radius-sm);padding:16px 20px;text-align:center;min-width:140px;position:relative;transition:all var(--transition)}
+.arch-node:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 20px rgba(99,102,241,.15)}
+.arch-node-icon{font-size:24px;margin-bottom:6px}.arch-node-title{font-size:13px;font-weight:700}.arch-node-sub{font-size:11px;color:var(--text-muted);margin-top:2px}
+.arch-arrow{color:var(--text-muted);font-size:20px;flex-shrink:0;animation:arrow-pulse 2s ease-in-out infinite}
+@keyframes arrow-pulse{0%,100%{opacity:.4}50%{opacity:1}}
+.arch-branch{display:flex;flex-direction:column;gap:8px;align-items:center}
+.arch-branch .arch-node{min-width:120px;padding:10px 14px}.arch-branch .arch-node-title{font-size:11px}
+.arch-branch-line{width:1px;height:20px;background:linear-gradient(to bottom,var(--accent),transparent)}
+.arch-sub-row{display:flex;gap:8px;margin-top:20px;justify-content:center;flex-wrap:wrap}
+.arch-sub-node{background:var(--bg-surface-2);border:1px solid var(--border);border-radius:var(--radius-xs);padding:8px 14px;font-size:11px;color:var(--text-secondary);transition:all var(--transition)}
+.arch-sub-node:hover{border-color:var(--accent);color:var(--text)}
+.card-grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.card-grid-sm{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:all .3s ease;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;transition:opacity var(--transition)}
+.card:hover{border-color:rgba(99,102,241,.3);transform:translateY(-2px);box-shadow:var(--shadow)}.card:hover::before{opacity:1}
+.card-icon{width:40px;height:40px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:14px}
+.card-title{font-size:15px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.card-desc{font-size:13px;color:var(--text-secondary);line-height:1.6}
+.badge{display:inline-flex;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.badge-red{background:rgba(239,68,68,.15);color:var(--red)}.badge-blue{background:rgba(59,130,246,.15);color:var(--blue)}.badge-green{background:rgba(16,185,129,.15);color:var(--green)}.badge-yellow{background:rgba(245,158,11,.15);color:var(--yellow)}.badge-purple{background:rgba(168,85,247,.15);color:var(--purple)}.badge-orange{background:rgba(249,115,22,.15);color:var(--orange)}.badge-cyan{background:rgba(6,182,212,.15);color:var(--cyan)}
+.filter-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.filter-pill{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg-surface);color:var(--text-secondary);transition:all var(--transition);font-family:var(--font-sans)}
+.filter-pill:hover,.filter-pill.active{border-color:var(--accent);color:var(--accent-light);background:var(--accent-glow)}
+.timeline{position:relative;padding-left:32px}
+.timeline::before{content:'';position:absolute;left:11px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--accent),var(--cyan),var(--emerald),var(--yellow))}
+.timeline-group{margin-bottom:32px}
+.timeline-group-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;position:relative}
+.timeline-dot{position:absolute;left:-27px;width:14px;height:14px;border-radius:50%;border:2px solid;background:var(--bg-deep)}
+.timeline-group-title{font-size:16px;font-weight:700}
+.timeline-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.timeline-item{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 14px;font-size:12px;font-family:var(--font-mono);color:var(--text-secondary);transition:all var(--transition)}
+.timeline-item:hover{border-color:var(--accent);color:var(--text);background:var(--bg-surface-2)}
+.mcp-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:all .3s ease;position:relative}
+.mcp-card:hover{border-color:rgba(6,182,212,.3);box-shadow:0 0 30px rgba(6,182,212,.08);transform:translateY(-2px)}
+.mcp-status{position:absolute;top:16px;right:16px;width:8px;height:8px;border-radius:50%;background:var(--emerald);box-shadow:0 0 8px rgba(52,211,153,.5);animation:blink 2s ease-in-out infinite}
+.mcp-name{font-size:15px;font-weight:700;font-family:var(--font-mono);margin-bottom:6px}
+.mcp-desc{font-size:13px;color:var(--text-secondary);margin-bottom:10px}
+.mcp-tools{display:flex;flex-wrap:wrap;gap:4px}
+.mcp-tool{padding:2px 8px;border-radius:4px;font-size:10px;font-family:var(--font-mono);background:var(--bg-surface-2);color:var(--text-muted);border:1px solid var(--border)}
+.skill-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:all .3s ease;position:relative;overflow:hidden}
+.skill-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--cyan));opacity:0;transition:opacity var(--transition)}
+.skill-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}.skill-card:hover::after{opacity:1}
+.skill-status-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.skill-status{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--emerald)}
+.skill-status-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);box-shadow:0 0 6px rgba(52,211,153,.5)}
+.skill-name{font-size:16px;font-weight:700;margin-bottom:6px}.skill-desc{font-size:13px;color:var(--text-secondary);line-height:1.6}
+.commands-section{margin-bottom:32px}
+.commands-section-title{font-size:16px;font-weight:700;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.cmd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px}
+.cmd-item{display:flex;align-items:baseline;gap:10px;padding:8px 12px;border-radius:var(--radius-xs);transition:background var(--transition)}
+.cmd-item:hover{background:var(--bg-surface)}
+.cmd-name{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--cyan);white-space:nowrap;min-width:120px}
+.cmd-desc{font-size:12px;color:var(--text-secondary)}
+.agent-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;transition:all var(--transition)}
+.agent-card:hover{border-color:var(--purple);transform:translateY(-1px)}
+.agent-name{font-size:14px;font-weight:700;margin-bottom:4px}.agent-type{font-size:11px;color:var(--text-muted)}
+.module-diagram{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:32px;overflow-x:auto}
+.module-tree{font-family:var(--font-mono);font-size:13px;line-height:2}
+.module-tree .dir{color:var(--cyan);font-weight:600}.module-tree .file{color:var(--text-secondary)}.module-tree .comment{color:var(--text-muted);font-style:italic}
+.module-tree .indent{padding-left:24px}.module-tree .indent2{padding-left:48px}
+.pipeline{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:20px 0}
+.pipeline-stage{flex:1;min-width:140px;text-align:center;padding:20px 16px;position:relative;background:var(--bg-surface);border:1px solid var(--border)}
+.pipeline-stage:first-child{border-radius:var(--radius-sm) 0 0 var(--radius-sm)}.pipeline-stage:last-child{border-radius:0 var(--radius-sm) var(--radius-sm) 0}
+.pipeline-stage:not(:last-child)::after{content:'';position:absolute;right:-8px;top:50%;transform:translateY(-50%);width:0;height:0;border-left:8px solid var(--bg-surface-2);border-top:16px solid transparent;border-bottom:16px solid transparent;z-index:1}
+.pipeline-stage-icon{font-size:20px;margin-bottom:6px}.pipeline-stage-title{font-size:12px;font-weight:700}.pipeline-stage-desc{font-size:10px;color:var(--text-muted);margin-top:4px}
+.velocity-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.velocity-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;text-align:center;position:relative;overflow:hidden}
+.velocity-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,var(--accent-glow),transparent 70%);opacity:0;transition:opacity var(--transition)}
+.velocity-card:hover::before{opacity:1}
+.velocity-value{font-size:36px;font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums;position:relative}
+.velocity-label{font-size:13px;color:var(--text-secondary);margin-top:4px;position:relative}
+.velocity-badge{display:inline-block;margin-top:8px;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;position:relative}
+.ref-table-wrapper{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius)}
+.ref-table{width:100%;border-collapse:collapse;font-size:13px}
+.ref-table th{text-align:left;padding:12px 16px;background:var(--bg-surface);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);border-bottom:1px solid var(--border);position:sticky;top:0}
+.ref-table td{padding:10px 16px;border-bottom:1px solid var(--border);vertical-align:top}
+.ref-table tr:hover td{background:rgba(99,102,241,.04)}
+.ref-table .mono{font-family:var(--font-mono);font-size:12px;color:var(--cyan)}
+.code-block{position:relative;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin:16px 0;overflow:hidden}
+.code-block-header{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--bg-surface-2);border-bottom:1px solid var(--border)}
+.code-block-lang{font-size:11px;font-weight:600;color:var(--text-muted)}
+.code-copy-btn{background:none;border:1px solid var(--border);border-radius:var(--radius-xs);padding:4px 10px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:var(--font-sans);transition:all var(--transition)}
+.code-copy-btn:hover{border-color:var(--accent);color:var(--accent-light)}
+.code-block pre{padding:16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.7;color:var(--text-secondary)}
+.code-block code .kw{color:var(--purple)}.code-block code .fn{color:var(--blue)}.code-block code .str{color:var(--emerald)}.code-block code .cm{color:var(--text-muted)}.code-block code .num{color:var(--yellow)}
+.footer{padding:40px 60px;border-top:1px solid var(--border);text-align:center;color:var(--text-muted);font-size:13px}
+.fade-in{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+/* Diagram: Mind Map */
+.mindmap-container{padding:40px 20px;overflow-x:auto}
+.mindmap-center{display:flex;flex-direction:column;align-items:center;gap:40px}
+.mindmap-core{background:linear-gradient(135deg,var(--accent),var(--cyan));color:#fff;font-size:18px;font-weight:800;padding:20px 36px;border-radius:50px;box-shadow:0 0 40px rgba(99,102,241,.4);text-align:center}
+.mindmap-branches{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;width:100%;max-width:1100px}
+.mindmap-branch{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center;transition:all .3s ease;position:relative}
+.mindmap-branch:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.mindmap-branch::before{content:'';position:absolute;top:-20px;left:50%;width:2px;height:20px;background:linear-gradient(to bottom,var(--accent),var(--border))}
+.mindmap-branch-icon{font-size:28px;margin-bottom:8px}.mindmap-branch-title{font-size:14px;font-weight:700;margin-bottom:8px}.mindmap-branch-count{font-size:11px;color:var(--text-muted);margin-bottom:10px}
+.mindmap-leaves{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.mindmap-leaf{padding:2px 8px;border-radius:4px;font-size:10px;background:var(--bg-surface-2);color:var(--text-secondary);border:1px solid var(--border)}
+.mindmap-branch:hover .mindmap-leaf{border-color:var(--accent);color:var(--text)}
+/* Diagram: Sequence */
+.seq-diagram{padding:40px 20px;overflow-x:auto}
+.seq-timeline{display:flex;flex-direction:column;gap:0;position:relative;padding-left:60px;min-width:600px}
+.seq-timeline::before{content:'';position:absolute;left:30px;top:20px;bottom:20px;width:3px;background:linear-gradient(to bottom,var(--accent),var(--cyan),var(--emerald),var(--yellow),var(--green));border-radius:2px}
+.seq-step{display:flex;align-items:center;gap:20px;padding:14px 0;position:relative}
+.seq-step-num{position:absolute;left:-46px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;box-shadow:0 0 12px rgba(99,102,241,.3);z-index:1}
+.seq-step-icon{font-size:28px;flex-shrink:0}
+.seq-step-content{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 20px;flex:1;transition:all var(--transition)}
+.seq-step-content:hover{border-color:var(--accent);box-shadow:0 0 20px rgba(99,102,241,.1)}
+.seq-step-title{font-size:14px;font-weight:700;margin-bottom:4px}.seq-step-desc{font-size:12px;color:var(--text-secondary)}
+/* Diagram: Flow */
+.flow-chart{padding:40px 20px;overflow-x:auto}
+.flow-container{display:flex;flex-direction:column;gap:24px;min-width:700px}
+.flow-tiers{display:flex;flex-direction:column;gap:12px}
+.flow-tier{display:flex;align-items:center;gap:8px;padding:14px 20px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);transition:all var(--transition)}
+.flow-tier:hover{transform:translateX(4px);border-color:var(--accent)}
+.flow-tier-label{font-size:12px;font-weight:800;padding:4px 10px;border-radius:6px;flex-shrink:0;min-width:70px;text-align:center}
+.flow-tier-steps{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.flow-tier-step{padding:4px 10px;border-radius:var(--radius-xs);font-size:11px;background:var(--bg-surface-2);border:1px solid var(--border);color:var(--text-secondary)}
+.flow-tier-arrow{color:var(--text-muted);font-size:14px;flex-shrink:0}
+/* Diagram: Data Flow */
+.dataflow-container{padding:40px 20px;overflow-x:auto}
+.dataflow{display:flex;flex-direction:column;gap:16px;align-items:center;min-width:500px}
+.dataflow-node{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 24px;text-align:center;transition:all var(--transition);max-width:500px;width:100%}
+.dataflow-node:hover{border-color:var(--accent)}
+.dataflow-node-title{font-size:14px;font-weight:700;margin-bottom:4px}.dataflow-node-desc{font-size:11px;color:var(--text-secondary)}
+.dataflow-arrow{width:3px;height:30px;background:linear-gradient(to bottom,var(--accent),var(--cyan));border-radius:2px;position:relative}
+.dataflow-arrow::after{content:'';position:absolute;bottom:-6px;left:-4px;width:0;height:0;border-left:5.5px solid transparent;border-right:5.5px solid transparent;border-top:8px solid var(--cyan)}
+.dataflow-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.dataflow-branch{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-xs);padding:10px 16px;text-align:center;flex:1;min-width:150px;max-width:200px;transition:all var(--transition)}
+.dataflow-branch:hover{border-color:var(--accent)}
+.dataflow-branch-title{font-size:12px;font-weight:700}.dataflow-branch-desc{font-size:10px;color:var(--text-muted)}
+.dataflow-sync-arrow{font-size:18px;color:var(--emerald)}
+/* Diagram: Hook Pipeline */
+.hookpipe-container{padding:20px 0;overflow-x:auto}
+.hookpipe-stage{margin-bottom:20px}
+.hookpipe-label{font-size:13px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.hookpipe-label-dot{width:10px;height:10px;border-radius:50%}
+.hookpipe-items{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.hookpipe-item{padding:6px 12px;border-radius:var(--radius-xs);font-size:11px;font-family:var(--font-mono);background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);transition:all var(--transition)}
+.hookpipe-item:hover{border-color:var(--accent);color:var(--text);box-shadow:0 0 10px rgba(99,102,241,.15)}
+.hookpipe-arrow{color:var(--text-muted);font-size:14px;flex-shrink:0}
+/* Diagram: Org Chart */
+.orgchart-container{padding:40px 20px;overflow-x:auto}
+.orgchart{display:flex;flex-direction:column;align-items:center;gap:0;min-width:700px}
+.orgchart-node{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 20px;text-align:center;transition:all var(--transition);position:relative}
+.orgchart-node:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 20px rgba(99,102,241,.15)}
+.orgchart-node-icon{font-size:24px}.orgchart-node-title{font-size:13px;font-weight:700}.orgchart-node-role{font-size:10px;color:var(--text-muted)}
+.orgchart-connector{width:2px;height:24px;background:var(--border-light);margin:0 auto}
+.orgchart-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;position:relative}
+.orgchart-row::before{content:'';position:absolute;top:-12px;left:calc(50% - 200px);right:calc(50% - 200px);height:2px;background:var(--border-light)}
+@media(max-width:1024px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0);box-shadow:var(--shadow-lg)}.sidebar-toggle{display:block}.main{margin-left:0}.section{padding:60px 24px}.hero{padding:80px 24px 60px}.mindmap-branches{grid-template-columns:repeat(2,1fr)}.footer{padding:40px 24px}}
+@media(max-width:640px){.hero-stat-value{font-size:24px}.card-grid{grid-template-columns:1fr}.cmd-grid{grid-template-columns:1fr}.velocity-grid{grid-template-columns:repeat(2,1fr)}.pipeline{flex-wrap:wrap}.pipeline-stage{min-width:auto;flex:auto}.mindmap-branches{grid-template-columns:1fr}}
+@media print{.sidebar,.sidebar-toggle,#progress-bar,.code-copy-btn{display:none!important}.main{margin-left:0!important}.section{padding:20px 0;page-break-inside:avoid}body{background:#fff;color:#000}.card,.mcp-card,.skill-card,.agent-card{border-color:#ccc;background:#f9f9f9}a{color:#333}}
+</style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')" aria-label="Toggle navigation">&#9776;</button>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><h2>Claude Code Infra</h2><span>v2.0 Архитектурная документация</span></div>
+  <div class="sidebar-search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="global-search" placeholder="Поиск по документации..." autocomplete="off">
+  </div>
+  <div class="nav-group"><div class="nav-group-title">Начало</div><a class="nav-link" href="#hero">Обзор</a><a class="nav-link" href="#architecture">Архитектура</a></div>
+  <div class="nav-group"><div class="nav-group-title">Ключевые системы</div><a class="nav-link" href="#rules">Правила (28)</a><a class="nav-link" href="#hooks">Хуки (31)</a><a class="nav-link" href="#mcp-servers">MCP Серверы (15)</a><a class="nav-link" href="#skills">Скиллы (9)</a></div>
+  <div class="nav-group"><div class="nav-group-title">Операции</div><a class="nav-link" href="#commands">Команды (53)</a><a class="nav-link" href="#agents">Агенты (23)</a></div>
+  <div class="nav-group"><div class="nav-group-title">Инфраструктура</div><a class="nav-link" href="#modular-arch">Модульная архитектура</a><a class="nav-link" href="#git-workflow">Git Workflow</a><a class="nav-link" href="#velocity">Дашборд скорости</a></div>
+  <div class="nav-group"><div class="nav-group-title">Глубокие системы</div><a class="nav-link" href="#cto-layer">CTO Layer (4 фазы)</a><a class="nav-link" href="#virtual-company">Виртуальная компания (15)</a><a class="nav-link" href="#instincts">Инстинкты (10)</a><a class="nav-link" href="#gamification">Геймификация (23)</a><a class="nav-link" href="#memory-system">Система памяти</a><a class="nav-link" href="#sleepless">Sleepless Daemon</a><a class="nav-link" href="#teams">Команды агентов (8)</a><a class="nav-link" href="#anti-patterns">Антипаттерны</a></div>
+  <div class="nav-group"><div class="nav-group-title">Диаграммы</div><a class="nav-link" href="#diagram-mindmap">Mind Map инфраструктуры</a><a class="nav-link" href="#diagram-sequence">Жизненный цикл задачи</a><a class="nav-link" href="#diagram-flow">Pipeline промпта</a><a class="nav-link" href="#diagram-dataflow">Поток данных памяти</a><a class="nav-link" href="#diagram-hookpipe">Hook Pipeline</a><a class="nav-link" href="#diagram-orgchart">Оргструктура компании</a></div>
+  <div class="nav-group"><div class="nav-group-title">Справка</div><a class="nav-link" href="#quick-ref">Быстрая справка</a></div>
+</nav>
+<div class="main">
+
+<section class="hero" id="hero">
+  <div class="hero-grid"></div><div class="hero-glow hero-glow-1"></div><div class="hero-glow hero-glow-2"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="hero-badge-dot"></span>Боевая инфраструктура</div>
+    <h1><span class="gradient-text">Claude Code</span><br>AI Инфраструктура</h1>
+    <p class="hero-subtitle">Enterprise-grade AI фреймворк для автономной разработки на максималках. 28 правил, 31 хук, 15 MCP серверов, 9 кастомных скиллов, 53 команды и 23 специализированных агента, оркестрированные в самовосстанавливающуюся, самообучающуюся систему.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-value" data-target="28">0</div><div class="hero-stat-label">Правил</div></div>
+      <div class="hero-stat"><div class="hero-stat-value" data-target="31">0</div><div class="hero-stat-label">Хуков</div></div>
+      <div class="hero-stat"><div class="hero-stat-value" data-target="15">0</div><div class="hero-stat-label">MCP Серверов</div></div>
+      <div class="hero-stat"><div class="hero-stat-value" data-target="9">0</div><div class="hero-stat-label">Скиллов</div></div>
+      <div class="hero-stat"><div class="hero-stat-value" data-target="53">0</div><div class="hero-stat-label">Команд</div></div>
+      <div class="hero-stat"><div class="hero-stat-value" data-target="23">0</div><div class="hero-stat-label">Агентов</div></div>
+    </div>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="document.getElementById('architecture').scrollIntoView({behavior:'smooth'})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>Начать обзор</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('quick-ref').scrollIntoView({behavior:'smooth'})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>Быстрая справка</button>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="architecture">
+  <div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Проектирование</div><h2>Обзор архитектуры</h2><p class="section-desc">Полный data flow от ввода пользователя через CTO-слой до доменного выполнения. Каждый промпт проходит через quality gates, хуки и MCP серверы.</p></div>
+  <div class="arch-diagram fade-in"><div class="arch-flow">
+    <div class="arch-node" style="border-color:rgba(249,115,22,.4)"><div class="arch-node-icon">&#127908;</div><div class="arch-node-title">Ввод пользователя</div><div class="arch-node-sub">FlowWhisper голос</div></div>
+    <div class="arch-arrow">&#10132;</div>
+    <div class="arch-branch"><div class="arch-node" style="border-color:rgba(239,68,68,.4)"><div class="arch-node-icon">&#9881;</div><div class="arch-node-title">Слой хуков</div><div class="arch-node-sub">31 хук</div></div><div class="arch-branch-line"></div><div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center"><div class="arch-sub-node">Pre-commit</div><div class="arch-sub-node">Sentry</div><div class="arch-sub-node">Quality Gates</div></div></div>
+    <div class="arch-arrow">&#10132;</div>
+    <div class="arch-node" style="border-color:rgba(99,102,241,.4)"><div class="arch-node-icon">&#129504;</div><div class="arch-node-title">CTO Layer</div><div class="arch-node-sub">Фазы 0-4</div></div>
+    <div class="arch-arrow">&#10132;</div>
+    <div class="arch-branch"><div class="arch-node" style="border-color:rgba(168,85,247,.4)"><div class="arch-node-icon">&#9889;</div><div class="arch-node-title">Роутер скиллов</div><div class="arch-node-sub">9 скиллов</div></div><div class="arch-branch-line"></div><div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center"><div class="arch-sub-node">MCP Серверы</div><div class="arch-sub-node">Serena LSP</div><div class="arch-sub-node">Context7</div></div></div>
+    <div class="arch-arrow">&#10132;</div>
+    <div class="arch-node" style="border-color:rgba(16,185,129,.4)"><div class="arch-node-icon">&#128640;</div><div class="arch-node-title">Выполнение</div><div class="arch-node-sub">23 агента</div></div>
+  </div></div>
+  <div class="arch-sub-row fade-in" style="margin-top:24px"><div class="arch-sub-node">28 правил обеспечивают стандарты</div><div class="arch-sub-node">Геймификация считает XP</div><div class="arch-sub-node">MEMORY.md хранит контекст</div><div class="arch-sub-node">Git-синхронизация между сессиями</div><div class="arch-sub-node">Telegram уведомления</div><div class="arch-sub-node">Self-healing watchdog</div></div>
+</section>
+
+<section class="section" id="rules">
+  <div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Управление</div><h2>Правила <span style="color:var(--text-muted);font-weight:400">(28)</span></h2><p class="section-desc">Правила-гарды контролируют каждый аспект процесса. Блокирующие не дают закрыть задачу без соблюдения.</p></div>
+  <div class="filter-pills fade-in" id="rules-filters"><button class="filter-pill active" data-filter="all">Все (28)</button><button class="filter-pill" data-filter="blocking">Блокирующие (5)</button><button class="filter-pill" data-filter="quality">Качество (4)</button><button class="filter-pill" data-filter="workflow">Воркфлоу (5)</button><button class="filter-pill" data-filter="security">Безопасность (3)</button><button class="filter-pill" data-filter="infrastructure">Инфра (4)</button><button class="filter-pill" data-filter="domain">Домен (7)</button></div>
+  <div class="card-grid fade-in" id="rules-grid">
+    <div class="card" data-category="blocking"><div class="card-icon" style="background:rgba(239,68,68,.1);color:var(--red)">&#128274;</div><div class="card-title">serena-sentry-enforcement <span class="badge badge-red">БЛОК</span></div><div class="card-desc">Обязательная Serena для навигации и Sentry перед любым фиксом. Без исключений.</div></div>
+    <div class="card" data-category="blocking"><div class="card-icon" style="background:rgba(239,68,68,.1);color:var(--red)">&#9989;</div><div class="card-title">verify-before-done <span class="badge badge-red">БЛОК</span></div><div class="card-desc">Никакого "готово" без доказательства: скриншот, curl, тест или Playwright.</div></div>
+    <div class="card" data-category="blocking"><div class="card-icon" style="background:rgba(239,68,68,.1);color:var(--red)">&#128193;</div><div class="card-title">git-workflow-enforcement <span class="badge badge-red">БЛОК</span></div><div class="card-desc">Только feature-ветки. Без force-push main. Conventional commits. Pre-commit обязателен.</div></div>
+    <div class="card" data-category="blocking"><div class="card-icon" style="background:rgba(239,68,68,.1);color:var(--red)">&#128230;</div><div class="card-title">modular-architecture <span class="badge badge-red">БЛОК</span></div><div class="card-desc">Domain-driven структура обязательна. Домен не импортирует из другого домена.</div></div>
+    <div class="card" data-category="blocking"><div class="card-icon" style="background:rgba(239,68,68,.1);color:var(--red)">&#129514;</div><div class="card-title">testing-always <span class="badge badge-red">БЛОК</span></div><div class="card-desc">Каждое изменение = тесты. Фикс бага = regression-тест первым. Деплой только с зелёными.</div></div>
+    <div class="card" data-category="quality"><div class="card-icon" style="background:rgba(59,130,246,.1);color:var(--blue)">&#128736;</div><div class="card-title">quality-gates <span class="badge badge-blue">КАЧЕСТВО</span></div><div class="card-desc">Чеклист: MEMORY.md, Sentry, тесты, Serena -- до написания кода.</div></div>
+    <div class="card" data-category="quality"><div class="card-icon" style="background:rgba(59,130,246,.1);color:var(--blue)">&#128196;</div><div class="card-title">docs-always <span class="badge badge-blue">КАЧЕСТВО</span></div><div class="card-desc">Google-style docstrings. 80% функций, 90% классов. Interrogate включён.</div></div>
+    <div class="card" data-category="quality"><div class="card-icon" style="background:rgba(59,130,246,.1);color:var(--blue)">&#128200;</div><div class="card-title">coding-standards <span class="badge badge-blue">КАЧЕСТВО</span></div><div class="card-desc">Строгие типы, async/await, SQLAlchemy 2.0, tenacity retry, таймауты.</div></div>
+    <div class="card" data-category="quality"><div class="card-icon" style="background:rgba(59,130,246,.1);color:var(--blue)">&#128202;</div><div class="card-title">data-correctness <span class="badge badge-blue">КАЧЕСТВО</span></div><div class="card-desc">Проверять реальные данные. Сверять БД и фронт. Пустой массив = баг.</div></div>
+    <div class="card" data-category="workflow"><div class="card-icon" style="background:rgba(16,185,129,.1);color:var(--green)">&#128279;</div><div class="card-title">chain-thinking <span class="badge badge-green">ВОРКФЛОУ</span></div><div class="card-desc">Трассировка пайплайна: Фронт->API->Worker->Cron->DB->Ext API. Не лечить симптомы.</div></div>
+    <div class="card" data-category="workflow"><div class="card-icon" style="background:rgba(16,185,129,.1);color:var(--green)">&#128270;</div><div class="card-title">research-before-code <span class="badge badge-green">ВОРКФЛОУ</span></div><div class="card-desc">Context7 первым. Проверить готовые решения. Buy vs build. 3 варианта.</div></div>
+    <div class="card" data-category="workflow"><div class="card-icon" style="background:rgba(16,185,129,.1);color:var(--green)">&#128221;</div><div class="card-title">spec-first <span class="badge badge-green">ВОРКФЛОУ</span></div><div class="card-desc">Спека до кода для задач >3 файлов. Stories, API, модели, edge cases.</div></div>
+    <div class="card" data-category="workflow"><div class="card-icon" style="background:rgba(16,185,129,.1);color:var(--green)">&#129300;</div><div class="card-title">think-ahead <span class="badge badge-green">ВОРКФЛОУ</span></div><div class="card-desc">x10/x100 масштаб. Техдолг. Обратная совместимость. Планы отката.</div></div>
+    <div class="card" data-category="workflow"><div class="card-icon" style="background:rgba(16,185,129,.1);color:var(--green)">&#9200;</div><div class="card-title">time-estimation <span class="badge badge-green">ВОРКФЛОУ</span></div><div class="card-desc">AI-скорость: Человеческое время / 5 / агенты. Разбивка по волнам в часах.</div></div>
+    <div class="card" data-category="security"><div class="card-icon" style="background:rgba(245,158,11,.1);color:var(--yellow)">&#128272;</div><div class="card-title">security-baseline <span class="badge badge-yellow">БЕЗОПАСНОСТЬ</span></div><div class="card-desc">OWASP: .env, валидация, параметризованный SQL, CORS whitelist, JWT.</div></div>
+    <div class="card" data-category="security"><div class="card-icon" style="background:rgba(245,158,11,.1);color:var(--yellow)">&#128737;</div><div class="card-title">safe-ops <span class="badge badge-yellow">БЕЗОПАСНОСТЬ</span></div><div class="card-desc">Бэкап перед критическими изменениями. Ротация 10 бэкапов. Скрипт отката.</div></div>
+    <div class="card" data-category="security"><div class="card-icon" style="background:rgba(245,158,11,.1);color:var(--yellow)">&#128680;</div><div class="card-title">sentry-first <span class="badge badge-yellow">БЕЗОПАСНОСТЬ</span></div><div class="card-desc">Без Sentry не фиксить. list_issues->get_issue_details->analyze->фикс.</div></div>
+    <div class="card" data-category="infrastructure"><div class="card-icon" style="background:rgba(168,85,247,.1);color:var(--purple)">&#128640;</div><div class="card-title">ci-cd-templates <span class="badge badge-purple">ИНФРА</span></div><div class="card-desc">GitHub Actions для Python (FastAPI) и TypeScript (Next.js). AI-ревью.</div></div>
+    <div class="card" data-category="infrastructure"><div class="card-icon" style="background:rgba(168,85,247,.1);color:var(--purple)">&#128193;</div><div class="card-title">project-bootstrap <span class="badge badge-purple">ИНФРА</span></div><div class="card-desc">Стандартная структура: src/, tests/, docs/adr/, MEMORY.md, CI/CD с 1 дня.</div></div>
+    <div class="card" data-category="infrastructure"><div class="card-icon" style="background:rgba(168,85,247,.1);color:var(--purple)">&#9729;</div><div class="card-title">vps-deploy <span class="badge badge-purple">ИНФРА</span></div><div class="card-desc">VPS деплой SSH+Docker. Nginx, Certbot SSL, health checks, авто-откат.</div></div>
+    <div class="card" data-category="infrastructure"><div class="card-icon" style="background:rgba(168,85,247,.1);color:var(--purple)">&#129657;</div><div class="card-title">self-healing <span class="badge badge-purple">ИНФРА</span></div><div class="card-desc">Мониторинг. 2x упал=рестарт, 3x=Telegram, 5x=эскалация.</div></div>
+    <div class="card" data-category="domain"><div class="card-icon" style="background:rgba(249,115,22,.1);color:var(--orange)">&#128722;</div><div class="card-title">marketplace-ops <span class="badge badge-orange">ДОМЕН</span></div><div class="card-desc">WB/Ozon/YM. Rate limiting, тест на 1-3 товарах, лог мутаций API.</div></div>
+    <div class="card" data-category="domain"><div class="card-icon" style="background:rgba(249,115,22,.1);color:var(--orange)">&#128231;</div><div class="card-title">outreach-automation <span class="badge badge-orange">ДОМЕН</span></div><div class="card-desc">B2B: Сбор->Обогащение->Скоринг->Персонализация->Follow-up->CRM.</div></div>
+    <div class="card" data-category="domain"><div class="card-icon" style="background:rgba(249,115,22,.1);color:var(--orange)">&#127760;</div><div class="card-title">seo-automation <span class="badge badge-orange">ДОМЕН</span></div><div class="card-desc">SEO: Ключи->Контент->Публикация->Индексация->Мониторинг->Оптимизация.</div></div>
+    <div class="card" data-category="domain"><div class="card-icon" style="background:rgba(249,115,22,.1);color:var(--orange)">&#127891;</div><div class="card-title">skolkovo-product <span class="badge badge-orange">ДОМЕН</span></div><div class="card-desc">Сколково: AI/ML, SaaS, C4 диаграммы, roadmap 3 года.</div></div>
+    <div class="card" data-category="domain"><div class="card-icon" style="background:rgba(249,115,22,.1);color:var(--orange)">&#127941;</div><div class="card-title">auto-coaching <span class="badge badge-orange">ДОМЕН</span></div><div class="card-desc">AI-коучинг: метрики, регрессии, недоиспользуемые инструменты, 3 совета.</div></div>
+    <div class="card" data-category="domain"><div class="card-icon" style="background:rgba(249,115,22,.1);color:var(--orange)">&#127970;</div><div class="card-title">virtual-company <span class="badge badge-orange">ДОМЕН</span></div><div class="card-desc">Авто-маршрутизация: >1д=Архитектор, >3файлов=Дизайнер, деплой=Security+DevOps.</div></div>
+    <div class="card" data-category="domain"><div class="card-icon" style="background:rgba(249,115,22,.1);color:var(--orange)">&#128218;</div><div class="card-title">context7-mandatory <span class="badge badge-orange">ДОМЕН</span></div><div class="card-desc">resolve-library-id+query-docs до любой библиотеки. Не угадывать API.</div></div>
+  </div>
+</section>
+
+<section class="section" id="hooks">
+  <div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>Автоматизация</div><h2>Pipeline хуков <span style="color:var(--text-muted);font-weight:400">(31)</span></h2><p class="section-desc">Хуки перехватывают действия на 4 стадиях: SessionStart, PreToolUse, PostToolUse, Stop. Качество, безопасность и обучение -- автоматически.</p></div>
+  <div class="timeline fade-in">
+    <div class="timeline-group"><div class="timeline-group-header"><div class="timeline-dot" style="border-color:var(--green)"></div><div class="timeline-group-title" style="color:var(--green)">SessionStart <span style="color:var(--text-muted);font-weight:400">(5)</span></div></div><div class="timeline-items"><div class="timeline-item">session-start.js</div><div class="timeline-item">mcp-health-check.py</div><div class="timeline-item">memory-decay.py</div><div class="timeline-item">skill-auto-activate.py</div><div class="timeline-item">context-loader.js</div></div></div>
+    <div class="timeline-group"><div class="timeline-group-header"><div class="timeline-dot" style="border-color:var(--blue)"></div><div class="timeline-group-title" style="color:var(--blue)">PreToolUse <span style="color:var(--text-muted);font-weight:400">(7)</span></div></div><div class="timeline-items"><div class="timeline-item">secret-scanner.js</div><div class="timeline-item">block-dev-server.js</div><div class="timeline-item">block-md-creation.js</div><div class="timeline-item">prompt-check.js</div><div class="timeline-item">pre-push-check.js</div><div class="timeline-item">commit-validator.js</div><div class="timeline-item">commit-guard.js</div></div></div>
+    <div class="timeline-group"><div class="timeline-group-header"><div class="timeline-dot" style="border-color:var(--purple)"></div><div class="timeline-group-title" style="color:var(--purple)">PostToolUse <span style="color:var(--text-muted);font-weight:400">(8)</span></div></div><div class="timeline-items"><div class="timeline-item">auto-test.js</div><div class="timeline-item">lint-fix.js</div><div class="timeline-item">post-edit-check.js</div><div class="timeline-item">type-check.js</div><div class="timeline-item">auto-doc.py</div><div class="timeline-item">bundle-check.js</div><div class="timeline-item">learning-log.js</div><div class="timeline-item">notification-log.js</div></div></div>
+    <div class="timeline-group"><div class="timeline-group-header"><div class="timeline-dot" style="border-color:var(--yellow)"></div><div class="timeline-group-title" style="color:var(--yellow)">Stop <span style="color:var(--text-muted);font-weight:400">(5)</span></div></div><div class="timeline-items"><div class="timeline-item">result-verifier.sh</div><div class="timeline-item">quality-sentinel.sh</div><div class="timeline-item">suggest-compact.js</div><div class="timeline-item">stop-check.js</div><div class="timeline-item">auto-checkpoint.py</div></div></div>
+    <div class="timeline-group"><div class="timeline-group-header"><div class="timeline-dot" style="border-color:var(--cyan)"></div><div class="timeline-group-title" style="color:var(--cyan)">Lifecycle <span style="color:var(--text-muted);font-weight:400">(6)</span></div></div><div class="timeline-items"><div class="timeline-item">session-end.js</div><div class="timeline-item">e2e-on-deploy.py</div><div class="timeline-item">pre-compact.js</div><div class="timeline-item">process-watchdog.py</div><div class="timeline-item">session-summarizer.py</div><div class="timeline-item">verify-adr.sh</div></div></div>
+  </div>
+</section>
+
+<section class="section" id="mcp-servers">
+  <div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Интеграции</div><h2>MCP Серверы <span style="color:var(--text-muted);font-weight:400">(15)</span></h2><p class="section-desc">Model Context Protocol серверы дают структурированный доступ к внешним системам через единый интерфейс.</p></div>
+  <div class="card-grid fade-in">
+    <div class="mcp-card"><div class="mcp-status"></div><div class="mcp-name">serena</div><div class="mcp-desc">LSP-навигация. Поиск символов, ссылок, семантическое редактирование.</div><div class="mcp-tools"><span class="mcp-tool">find_symbol</span><span class="mcp-tool">find_referencing_symbols</span><span class="mcp-tool">get_symbols_overview</span><span class="mcp-tool">replace_symbol_body</span><span class="mcp-tool">activate_project</span></div></div>
+    <div class="mcp-card"><div class="mcp-status"></div><div class="mcp-name">sentry-mcp</div><div class="mcp-desc">Мониторинг ошибок прода. Stack traces, AI root cause.</div><div class="mcp-tools"><span class="mcp-tool">list_issues</span><span class="mcp-tool">get_issue_details</span><span class="mcp-tool">analyze_issue_with_seer</span><span class="mcp-tool">list_events</span></div></div>
+    <div class="mcp-card"><div class="mcp-status"></div><div class="mcp-name">exa</div><div class="mcp-desc">Нейронный веб-поиск, 8 инструментов. Ресёрч, код, компании.</div><div class="mcp-tools"><span class="mcp-tool">web_search</span><span class="mcp-tool">get_code_context</span><span class="mcp-tool">company_research</span><span class="mcp-tool">deep_researcher</span></div></div>
+    <div class="mcp-card"><div class="mcp-status"></div><div class="mcp-name">brave-search</div><div class="mcp-desc">Быстрый веб-поиск. Фоллбэк для Exa.</div><div class="mcp-tools"><span class="mcp-tool">brave_web_search</span><span class="mcp-tool">brave_local_search</span></div></div>
+    <div class="mcp-card"><div class="mcp-status"></div><div class="mcp-name">github-mcp</div><div class="mcp-desc">GitHub API: issues, PR, repos, actions.</div><div class="mcp-tools"><span class="mcp-tool">create_issue</span><span class="mcp-tool">create_pr</span><span class="mcp-tool">list_repos</span><span class="mcp-tool">get_file_contents</span></div></div>
+    <div class="mcp-card"><div class="mcp-status"></div><div class="mcp-name">filesystem</div><div class="mcp-desc">Доступ к ~/. Чтение, запись, листинг.</div><div class="mcp-tools"><span class="mcp-tool">read_file</span><span class="mcp-tool">write_file</span><span class="mcp-tool">list_dir</span><span class="mcp-tool">search_files</span></div></div>
+    <div class="mcp-card"><div class="mcp-status"></div><div class="mcp-name">git</div><div class="mcp-desc">Git: status, diff, log, ветки, stash.</div><div class="mcp-tools"><span class="mcp-tool">git_status</span><span class="mcp-tool">git_diff</span><span class="mcp-tool">git_log</span><span class="mcp-tool">git_commit</span></div></div>
+    <div class="mcp-card"><div class="mcp-status"></div><div class="mcp-name">docker</div><div class="mcp-desc">Docker: build, run, compose, логи.</div><div class="mcp-tools"><span class="mcp-tool">docker_ps</span><span class="mcp-tool">docker_logs</span><span class="mcp-tool">docker_compose</span><span class="mcp-tool">docker_build</span></div></div>
+    <div class="mcp-card"><div class="mcp-status"></div><div class="mcp-name">telegram-notify</div><div class="mcp-desc">Telegram уведомления: ошибки, завершение, аппрув.</div><div class="mcp-tools"><span class="mcp-tool">send_message</span><span class="mcp-tool">send_alert</span></div></div>
+    <div class="mcp-card"><div class="mcp-status"></div><div class="mcp-name">time</div><div class="mcp-desc">Текущее время/дата для планирования.</div><div class="mcp-tools"><span class="mcp-tool">get_current_time</span><span class="mcp-tool">get_timezone</span></div></div>
+    <div class="mcp-card"><div class="mcp-status"></div><div class="mcp-name">security-scanner</div><div class="mcp-desc">pip-audit+bandit+detect-secrets+trivy.</div><div class="mcp-tools"><span class="mcp-tool">scan_dependencies</span><span class="mcp-tool">scan_secrets</span><span class="mcp-tool">scan_code</span><span class="mcp-tool">scan_docker</span></div></div>
+    <div class="mcp-card"><div class="mcp-status"></div><div class="mcp-name">vps-monitor</div><div class="mcp-desc">SSH мониторинг: CPU, RAM, диск, сервисы.</div><div class="mcp-tools"><span class="mcp-tool">check_cpu</span><span class="mcp-tool">check_memory</span><span class="mcp-tool">check_disk</span><span class="mcp-tool">list_services</span><span class="mcp-tool">restart_service</span></div></div>
+    <div class="mcp-card"><div class="mcp-status"></div><div class="mcp-name">deep-research</div><div class="mcp-desc">Мульти-источниковый ресёрч в структурированные отчёты.</div><div class="mcp-tools"><span class="mcp-tool">research_topic</span><span class="mcp-tool">compare_solutions</span></div></div>
+    <div class="mcp-card"><div class="mcp-status"></div><div class="mcp-name">gpt-researcher</div><div class="mcp-desc">Автономный исследователь: стратегия, источники, отчёты.</div><div class="mcp-tools"><span class="mcp-tool">research</span><span class="mcp-tool">get_report</span></div></div>
+    <div class="mcp-card"><div class="mcp-status"></div><div class="mcp-name">moysklad-api</div><div class="mcp-desc">Товары, запасы, заказы, контрагенты.</div><div class="mcp-tools"><span class="mcp-tool">get_products</span><span class="mcp-tool">get_stock</span><span class="mcp-tool">create_order</span></div></div>
+  </div>
+</section>
+
+<section class="section" id="skills">
+  <div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Возможности</div><h2>Кастомные скиллы <span style="color:var(--text-muted);font-weight:400">(9)</span></h2><p class="section-desc">Доменные модули, активирующиеся автоматически по контексту задачи.</p></div>
+  <div class="card-grid fade-in">
+    <div class="skill-card"><div class="skill-status-row"><div class="skill-status"><span class="skill-status-dot"></span> Авто</div><span class="badge badge-purple">ГОЛОС</span></div><div class="skill-name">elite-prompts</div><div class="skill-desc">Распознавание голоса FlowWhisper. Интерпретация намерения. Обогащение контекстом.</div></div>
+    <div class="skill-card"><div class="skill-status-row"><div class="skill-status"><span class="skill-status-dot"></span> Активен</div><span class="badge badge-red">КРИТ</span></div><div class="skill-name">infra-doctor</div><div class="skill-desc">9 диагностических цепей (A-I): Docker, зависимости, Data Flow, Rate Limits, сеть, API.</div></div>
+    <div class="skill-card"><div class="skill-status-row"><div class="skill-status"><span class="skill-status-dot"></span> Активен</div><span class="badge badge-red">БЛОК</span></div><div class="skill-name">verify</div><div class="skill-desc">Принудительная верификация. "Должно работать" не принимается.</div></div>
+    <div class="skill-card"><div class="skill-status-row"><div class="skill-status"><span class="skill-status-dot"></span> Роутинг</div><span class="badge badge-blue">РОУТИНГ</span></div><div class="skill-name">org-structure</div><div class="skill-desc">Маршрутизация Virtual Elite IT Company по ролям.</div></div>
+    <div class="skill-card"><div class="skill-status-row"><div class="skill-status"><span class="skill-status-dot"></span> Активен</div><span class="badge badge-green">КОУЧИНГ</span></div><div class="skill-name">growth-coach</div><div class="skill-desc">CTO-коучинг с бенчмаркингом. Метрики, советы, XP и ранг.</div></div>
+    <div class="skill-card"><div class="skill-status-row"><div class="skill-status"><span class="skill-status-dot"></span> Активен</div><span class="badge badge-cyan">МЕТА</span></div><div class="skill-name">improver</div><div class="skill-desc">Самоулучшение: анализ сессий, паттерны, оптимизация правил/хуков.</div></div>
+    <div class="skill-card"><div class="skill-status-row"><div class="skill-status"><span class="skill-status-dot"></span> Активен</div><span class="badge badge-purple">АРХИТ</span></div><div class="skill-name">modularize</div><div class="skill-desc">Миграция на DDD: bounded contexts, план миграции, контроль импортов.</div></div>
+    <div class="skill-card"><div class="skill-status-row"><div class="skill-status"><span class="skill-status-dot"></span> Кварт.</div><span class="badge badge-yellow">СТРАТЕГИЯ</span></div><div class="skill-name">tech-radar</div><div class="skill-desc">Квартальный радар: Adopt/Trial/Assess/Hold для всех инструментов.</div></div>
+    <div class="skill-card"><div class="skill-status-row"><div class="skill-status"><span class="skill-status-dot"></span> Активен</div><span class="badge badge-orange">ДОМЕН</span></div><div class="skill-name">wb-marketplace</div><div class="skill-desc">WB/Ozon контент: скоринг карточек, SEO, AI-ответы с PubMed.</div></div>
+  </div>
+</section>
+
+<section class="section" id="commands">
+  <div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Операции</div><h2>Команды <span style="color:var(--text-muted);font-weight:400">(53)</span></h2><p class="section-desc">Слэш-команды для всего -- от git до security-аудитов. Каждая инкапсулирует полный рабочий процесс.</p></div>
+  <div id="commands-container" class="fade-in">
+    <div class="commands-section"><div class="commands-section-title" style="color:var(--green)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><line x1="6" y1="9" x2="6" y2="21"/></svg>Git (6)</div><div class="cmd-grid"><div class="cmd-item"><span class="cmd-name">/commit</span><span class="cmd-desc">Анализ staged, создание коммита</span></div><div class="cmd-item"><span class="cmd-name">/pr-create</span><span class="cmd-desc">Создать PR с описанием</span></div><div class="cmd-item"><span class="cmd-name">/pr-review</span><span class="cmd-desc">Ревью PR по номеру</span></div><div class="cmd-item"><span class="cmd-name">/release</span><span class="cmd-desc">Тегированный релиз</span></div><div class="cmd-item"><span class="cmd-name">/changelog</span><span class="cmd-desc">Changelog из коммитов</span></div><div class="cmd-item"><span class="cmd-name">/worktree</span><span class="cmd-desc">Настройка worktrees</span></div></div></div>
+    <div class="commands-section"><div class="commands-section-title" style="color:var(--blue)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Код (6)</div><div class="cmd-grid"><div class="cmd-item"><span class="cmd-name">/refactor</span><span class="cmd-desc">Систематический рефакторинг</span></div><div class="cmd-item"><span class="cmd-name">/rename</span><span class="cmd-desc">Переименование по кодовой базе</span></div><div class="cmd-item"><span class="cmd-name">/extract</span><span class="cmd-desc">Извлечение функции</span></div><div class="cmd-item"><span class="cmd-name">/simplify</span><span class="cmd-desc">Упрощение кода</span></div><div class="cmd-item"><span class="cmd-name">/dead-code</span><span class="cmd-desc">Удаление мёртвого кода</span></div><div class="cmd-item"><span class="cmd-name">/cleanup</span><span class="cmd-desc">Чистка кода</span></div></div></div>
+    <div class="commands-section"><div class="commands-section-title" style="color:var(--emerald)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Тестирование (6)</div><div class="cmd-grid"><div class="cmd-item"><span class="cmd-name">/tdd</span><span class="cmd-desc">TDD red-green-refactor</span></div><div class="cmd-item"><span class="cmd-name">/test-fix</span><span class="cmd-desc">Фикс падающих тестов</span></div><div class="cmd-item"><span class="cmd-name">/test-coverage</span><span class="cmd-desc">Анализ покрытия</span></div><div class="cmd-item"><span class="cmd-name">/e2e</span><span class="cmd-desc">E2E Playwright тесты</span></div><div class="cmd-item"><span class="cmd-name">/integration-test</span><span class="cmd-desc">Интеграционные тесты</span></div><div class="cmd-item"><span class="cmd-name">/snapshot-test</span><span class="cmd-desc">Snapshot тесты</span></div></div></div>
+    <div class="commands-section"><div class="commands-section-title" style="color:var(--cyan)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12l-4-4v3H3v2h15v3l4-4z"/></svg>Деплой (6)</div><div class="cmd-grid"><div class="cmd-item"><span class="cmd-name">/deploy</span><span class="cmd-desc">Деплой SSH+Docker</span></div><div class="cmd-item"><span class="cmd-name">/deploy-check</span><span class="cmd-desc">Пред-деплой проверка</span></div><div class="cmd-item"><span class="cmd-name">/dockerfile</span><span class="cmd-desc">Оптимальный Dockerfile</span></div><div class="cmd-item"><span class="cmd-name">/ci-pipeline</span><span class="cmd-desc">Конфиг CI pipeline</span></div><div class="cmd-item"><span class="cmd-name">/hardening</span><span class="cmd-desc">Security hardening</span></div><div class="cmd-item"><span class="cmd-name">/monitor</span><span class="cmd-desc">Мониторинг/алерты</span></div></div></div>
+    <div class="commands-section"><div class="commands-section-title" style="color:var(--purple)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Документация (6)</div><div class="cmd-grid"><div class="cmd-item"><span class="cmd-name">/doc-gen</span><span class="cmd-desc">Доки из кода</span></div><div class="cmd-item"><span class="cmd-name">/api-docs</span><span class="cmd-desc">API документация</span></div><div class="cmd-item"><span class="cmd-name">/diagram</span><span class="cmd-desc">Mermaid диаграммы</span></div><div class="cmd-item"><span class="cmd-name">/adr</span><span class="cmd-desc">Architecture Decision Record</span></div><div class="cmd-item"><span class="cmd-name">/onboard</span><span class="cmd-desc">Гайд онбординга</span></div><div class="cmd-item"><span class="cmd-name">/update-codemap</span><span class="cmd-desc">Обновить codemap</span></div></div></div>
+    <div class="commands-section"><div class="commands-section-title" style="color:var(--yellow)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Безопасность (4)</div><div class="cmd-grid"><div class="cmd-item"><span class="cmd-name">/audit</span><span class="cmd-desc">Полный security-аудит</span></div><div class="cmd-item"><span class="cmd-name">/secrets-scan</span><span class="cmd-desc">Сканирование секретов</span></div><div class="cmd-item"><span class="cmd-name">/csp</span><span class="cmd-desc">Content Security Policy</span></div><div class="cmd-item"><span class="cmd-name">/review</span><span class="cmd-desc">Строгий code review</span></div></div></div>
+    <div class="commands-section"><div class="commands-section-title" style="color:var(--pink)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Планирование (4)</div><div class="cmd-grid"><div class="cmd-item"><span class="cmd-name">/plan</span><span class="cmd-desc">План реализации</span></div><div class="cmd-item"><span class="cmd-name">/spec</span><span class="cmd-desc">Spec-Driven Development</span></div><div class="cmd-item"><span class="cmd-name">/design-review</span><span class="cmd-desc">Дизайн-ревью</span></div><div class="cmd-item"><span class="cmd-name">/memory-bank</span><span class="cmd-desc">Обновить CLAUDE.md</span></div></div></div>
+    <div class="commands-section"><div class="commands-section-title" style="color:var(--orange)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Проект (6)</div><div class="cmd-grid"><div class="cmd-item"><span class="cmd-name">/new-project</span><span class="cmd-desc">Инит проекта с памятью</span></div><div class="cmd-item"><span class="cmd-name">/checkpoint</span><span class="cmd-desc">Сохранить в MEMORY+git</span></div><div class="cmd-item"><span class="cmd-name">/continue</span><span class="cmd-desc">Восстановить контекст</span></div><div class="cmd-item"><span class="cmd-name">/wrap-up</span><span class="cmd-desc">Завершить сессию</span></div><div class="cmd-item"><span class="cmd-name">/xp</span><span class="cmd-desc">Дашборд геймификации</span></div><div class="cmd-item"><span class="cmd-name">/parallel</span><span class="cmd-desc">Запуск агентов параллельно</span></div></div></div>
+    <div class="commands-section"><div class="commands-section-title" style="color:var(--amber)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Бизнес (9)</div><div class="cmd-grid"><div class="cmd-item"><span class="cmd-name">/wb-enrich</span><span class="cmd-desc">WB Content Factory</span></div><div class="cmd-item"><span class="cmd-name">/wb-qa</span><span class="cmd-desc">QA карточек</span></div><div class="cmd-item"><span class="cmd-name">/market-analytics</span><span class="cmd-desc">Аналитика маркетплейсов</span></div><div class="cmd-item"><span class="cmd-name">/n8n-status</span><span class="cmd-desc">Статус N8N</span></div><div class="cmd-item"><span class="cmd-name">/orchestrate</span><span class="cmd-desc">Многошаговый воркфлоу</span></div><div class="cmd-item"><span class="cmd-name">/fix-issue</span><span class="cmd-desc">Фикс GitHub issue</span></div><div class="cmd-item"><span class="cmd-name">/migrate</span><span class="cmd-desc">Миграция фреймворка</span></div><div class="cmd-item"><span class="cmd-name">/dependency-audit</span><span class="cmd-desc">Аудит зависимостей</span></div><div class="cmd-item"><span class="cmd-name">/cto</span><span class="cmd-desc">CTO-оценка</span></div></div></div>
+  </div>
+</section>
+
+<section class="section" id="agents">
+  <div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>AI-команда</div><h2>Агенты <span style="color:var(--text-muted);font-weight:400">(23)</span></h2><p class="section-desc">Автономные агенты через tmux. Каждый со своей экспертизой, общаются через Agent Team протокол.</p></div>
+  <div class="card-grid card-grid-sm fade-in">
+    <div class="agent-card"><div class="agent-name">architect</div><div class="agent-type" style="color:var(--purple)">Проектирование, ADR, C4</div></div>
+    <div class="agent-card"><div class="agent-name">coder</div><div class="agent-type" style="color:var(--cyan)">Реализация по спеке</div></div>
+    <div class="agent-card"><div class="agent-name">tester</div><div class="agent-type" style="color:var(--emerald)">pytest, Jest, Playwright</div></div>
+    <div class="agent-card"><div class="agent-name">reviewer</div><div class="agent-type" style="color:var(--blue)">Code review: архитектура, качество</div></div>
+    <div class="agent-card"><div class="agent-name">code-reviewer</div><div class="agent-type" style="color:var(--accent)">Глубокий review: security, perf</div></div>
+    <div class="agent-card"><div class="agent-name">qa-reviewer</div><div class="agent-type" style="color:var(--green)">QA скоринг (0-10)</div></div>
+    <div class="agent-card"><div class="agent-name">qa-engineer</div><div class="agent-type" style="color:var(--emerald)">Полный QA: unit, E2E, coverage</div></div>
+    <div class="agent-card"><div class="agent-name">api-debugger</div><div class="agent-type" style="color:var(--red)">REST API отладка</div></div>
+    <div class="agent-card"><div class="agent-name">researcher</div><div class="agent-type" style="color:var(--violet)">Ресёрч, best practices</div></div>
+    <div class="agent-card"><div class="agent-name">data-analyst</div><div class="agent-type" style="color:var(--amber)">SQL, pandas, аналитика</div></div>
+    <div class="agent-card"><div class="agent-name">devops-engineer</div><div class="agent-type" style="color:var(--cyan)">Docker, CI/CD, мониторинг</div></div>
+    <div class="agent-card"><div class="agent-name">security-reviewer</div><div class="agent-type" style="color:var(--red)">OWASP, уязвимости</div></div>
+    <div class="agent-card"><div class="agent-name">security-auditor</div><div class="agent-type" style="color:var(--rose)">Полный аудит, пентест</div></div>
+    <div class="agent-card"><div class="agent-name">browser-automation</div><div class="agent-type" style="color:var(--green)">Stealth camoufox</div></div>
+    <div class="agent-card"><div class="agent-name">n8n-automator</div><div class="agent-type" style="color:var(--orange)">N8N, JSON-фиксы</div></div>
+    <div class="agent-card"><div class="agent-name">content-factory</div><div class="agent-type" style="color:var(--pink)">Bio-STM/SoulWay</div></div>
+    <div class="agent-card"><div class="agent-name">ozon-specialist</div><div class="agent-type" style="color:var(--blue)">Ozon API, аналитика</div></div>
+    <div class="agent-card"><div class="agent-name">wb-enrichment</div><div class="agent-type" style="color:var(--orange)">Обогащение карточек WB</div></div>
+    <div class="agent-card"><div class="agent-name">fullstack-developer</div><div class="agent-type" style="color:var(--accent)">React+FastAPI</div></div>
+    <div class="agent-card"><div class="agent-name">solution-architect</div><div class="agent-type" style="color:var(--purple)">Кросс-системные интеграции</div></div>
+    <div class="agent-card"><div class="agent-name">sync-architect</div><div class="agent-type" style="color:var(--cyan)">Кросс-платформенный sync</div></div>
+    <div class="agent-card"><div class="agent-name">sync-researcher</div><div class="agent-type" style="color:var(--violet)">Паттерны синхронизации</div></div>
+    <div class="agent-card"><div class="agent-name">sync-tester</div><div class="agent-type" style="color:var(--emerald)">Тест sync, идемпотентность</div></div>
+  </div>
+</section>
+
+<section class="section" id="modular-arch">
+  <div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Структура</div><h2>Модульная архитектура</h2><p class="section-desc">Domain-driven: каждый домен самодостаточен. Строгие правила импортов.</p></div>
+  <div class="module-diagram fade-in"><div class="module-tree"><div><span class="dir">src/</span></div><div class="indent"><span class="dir">shared/</span> <span class="comment">-- конфиг, БД, auth</span></div><div class="indent2"><span class="file">config.py, database.py, auth.py, exceptions.py</span></div><div class="indent"><span class="dir">{domain}/</span> <span class="comment">-- bounded context</span></div><div class="indent2"><span class="file">models.py</span> <span class="comment">-- SQLAlchemy</span></div><div class="indent2"><span class="file">schemas.py</span> <span class="comment">-- Pydantic</span></div><div class="indent2"><span class="file">service.py</span> <span class="comment">-- бизнес-логика</span></div><div class="indent2"><span class="file">router.py</span> <span class="comment">-- FastAPI</span></div><div class="indent2"><span class="file">gateway.py</span> <span class="comment">-- внешние API</span></div><div class="indent2"><span class="file">events.py</span> <span class="comment">-- события</span></div><div class="indent2"><span class="file">tests/</span> <span class="comment">-- тесты</span></div></div></div>
+</section>
+
+<section class="section" id="git-workflow">
+  <div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 012 2v7"/><line x1="6" y1="9" x2="6" y2="21"/></svg>CI/CD</div><h2>Git Workflow Pipeline</h2><p class="section-desc">Каждое изменение через многоэтапный пайплайн: quality gates, security, AI review.</p></div>
+  <div class="pipeline fade-in">
+    <div class="pipeline-stage" style="border-left:3px solid var(--green)"><div class="pipeline-stage-icon">&#128421;</div><div class="pipeline-stage-title">Feature-ветка</div><div class="pipeline-stage-desc">feat/* / fix/*</div></div>
+    <div class="pipeline-stage" style="border-left:3px solid var(--blue)"><div class="pipeline-stage-icon">&#9881;</div><div class="pipeline-stage-title">Pre-commit</div><div class="pipeline-stage-desc">ruff, secrets</div></div>
+    <div class="pipeline-stage" style="border-left:3px solid var(--purple)"><div class="pipeline-stage-icon">&#128640;</div><div class="pipeline-stage-title">Push</div><div class="pipeline-stage-desc">pre-push-check</div></div>
+    <div class="pipeline-stage" style="border-left:3px solid var(--cyan)"><div class="pipeline-stage-icon">&#128736;</div><div class="pipeline-stage-title">CI</div><div class="pipeline-stage-desc">lint+тесты+security</div></div>
+    <div class="pipeline-stage" style="border-left:3px solid var(--accent)"><div class="pipeline-stage-icon">&#129302;</div><div class="pipeline-stage-title">AI-ревью</div><div class="pipeline-stage-desc">Claude Code</div></div>
+    <div class="pipeline-stage" style="border-left:3px solid var(--yellow)"><div class="pipeline-stage-icon">&#128269;</div><div class="pipeline-stage-title">PR-ревью</div><div class="pipeline-stage-desc">Человек</div></div>
+    <div class="pipeline-stage" style="border-left:3px solid var(--emerald)"><div class="pipeline-stage-icon">&#127919;</div><div class="pipeline-stage-title">Деплой</div><div class="pipeline-stage-desc">Health+откат</div></div>
+  </div>
+</section>
+
+<section class="section" id="velocity">
+  <div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Метрики</div><h2>Дашборд скорости</h2><p class="section-desc">Метрики в реальном времени. AI-разработка = top 1% продуктивности.</p></div>
+  <div class="velocity-grid fade-in">
+    <div class="velocity-card"><div class="velocity-value" style="color:var(--accent-light)" data-target="287">0</div><div class="velocity-label">Коммитов / неделя</div><div class="velocity-badge" style="background:rgba(16,185,129,.15);color:var(--emerald)">Top 1%</div></div>
+    <div class="velocity-card"><div class="velocity-value" style="color:var(--cyan)">261K</div><div class="velocity-label">LOC / неделя</div><div class="velocity-badge" style="background:rgba(6,182,212,.15);color:var(--cyan)">God Tier</div></div>
+    <div class="velocity-card"><div class="velocity-value" style="color:var(--emerald)">1,974</div><div class="velocity-label">Тестов всего</div><div class="velocity-badge" style="background:rgba(16,185,129,.15);color:var(--emerald)">Растёт</div></div>
+    <div class="velocity-card"><div class="velocity-value" style="color:var(--purple)">90K</div><div class="velocity-label">LOC всего</div><div class="velocity-badge" style="background:rgba(168,85,247,.15);color:var(--purple)">Мульти</div></div>
+    <div class="velocity-card"><div class="velocity-value" style="color:var(--yellow)">24/7</div><div class="velocity-label">Sleepless</div><div class="velocity-badge" style="background:rgba(245,158,11,.15);color:var(--yellow)">Активен</div></div>
+  </div>
+</section>
+
+<section class="section" id="cto-layer"><div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Решения</div><h2>CTO Layer <span style="color:var(--text-muted);font-weight:400">(4 фазы)</span></h2><p class="section-desc">Каждый промпт через 4 фазы. Claude = CTO: стратегия->архитектура->код. Никогда сразу в код.</p></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px" class="fade-in">
+    <div class="card" style="border-top:3px solid var(--cyan)"><div style="font-size:32px;font-weight:900;color:var(--cyan);margin-bottom:8px">0</div><div class="card-title">Понимание</div><div class="card-desc">Интерпретация намерения. Масштаб: мелочь/задача/проект. Уточнения.</div></div>
+    <div class="card" style="border-top:3px solid var(--accent)"><div style="font-size:32px;font-weight:900;color:var(--accent);margin-bottom:8px">1</div><div class="card-title">Стратегия</div><div class="card-desc">ЗАЧЕМ до КАК. Бизнес-цель. Top-3? Стоимость бездействия. Челлендж.</div></div>
+    <div class="card" style="border-top:3px solid var(--purple)"><div style="font-size:32px;font-weight:900;color:var(--purple);margin-bottom:8px">2</div><div class="card-title">Архитектура</div><div class="card-desc">Модули, data flow, 3 варианта. Влияние. Definition of Done. Согласование.</div></div>
+    <div class="card" style="border-top:3px solid var(--emerald)"><div style="font-size:32px;font-weight:900;color:var(--emerald);margin-bottom:8px">3</div><div class="card-title">Реализация</div><div class="card-desc">Код->тесты->проверка->далее. Не работает = СТОП, к Фазе 2.</div></div>
+  </div>
+</section>
+
+<section class="section" id="virtual-company"><div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Организация</div><h2>Virtual Elite IT Company <span style="color:var(--text-muted);font-weight:400">(15)</span></h2><p class="section-desc">Авто-роутинг ролей по типу задачи. По образцу Stripe, Vercel, Cloudflare.</p></div>
+  <div class="card-grid card-grid-sm fade-in">
+    <div class="agent-card" style="border-left:3px solid var(--accent)"><div class="agent-name">CTO</div><div class="agent-type" style="color:var(--accent)">Каждый промпт. Фазы 0-4.</div></div>
+    <div class="agent-card" style="border-left:3px solid var(--purple)"><div class="agent-name">Главный архитектор</div><div class="agent-type" style="color:var(--purple)">Задачи >1д. 3 варианта, ADR.</div></div>
+    <div class="agent-card" style="border-left:3px solid var(--blue)"><div class="agent-name">Продукт-дизайнер</div><div class="agent-type" style="color:var(--blue)">Задачи >3 файлов. Спека.</div></div>
+    <div class="agent-card" style="border-left:3px solid var(--cyan)"><div class="agent-name">Лид исследований</div><div class="agent-type" style="color:var(--cyan)">Новые технологии. Context7.</div></div>
+    <div class="agent-card" style="border-left:3px solid var(--emerald)"><div class="agent-name">Сеньор-инженер</div><div class="agent-type" style="color:var(--emerald)">Чистый код, тесты, доки.</div></div>
+    <div class="agent-card" style="border-left:3px solid var(--red)"><div class="agent-name">Security-офицер</div><div class="agent-type" style="color:var(--red)">Каждый деплой. OWASP.</div></div>
+    <div class="agent-card" style="border-left:3px solid var(--orange)"><div class="agent-name">DevOps</div><div class="agent-type" style="color:var(--orange)">Docker, CI/CD, health.</div></div>
+    <div class="agent-card" style="border-left:3px solid var(--rose)"><div class="agent-name">Дебаггер</div><div class="agent-type" style="color:var(--rose)">Sentry, root cause.</div></div>
+    <div class="agent-card" style="border-left:3px solid var(--yellow)"><div class="agent-name">SEO-инженер</div><div class="agent-type" style="color:var(--yellow)">Технический SEO, schema.</div></div>
+    <div class="agent-card" style="border-left:3px solid var(--green)"><div class="agent-name">QA-инженер</div><div class="agent-type" style="color:var(--green)">Unit, E2E, coverage.</div></div>
+  </div>
+</section>
+
+<section class="section" id="instincts"><div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>Рефлексы</div><h2>Инстинкты <span style="color:var(--text-muted);font-weight:400">(10)</span></h2><p class="section-desc">Выученные рефлексы из CL v2.1. Срабатывают автоматически по паттернам.</p></div>
+  <div class="card-grid fade-in">
+    <div class="card"><div class="card-icon" style="background:rgba(168,85,247,.1);color:var(--purple)">&#129504;</div><div class="card-title">architect-mode-triggers</div><div class="card-desc">Авто-включение архитектуры при сложных задачах. Фаза 2 до кода.</div></div>
+    <div class="card"><div class="card-icon" style="background:rgba(16,185,129,.1);color:var(--green)">&#128190;</div><div class="card-title">checkpoint-auto</div><div class="card-desc">Авто-сохранение после значимых изменений. MEMORY.md + git.</div></div>
+    <div class="card"><div class="card-icon" style="background:rgba(59,130,246,.1);color:var(--blue)">&#128269;</div><div class="card-title">deep-research-not-surface</div><div class="card-desc">Глубокое исследование вместо поверхностных ответов.</div></div>
+    <div class="card"><div class="card-icon" style="background:rgba(239,68,68,.1);color:var(--red)">&#128545;</div><div class="card-title">frustration-same-error</div><div class="card-desc">Ошибка 2 раза = смена стратегии.</div></div>
+    <div class="card"><div class="card-icon" style="background:rgba(249,115,22,.1);color:var(--orange)">&#128165;</div><div class="card-title">n8n-is-broken</div><div class="card-desc">N8N падает = Python-скрипт надёжнее.</div></div>
+    <div class="card"><div class="card-icon" style="background:rgba(99,102,241,.1);color:var(--accent)">&#127769;</div><div class="card-title">night-agent-ready</div><div class="card-desc">Конец сессии = подготовка ночной очереди.</div></div>
+    <div class="card"><div class="card-icon" style="background:rgba(245,158,11,.1);color:var(--yellow)">&#9200;</div><div class="card-title">no-days-estimates</div><div class="card-desc">Блок "X дней". Только часы по AI-формуле.</div></div>
+    <div class="card"><div class="card-icon" style="background:rgba(6,182,212,.1);color:var(--cyan)">&#9994;</div><div class="card-title">parallel-not-sequential</div><div class="card-desc">Независимые задачи = параллельно через Agent Teams.</div></div>
+    <div class="card"><div class="card-icon" style="background:rgba(236,72,153,.1);color:var(--pink)">&#127942;</div><div class="card-title">quality-score-mandatory</div><div class="card-desc">Скоринг каждого deliverable. Без метрики = не готово.</div></div>
+    <div class="card"><div class="card-icon" style="background:rgba(52,211,153,.1);color:var(--emerald)">&#128214;</div><div class="card-title">study-before-act</div><div class="card-desc">Сначала прочитай контекст, Serena, потом код.</div></div>
+  </div>
+</section>
+
+<section class="section" id="gamification"><div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>XP</div><h2>Геймификация <span style="color:var(--text-muted);font-weight:400">(23)</span></h2><p class="section-desc">XP, левелинг, бенчмаркинг с топ-100 AI-разработчиков.</p></div>
+  <div class="fade-in" style="margin-bottom:24px"><h3 style="font-size:16px;font-weight:700;margin-bottom:16px">Ядро</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px"><div class="timeline-item" style="display:flex;justify-content:space-between"><span style="color:var(--cyan)">engine.py</span><span>XP калькулятор + левелинг</span></div><div class="timeline-item" style="display:flex;justify-content:space-between"><span style="color:var(--cyan)">auto_xp.py</span><span>Авто-XP из git</span></div><div class="timeline-item" style="display:flex;justify-content:space-between"><span style="color:var(--cyan)">quests.py</span><span>Квесты (дневные/недельные)</span></div><div class="timeline-item" style="display:flex;justify-content:space-between"><span style="color:var(--cyan)">config.json</span><span>Ставки XP, уровни</span></div></div></div>
+  <div class="fade-in"><h3 style="font-size:16px;font-weight:700;margin-bottom:16px">Коучинг и UI</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px"><div class="timeline-item" style="display:flex;justify-content:space-between"><span style="color:var(--emerald)">creator_coaching.py</span><span>Бенчмаркинг</span></div><div class="timeline-item" style="display:flex;justify-content:space-between"><span style="color:var(--emerald)">growth-engine.py</span><span>Скорость роста</span></div><div class="timeline-item" style="display:flex;justify-content:space-between"><span style="color:var(--purple)">dashboard.py</span><span>Терминальный дашборд</span></div><div class="timeline-item" style="display:flex;justify-content:space-between"><span style="color:var(--purple)">telegram_notifier.py</span><span>Level-up алерты</span></div></div></div>
+</section>
+
+<section class="section" id="memory-system"><div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/><path d="M12 6v6l4 2"/></svg>Персистентность</div><h2>Система памяти</h2><p class="section-desc">Многоуровневая память с затуханием для краткосрочных данных и перманентным хранилищем.</p></div>
+  <div class="module-diagram fade-in"><div class="module-tree"><div><span class="dir">~/.claude/memory/</span></div><div class="indent"><span class="file">GLOBAL_MEMORY.md</span> <span class="comment">-- все проекты, решения</span></div><div class="indent"><span class="dir">decay-7d/</span> <span class="comment">-- истечение 7 дней</span></div><div class="indent"><span class="dir">decay-30d/</span> <span class="comment">-- истечение 30 дней</span></div><div class="indent"><span class="dir">permanent/</span> <span class="comment">-- навсегда</span></div><div class="indent"><span class="dir">decisions/</span> <span class="comment">-- ADR</span></div></div></div>
+</section>
+
+<section class="section" id="sleepless"><div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>24/7</div><h2>Sleepless Daemon</h2><p class="section-desc">Автономная разработка 24/7. Redis-очередь, tmux-воркеры, отчёты в Telegram.</p></div>
+  <div class="code-block fade-in"><div class="code-block-header"><span class="code-block-lang">Правила ночного агента</span><button class="code-copy-btn" onclick="copyCode(this)">Копировать</button></div><pre><code><span class="cm"># MERGE CONTRACT: Только feature/*/fix/*. НИКОГДА main.</span>
+<span class="cm"># TWO STRIKES: Тест падает 2x = СТОП, следующая задача.</span>
+<span class="cm"># RPI: Research -> Plan -> Implement.</span>
+<span class="cm"># MAX 2 RETRIES. ON STUCK >10мин = skip.</span>
+sleepy start / add <span class="str">"task"</span> -p proj / status / stop</code></pre></div>
+</section>
+
+<section class="section" id="teams"><div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3h-8l-2 4h12l-2-4z"/></svg>Коллаб</div><h2>Команды агентов <span style="color:var(--text-muted);font-weight:400">(8)</span></h2><p class="section-desc">Готовые составы для типовых задач. Запуск через /parallel.</p></div>
+  <div class="card-grid fade-in">
+    <div class="card"><div class="card-title" style="color:var(--cyan)">marketai-sprint</div><div class="card-desc">Архитектор+Кодер+Тестировщик+Ревьювер. Фичи MarketAI.</div></div>
+    <div class="card"><div class="card-title" style="color:var(--yellow)">marketai-audit</div><div class="card-desc">Security+QA. Пред-деплойная валидация.</div></div>
+    <div class="card"><div class="card-title" style="color:var(--green)">marketai-responses-v3</div><div class="card-desc">Content+QA+Data. Качество авто-ответов.</div></div>
+    <div class="card"><div class="card-title" style="color:var(--purple)">b2b-dashboard</div><div class="card-desc">Data+Frontend+Backend. Аналитические дашборды.</div></div>
+    <div class="card"><div class="card-title" style="color:var(--emerald)">sync-team</div><div class="card-desc">Sync-Architect+Researcher+Tester. Data sync.</div></div>
+    <div class="card"><div class="card-title" style="color:var(--pink)">content-pipeline</div><div class="card-desc">Content+Copywriter+SEO. Сквозной контент.</div></div>
+  </div>
+</section>
+
+<section class="section" id="anti-patterns"><div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Стоп</div><h2>Антипаттерны</h2><p class="section-desc">Модели провала = автоматический СТОП и коррекция курса.</p></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px" class="fade-in">
+    <div style="padding:16px 20px;background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius-sm);display:flex;gap:14px"><span style="color:var(--red);font-size:20px">&#9888;</span><div><div style="font-size:14px;font-weight:700;margin-bottom:4px">"Сейчас быстро закодим"</div><div style="font-size:12px;color:var(--text-secondary)">СТОП. Фаза 1 пропущена. Зачем? Какая метрика?</div></div></div>
+    <div style="padding:16px 20px;background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius-sm);display:flex;gap:14px"><span style="color:var(--red);font-size:20px">&#9888;</span><div><div style="font-size:14px;font-weight:700;margin-bottom:4px">"Давай ещё добавим X"</div><div style="font-size:12px;color:var(--text-secondary)">СТОП. Scope creep. Сначала доделай текущее.</div></div></div>
+    <div style="padding:16px 20px;background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius-sm);display:flex;gap:14px"><span style="color:var(--red);font-size:20px">&#9888;</span><div><div style="font-size:14px;font-weight:700;margin-bottom:4px">"Надо переписать всё"</div><div style="font-size:12px;color:var(--text-secondary)">СТОП. Минимальное изменение для цели.</div></div></div>
+    <div style="padding:16px 20px;background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius-sm);display:flex;gap:14px"><span style="color:var(--red);font-size:20px">&#9888;</span><div><div style="font-size:14px;font-weight:700;margin-bottom:4px">"Готово" без верификации</div><div style="font-size:12px;color:var(--text-secondary)">СТОП. Тест, curl, скриншот или Playwright.</div></div></div>
+  </div>
+</section>
+
+<!-- ====== DIAGRAM 1: MIND MAP ====== -->
+<section class="section" id="diagram-mindmap">
+  <div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4m-7-7H1m22 0h-4"/></svg>Визуализация</div><h2>Mind Map -- полная карта инфраструктуры</h2><p class="section-desc">Вся инфраструктура одним взглядом. 8 ключевых ветвей.</p></div>
+  <div class="mindmap-container fade-in"><div class="mindmap-center">
+    <div class="mindmap-core">Claude Code Infrastructure</div>
+    <div class="mindmap-branches">
+      <div class="mindmap-branch" style="border-top:3px solid var(--red)"><div class="mindmap-branch-icon">&#128274;</div><div class="mindmap-branch-title">Правила</div><div class="mindmap-branch-count">28</div><div class="mindmap-leaves"><span class="mindmap-leaf">Blocking</span><span class="mindmap-leaf">Quality</span><span class="mindmap-leaf">Workflow</span><span class="mindmap-leaf">Security</span><span class="mindmap-leaf">Infra</span><span class="mindmap-leaf">Domain</span></div></div>
+      <div class="mindmap-branch" style="border-top:3px solid var(--green)"><div class="mindmap-branch-icon">&#9881;</div><div class="mindmap-branch-title">Хуки</div><div class="mindmap-branch-count">31</div><div class="mindmap-leaves"><span class="mindmap-leaf">SessionStart</span><span class="mindmap-leaf">PreToolUse</span><span class="mindmap-leaf">PostToolUse</span><span class="mindmap-leaf">Stop</span><span class="mindmap-leaf">Lifecycle</span></div></div>
+      <div class="mindmap-branch" style="border-top:3px solid var(--cyan)"><div class="mindmap-branch-icon">&#128421;</div><div class="mindmap-branch-title">MCP Серверы</div><div class="mindmap-branch-count">15</div><div class="mindmap-leaves"><span class="mindmap-leaf">Навигация</span><span class="mindmap-leaf">Мониторинг</span><span class="mindmap-leaf">Поиск</span><span class="mindmap-leaf">DevOps</span><span class="mindmap-leaf">Кастомные</span></div></div>
+      <div class="mindmap-branch" style="border-top:3px solid var(--purple)"><div class="mindmap-branch-icon">&#9889;</div><div class="mindmap-branch-title">Скиллы</div><div class="mindmap-branch-count">9</div><div class="mindmap-leaves"><span class="mindmap-leaf">elite-prompts</span><span class="mindmap-leaf">infra-doctor</span><span class="mindmap-leaf">verify</span><span class="mindmap-leaf">org-structure</span><span class="mindmap-leaf">growth-coach</span></div></div>
+      <div class="mindmap-branch" style="border-top:3px solid var(--blue)"><div class="mindmap-branch-icon">&#128187;</div><div class="mindmap-branch-title">Команды</div><div class="mindmap-branch-count">54</div><div class="mindmap-leaves"><span class="mindmap-leaf">Git</span><span class="mindmap-leaf">Code</span><span class="mindmap-leaf">Test</span><span class="mindmap-leaf">Deploy</span><span class="mindmap-leaf">Docs</span><span class="mindmap-leaf">Security</span></div></div>
+      <div class="mindmap-branch" style="border-top:3px solid var(--orange)"><div class="mindmap-branch-icon">&#129302;</div><div class="mindmap-branch-title">Агенты</div><div class="mindmap-branch-count">23</div><div class="mindmap-leaves"><span class="mindmap-leaf">Architecture</span><span class="mindmap-leaf">Code</span><span class="mindmap-leaf">QA</span><span class="mindmap-leaf">Security</span><span class="mindmap-leaf">DevOps</span></div></div>
+      <div class="mindmap-branch" style="border-top:3px solid var(--emerald)"><div class="mindmap-branch-icon">&#129504;</div><div class="mindmap-branch-title">Память</div><div class="mindmap-branch-count">5 уровней</div><div class="mindmap-leaves"><span class="mindmap-leaf">GLOBAL</span><span class="mindmap-leaf">PROJECT</span><span class="mindmap-leaf">decay-7d</span><span class="mindmap-leaf">decay-30d</span><span class="mindmap-leaf">permanent</span></div></div>
+      <div class="mindmap-branch" style="border-top:3px solid var(--yellow)"><div class="mindmap-branch-icon">&#127942;</div><div class="mindmap-branch-title">Геймификация</div><div class="mindmap-branch-count">23 файла</div><div class="mindmap-leaves"><span class="mindmap-leaf">XP</span><span class="mindmap-leaf">Квесты</span><span class="mindmap-leaf">Коучинг</span><span class="mindmap-leaf">Дашборд</span></div></div>
+    </div>
+  </div></div>
+</section>
+
+<!-- ====== DIAGRAM 2: SEQUENCE ====== -->
+<section class="section" id="diagram-sequence">
+  <div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M2 12h20"/></svg>Жизненный цикл</div><h2>Жизненный цикл задачи</h2><p class="section-desc">От ввода до checkpoint через все фазы обработки.</p></div>
+  <div class="seq-diagram fade-in"><div class="seq-timeline">
+    <div class="seq-step"><div class="seq-step-num" style="background:var(--orange)">1</div><div class="seq-step-icon">&#128100;</div><div class="seq-step-content"><div class="seq-step-title">Пользователь</div><div class="seq-step-desc">FlowWhisper / текст. Сырой поток мысли.</div></div></div>
+    <div class="seq-step"><div class="seq-step-num" style="background:var(--red)">2</div><div class="seq-step-icon">&#128268;</div><div class="seq-step-content"><div class="seq-step-title">Хуки (SessionStart)</div><div class="seq-step-desc">mcp-health -> memory-decay -> skill-activate -> context-loader</div></div></div>
+    <div class="seq-step"><div class="seq-step-num" style="background:var(--accent)">3</div><div class="seq-step-icon">&#129504;</div><div class="seq-step-content"><div class="seq-step-title">CTO Layer</div><div class="seq-step-desc">Фаза 0: интерпретация, классификация, маршрутизация.</div></div></div>
+    <div class="seq-step"><div class="seq-step-num" style="background:var(--blue)">4</div><div class="seq-step-icon">&#128270;</div><div class="seq-step-content"><div class="seq-step-title">Research</div><div class="seq-step-desc">Context7, Exa, buy vs build. Информационная база.</div></div></div>
+    <div class="seq-step"><div class="seq-step-num" style="background:var(--purple)">5</div><div class="seq-step-icon">&#128208;</div><div class="seq-step-content"><div class="seq-step-title">Spec / Plan</div><div class="seq-step-desc">Спека, 3 варианта, согласование.</div></div></div>
+    <div class="seq-step"><div class="seq-step-num" style="background:var(--cyan)">6</div><div class="seq-step-icon">&#9889;</div><div class="seq-step-content"><div class="seq-step-title">Execution</div><div class="seq-step-desc">Параллельные агенты через tmux. Код + тесты.</div></div></div>
+    <div class="seq-step"><div class="seq-step-num" style="background:var(--emerald)">7</div><div class="seq-step-icon">&#129514;</div><div class="seq-step-content"><div class="seq-step-title">QA</div><div class="seq-step-desc">Unit + integration + property. Coverage. Lint. Sentry.</div></div></div>
+    <div class="seq-step"><div class="seq-step-num" style="background:var(--yellow)">8</div><div class="seq-step-icon">&#128269;</div><div class="seq-step-content"><div class="seq-step-title">Verify</div><div class="seq-step-desc">Скриншот, curl, pytest. "Должно работать" = СТОП.</div></div></div>
+    <div class="seq-step"><div class="seq-step-num" style="background:var(--green)">9</div><div class="seq-step-icon">&#9989;</div><div class="seq-step-content"><div class="seq-step-title">Done</div><div class="seq-step-desc">MEMORY.md, git commit, XP, Telegram. Готово к /continue.</div></div></div>
+  </div></div>
+</section>
+
+<!-- ====== DIAGRAM 3: FLOW CHART ====== -->
+<section class="section" id="diagram-flow">
+  <div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Pipeline</div><h2>Pipeline обработки промпта</h2><p class="section-desc">Классификация по tier-ам и маршрутизация через разные пайплайны.</p></div>
+  <div class="flow-chart fade-in"><div class="flow-container">
+    <div style="text-align:center;background:var(--bg-surface);border:2px solid var(--accent);border-radius:var(--radius);padding:14px 28px;font-weight:700;color:var(--accent-light)">Промпт -> skill-auto-activate.py -> Tier?</div>
+    <div class="flow-tiers">
+      <div class="flow-tier" style="border-left:4px solid var(--green)"><div class="flow-tier-label" style="background:rgba(16,185,129,.15);color:var(--green)">Tier 1</div><div class="flow-tier-steps"><span class="flow-tier-step">Quick fix</span><span class="flow-tier-arrow">-></span><span class="flow-tier-step">Код</span><span class="flow-tier-arrow">-></span><span class="flow-tier-step">Тест</span><span class="flow-tier-arrow">-></span><span class="flow-tier-step" style="border-color:var(--green);color:var(--green)">Done</span></div></div>
+      <div class="flow-tier" style="border-left:4px solid var(--blue)"><div class="flow-tier-label" style="background:rgba(59,130,246,.15);color:var(--blue)">Tier 2</div><div class="flow-tier-steps"><span class="flow-tier-step">Feature</span><span class="flow-tier-arrow">-></span><span class="flow-tier-step">Brainstorm</span><span class="flow-tier-arrow">-></span><span class="flow-tier-step">Spec</span><span class="flow-tier-arrow">-></span><span class="flow-tier-step">Код</span><span class="flow-tier-arrow">-></span><span class="flow-tier-step">PR</span><span class="flow-tier-arrow">-></span><span class="flow-tier-step" style="border-color:var(--blue);color:var(--blue)">Deploy</span></div></div>
+      <div class="flow-tier" style="border-left:4px solid var(--purple)"><div class="flow-tier-label" style="background:rgba(168,85,247,.15);color:var(--purple)">Tier 3</div><div class="flow-tier-steps"><span class="flow-tier-step">Архитектура</span><span class="flow-tier-arrow">-></span><span class="flow-tier-step">Research</span><span class="flow-tier-arrow">-></span><span class="flow-tier-step">ADR</span><span class="flow-tier-arrow">-></span><span class="flow-tier-step">Дизайн</span><span class="flow-tier-arrow">-></span><span class="flow-tier-step">Код</span><span class="flow-tier-arrow">-></span><span class="flow-tier-step" style="border-color:var(--purple);color:var(--purple)">Deploy</span></div></div>
+      <div class="flow-tier" style="border-left:4px solid var(--orange)"><div class="flow-tier-label" style="background:rgba(249,115,22,.15);color:var(--orange)">Tier 4</div><div class="flow-tier-steps"><span class="flow-tier-step">Кампания</span><span class="flow-tier-arrow">-></span><span class="flow-tier-step">Research</span><span class="flow-tier-arrow">-></span><span class="flow-tier-step">Стратегия</span><span class="flow-tier-arrow">-></span><span class="flow-tier-step" style="border-color:var(--orange);color:var(--orange)">Мульти-спринт</span></div></div>
+    </div>
+  </div></div>
+</section>
+
+<!-- ====== DIAGRAM 4: DATA FLOW ====== -->
+<section class="section" id="diagram-dataflow">
+  <div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 110 20 10 10 0 010-20z"/><path d="M12 6v6l4 2"/></svg>Data Flow</div><h2>Система памяти -- поток данных</h2><p class="section-desc">От сессии через уровни памяти до синхронизации с GitHub.</p></div>
+  <div class="dataflow-container fade-in"><div class="dataflow">
+    <div class="dataflow-node" style="border-color:var(--accent);border-width:2px"><div class="dataflow-node-title" style="color:var(--accent-light)">Текущая сессия</div><div class="dataflow-node-desc">Наблюдения, решения, контекст</div></div>
+    <div class="dataflow-arrow"></div>
+    <div class="dataflow-row">
+      <div class="dataflow-branch" style="border-top:3px solid var(--yellow)"><div class="dataflow-branch-title" style="color:var(--yellow)">decay-7d/</div><div class="dataflow-branch-desc">Саммари, 7 дней</div></div>
+      <div class="dataflow-branch" style="border-top:3px solid var(--orange)"><div class="dataflow-branch-title" style="color:var(--orange)">decay-30d/</div><div class="dataflow-branch-desc">Обзоры, 30 дней</div></div>
+      <div class="dataflow-branch" style="border-top:3px solid var(--purple)"><div class="dataflow-branch-title" style="color:var(--purple)">decisions/</div><div class="dataflow-branch-desc">ADR решения</div></div>
+      <div class="dataflow-branch" style="border-top:3px solid var(--green)"><div class="dataflow-branch-title" style="color:var(--green)">permanent/</div><div class="dataflow-branch-desc">Навсегда</div></div>
+    </div>
+    <div class="dataflow-arrow"></div>
+    <div class="dataflow-node" style="border-color:var(--emerald);border-width:2px"><div class="dataflow-node-title" style="color:var(--emerald)">GLOBAL_MEMORY.md</div><div class="dataflow-node-desc">229 строк, все проекты</div></div>
+    <div style="display:flex;align-items:center;gap:12px;justify-content:center;padding:10px 0"><span class="dataflow-sync-arrow">&#8596;</span><span style="font-size:12px;color:var(--text-secondary);font-family:var(--font-mono)">git sync</span><span class="dataflow-sync-arrow">&#8596;</span></div>
+    <div class="dataflow-node" style="border-color:var(--cyan);border-width:2px"><div class="dataflow-node-title" style="color:var(--cyan)">GitHub: claude-memory</div><div class="dataflow-node-desc">Авто-пуш при /checkpoint</div></div>
+    <div class="dataflow-arrow"></div>
+    <div class="dataflow-node" style="border-color:var(--blue);border-width:2px"><div class="dataflow-node-title" style="color:var(--blue)">PROJECT/MEMORY.md</div><div class="dataflow-node-desc">В каждом проекте</div></div>
+  </div></div>
+</section>
+
+<!-- ====== DIAGRAM 5: HOOK PIPELINE ====== -->
+<section class="section" id="diagram-hookpipe">
+  <div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>Hook Pipeline</div><h2>Hook Pipeline -- что срабатывает когда</h2><p class="section-desc">Горизонтальные пайплайны по стадиям жизненного цикла.</p></div>
+  <div class="hookpipe-container fade-in">
+    <div class="hookpipe-stage"><div class="hookpipe-label"><span class="hookpipe-label-dot" style="background:var(--green);box-shadow:0 0 8px rgba(16,185,129,.5)"></span><span style="color:var(--green)">SessionStart</span></div><div class="hookpipe-items"><span class="hookpipe-item">mcp-health</span><span class="hookpipe-arrow">-></span><span class="hookpipe-item">memory-decay</span><span class="hookpipe-arrow">-></span><span class="hookpipe-item">skill-auto-activate</span><span class="hookpipe-arrow">-></span><span class="hookpipe-item">context-loader</span></div></div>
+    <div class="hookpipe-stage"><div class="hookpipe-label"><span class="hookpipe-label-dot" style="background:var(--blue);box-shadow:0 0 8px rgba(59,130,246,.5)"></span><span style="color:var(--blue)">PreToolUse</span></div><div class="hookpipe-items"><span class="hookpipe-item">secret-scanner</span><span class="hookpipe-arrow">-></span><span class="hookpipe-item">commit-validator</span><span class="hookpipe-arrow">-></span><span class="hookpipe-item">pre-push-check</span><span class="hookpipe-arrow">-></span><span class="hookpipe-item">block-sensitive</span></div></div>
+    <div class="hookpipe-stage"><div class="hookpipe-label"><span class="hookpipe-label-dot" style="background:var(--purple);box-shadow:0 0 8px rgba(168,85,247,.5)"></span><span style="color:var(--purple)">PostToolUse</span></div><div class="hookpipe-items"><span class="hookpipe-item">auto-test</span><span class="hookpipe-arrow">-></span><span class="hookpipe-item">lint-fix</span><span class="hookpipe-arrow">-></span><span class="hookpipe-item">type-check</span><span class="hookpipe-arrow">-></span><span class="hookpipe-item">auto-doc</span><span class="hookpipe-arrow">-></span><span class="hookpipe-item">learning-log</span></div></div>
+    <div class="hookpipe-stage"><div class="hookpipe-label"><span class="hookpipe-label-dot" style="background:var(--yellow);box-shadow:0 0 8px rgba(245,158,11,.5)"></span><span style="color:var(--yellow)">Stop</span></div><div class="hookpipe-items"><span class="hookpipe-item">result-verifier</span><span class="hookpipe-arrow">-></span><span class="hookpipe-item">quality-sentinel</span><span class="hookpipe-arrow">-></span><span class="hookpipe-item">auto-checkpoint</span><span class="hookpipe-arrow">-></span><span class="hookpipe-item">session-end</span></div></div>
+  </div>
+</section>
+
+<!-- ====== DIAGRAM 6: ORG CHART ====== -->
+<section class="section" id="diagram-orgchart">
+  <div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Оргструктура</div><h2>Virtual Elite IT Company</h2><p class="section-desc">CEO (Дмитрий) на вершине, AI CTO маршрутизирует по ролям.</p></div>
+  <div class="orgchart-container fade-in"><div class="orgchart">
+    <div class="orgchart-node" style="border-color:var(--yellow);border-width:2px"><div class="orgchart-node-icon">&#128100;</div><div class="orgchart-node-title">CEO (Дмитрий)</div><div class="orgchart-node-role">Founder, стратегия</div></div>
+    <div class="orgchart-connector"></div>
+    <div class="orgchart-node" style="border-color:var(--accent);border-width:2px;box-shadow:0 0 20px rgba(99,102,241,.2)"><div class="orgchart-node-icon">&#129504;</div><div class="orgchart-node-title">AI CTO (Claude)</div><div class="orgchart-node-role">Каждый промпт, Фазы 0-4</div></div>
+    <div class="orgchart-connector"></div>
+    <div class="orgchart-row" style="gap:24px">
+      <div class="orgchart-node" style="border-left:3px solid var(--purple)"><div class="orgchart-node-icon">&#127959;</div><div class="orgchart-node-title">Архитектор</div><div class="orgchart-node-role">ADR, варианты, trade-offs</div></div>
+      <div class="orgchart-node" style="border-left:3px solid var(--blue)"><div class="orgchart-node-icon">&#128202;</div><div class="orgchart-node-title">VP Engineering</div><div class="orgchart-node-role">Метрики, процессы</div></div>
+    </div>
+    <div class="orgchart-connector"></div>
+    <div class="orgchart-row" style="gap:10px">
+      <div class="orgchart-node" style="border-left:3px solid var(--cyan)"><div class="orgchart-node-icon">&#128270;</div><div class="orgchart-node-title">Research</div></div>
+      <div class="orgchart-node" style="border-left:3px solid var(--blue)"><div class="orgchart-node-icon">&#128208;</div><div class="orgchart-node-title">Design</div></div>
+      <div class="orgchart-node" style="border-left:3px solid var(--red)"><div class="orgchart-node-icon">&#128737;</div><div class="orgchart-node-title">Security</div></div>
+      <div class="orgchart-node" style="border-left:3px solid var(--emerald)"><div class="orgchart-node-icon">&#128187;</div><div class="orgchart-node-title">Dev</div></div>
+      <div class="orgchart-node" style="border-left:3px solid var(--green)"><div class="orgchart-node-icon">&#129514;</div><div class="orgchart-node-title">QA</div></div>
+      <div class="orgchart-node" style="border-left:3px solid var(--orange)"><div class="orgchart-node-icon">&#128640;</div><div class="orgchart-node-title">Ops</div></div>
+      <div class="orgchart-node" style="border-left:3px solid var(--rose)"><div class="orgchart-node-icon">&#128027;</div><div class="orgchart-node-title">Debug</div></div>
+    </div>
+  </div></div>
+</section>
+
+<!-- ====== QUICK REFERENCE ====== -->
+<section class="section" id="quick-ref">
+  <div class="section-header fade-in"><div class="section-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>Справка</div><h2>Быстрая справка</h2><p class="section-desc">Поисковый индекс всех компонентов.</p></div>
+  <div class="sidebar-search fade-in" style="max-width:400px;margin-bottom:20px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text-muted)"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="ref-search" placeholder="Фильтр..." autocomplete="off" style="width:100%;padding:8px 12px 8px 34px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-size:13px;font-family:var(--font-sans);outline:none"></div>
+  <div class="ref-table-wrapper fade-in"><table class="ref-table" id="ref-table"><thead><tr><th style="width:130px">Тип</th><th style="width:200px">Имя</th><th>Описание</th></tr></thead><tbody>
+    <tr><td><span class="badge badge-red">Правило</span></td><td class="mono">verify-before-done</td><td>Без доказательства не готово</td></tr>
+    <tr><td><span class="badge badge-red">Правило</span></td><td class="mono">testing-always</td><td>Каждое изменение = тесты</td></tr>
+    <tr><td><span class="badge badge-red">Правило</span></td><td class="mono">serena-sentry</td><td>Обязательные Serena + Sentry</td></tr>
+    <tr><td><span class="badge badge-blue">Правило</span></td><td class="mono">quality-gates</td><td>Чеклист: MEMORY, Sentry, тесты</td></tr>
+    <tr><td><span class="badge badge-green">Правило</span></td><td class="mono">chain-thinking</td><td>Трассировка, root cause</td></tr>
+    <tr><td><span class="badge badge-green">Правило</span></td><td class="mono">research-before-code</td><td>Context7, buy vs build</td></tr>
+    <tr><td><span class="badge badge-yellow">Правило</span></td><td class="mono">security-baseline</td><td>OWASP базовый</td></tr>
+    <tr><td><span class="badge badge-yellow">Правило</span></td><td class="mono">sentry-first</td><td>Sentry до фикса</td></tr>
+    <tr><td><span class="badge badge-purple">Правило</span></td><td class="mono">ci-cd-templates</td><td>GitHub Actions шаблоны</td></tr>
+    <tr><td><span class="badge badge-cyan">Хук</span></td><td class="mono">session-start.js</td><td>Инит сессии</td></tr>
+    <tr><td><span class="badge badge-cyan">Хук</span></td><td class="mono">secret-scanner.js</td><td>Блок .env/.pem/.key</td></tr>
+    <tr><td><span class="badge badge-cyan">Хук</span></td><td class="mono">auto-test.js</td><td>Тесты после правок</td></tr>
+    <tr><td><span class="badge badge-cyan">Хук</span></td><td class="mono">quality-sentinel.sh</td><td>Проверка bare except, raw SQL</td></tr>
+    <tr><td><span class="badge badge-orange">MCP</span></td><td class="mono">serena</td><td>LSP навигация</td></tr>
+    <tr><td><span class="badge badge-orange">MCP</span></td><td class="mono">sentry-mcp</td><td>Ошибки, traces, AI</td></tr>
+    <tr><td><span class="badge badge-orange">MCP</span></td><td class="mono">exa</td><td>Нейронный поиск</td></tr>
+    <tr><td><span class="badge badge-purple">Скилл</span></td><td class="mono">elite-prompts</td><td>Голос, обогащение промптов</td></tr>
+    <tr><td><span class="badge badge-purple">Скилл</span></td><td class="mono">infra-doctor</td><td>9 диагностических цепей</td></tr>
+    <tr><td><span class="badge badge-purple">Скилл</span></td><td class="mono">verify</td><td>Принудительная верификация</td></tr>
+    <tr><td><span class="badge badge-green">Команда</span></td><td class="mono">/commit</td><td>Создание коммита</td></tr>
+    <tr><td><span class="badge badge-green">Команда</span></td><td class="mono">/deploy</td><td>Деплой SSH+Docker</td></tr>
+    <tr><td><span class="badge badge-green">Команда</span></td><td class="mono">/tdd</td><td>TDD воркфлоу</td></tr>
+    <tr><td><span class="badge badge-green">Команда</span></td><td class="mono">/checkpoint</td><td>Сохранить прогресс</td></tr>
+    <tr><td><span class="badge badge-green">Команда</span></td><td class="mono">/parallel</td><td>Параллельные агенты</td></tr>
+    <tr><td><span class="badge badge-green">Команда</span></td><td class="mono">/audit</td><td>Security аудит</td></tr>
+  </tbody></table></div>
+</section>
+
+<footer class="footer">
+  <p>Claude Code AI Infrastructure v2.0 &mdash; Собрано на Opus 4.6 (1M context)</p>
+  <p style="margin-top:8px;font-size:11px">28 правил &middot; 31 хук &middot; 15 MCP серверов &middot; 9 скиллов &middot; 53 команды &middot; 23 агента</p>
+  <p style="margin-top:8px;font-size:11px;color:var(--text-muted)">Последнее обновление: 2026-03-28</p>
+</footer>
+
+</div>
+
+<script>
+(function(){'use strict';
+var pb=document.getElementById('progress-bar');function up(){var h=document.documentElement,s=h.scrollTop||document.body.scrollTop,t=h.scrollHeight-h.clientHeight;pb.style.width=t>0?(s/t*100)+'%':'0%'}window.addEventListener('scroll',up,{passive:true});
+var secs=document.querySelectorAll('section[id],.hero[id]'),nls=document.querySelectorAll('.nav-link');function an(){var c='';secs.forEach(function(s){if(window.scrollY>=s.offsetTop-120)c=s.id});nls.forEach(function(l){l.classList.toggle('active',l.getAttribute('href')==='#'+c)})}window.addEventListener('scroll',an,{passive:true});
+var obs=new IntersectionObserver(function(e){e.forEach(function(en){if(en.isIntersecting)en.target.classList.add('visible')})},{threshold:.1,rootMargin:'0px 0px -40px 0px'});document.querySelectorAll('.fade-in').forEach(function(el){obs.observe(el)});
+function ac(){document.querySelectorAll('[data-target]').forEach(function(el){var tg=parseInt(el.getAttribute('data-target')),d=1500,st=performance.now();function step(n){var p=Math.min((n-st)/d,1),e=1-Math.pow(1-p,3);el.textContent=Math.round(tg*e);if(p<1)requestAnimationFrame(step)}requestAnimationFrame(step)})}
+var ho=new IntersectionObserver(function(e){if(e[0].isIntersecting){ac();ho.disconnect()}},{threshold:.3});var he=document.querySelector('.hero');if(he)ho.observe(he);
+var rf=document.getElementById('rules-filters');if(rf)rf.addEventListener('click',function(e){if(!e.target.classList.contains('filter-pill'))return;rf.querySelectorAll('.filter-pill').forEach(function(p){p.classList.remove('active')});e.target.classList.add('active');var f=e.target.getAttribute('data-filter');document.querySelectorAll('#rules-grid .card').forEach(function(c){c.style.display=(f==='all'||c.getAttribute('data-category')===f)?'':'none'})});
+var gs=document.getElementById('global-search');if(gs)gs.addEventListener('input',function(){var q=this.value.toLowerCase().trim();document.querySelectorAll('.card,.mcp-card,.skill-card,.agent-card,.timeline-item,.cmd-item').forEach(function(el){if(!q){el.style.display='';return}el.style.display=el.textContent.toLowerCase().includes(q)?'':'none'})});
+var rs=document.getElementById('ref-search');if(rs)rs.addEventListener('input',function(){var q=this.value.toLowerCase().trim();document.querySelectorAll('#ref-table tbody tr').forEach(function(r){r.style.display=(!q||r.textContent.toLowerCase().includes(q))?'':'none'})});
+nls.forEach(function(l){l.addEventListener('click',function(){if(window.innerWidth<=1024)document.querySelector('.sidebar').classList.remove('open')})});
+})();
+function copyCode(b){var p=b.closest('.code-block').querySelector('pre');navigator.clipboard.writeText(p.textContent).then(function(){b.textContent='Скопировано!';setTimeout(function(){b.textContent='Копировать'},2000)})}
+</script>
+</body>
+</html>
