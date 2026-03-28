@@ -69,6 +69,7 @@
 ## Session History
 - 2026-03-27: Mega session — infra bugs fixed, testing strategy deployed
 - 2026-03-28: Deep research платных MCP + build Security Scanner MCP + VPS Monitor MCP
+- 2026-03-28: GOD TIER upgrade: /continue v2.0 (7 фаз, Sentry+VPS+Docker+CI+Sleepless+Gamification), /checkpoint v2.0 (8 фаз, MEMORY+handoff+gamification+global sync), skill-routing-override rule (отменяет спам 3000 скиллов), 261 temp_git dirs cleaned (71MB freed)
 
 ## Skolkovo Deep Audit (2026-03-28)
 - 10 агентов параллельно: backend, frontend, tests, production, product, live walkthrough, business logic, CTO 7-zone, infra doctor, SEO
