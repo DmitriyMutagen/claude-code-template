@@ -740,8 +740,8 @@
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-title">Claude Code Infra</div>
-    <div class="logo-version">v<span id="guide-version">v3.234</span> — <span id="guide-updated">2026-03-28 10:57</span></div>
-    <meta name="guide-version" content="3.234">
+    <div class="logo-version">v<span id="guide-version">v3.247</span> — <span id="guide-updated">2026-03-28 11:51</span></div>
+    <meta name="guide-version" content="3.247">
   </div>
   <nav>
     <div class="section-divider">Основы</div>
@@ -1143,6 +1143,11 @@ DoD:           [конкретные критерии готовности]</pre
           <td>Every piece of Python code MUST be documented. "Done" is BLOCKED if docstrings are missing.</td>
         </tr>
         <tr>
+          <td><code>~/.claude/rules/git-workflow-enforcement</code></td>
+          <td>Git Workflow Enforcement — BLOCKING (все проекты)</td>
+          <td>- `git push origin main` — BLOCKED by hook</td>
+        </tr>
+        <tr>
           <td><code>~/.claude/rules/marketplace-ops</code></td>
           <td>Marketplace Operations Rules (WB / Ozon / YM)</td>
           <td>- **Ozon**: Client ID 2003894</td>
@@ -1150,7 +1155,7 @@ DoD:           [конкретные критерии готовности]</pre
         <tr>
           <td><code>~/.claude/rules/modular-architecture</code></td>
           <td>Modular Architecture — ОБЯЗАТЕЛЬНО для проектов >30 файлов</td>
-          <td>Каждый домен = самодостаточный модуль со своими models, routes, services, tests.</td>
+          <td>Три уровня:</td>
         </tr>
         <tr>
           <td><code>~/.claude/rules/outreach-automation</code></td>
@@ -1732,7 +1737,7 @@ N агентов (если запускались)</pre>
   <!-- AUTO:gamification START -->
 <div class="gm-stats">
       <div class="gm-level">🏛️ Архитектор</div>
-      <div class="gm-xp">⚡ 12,760 XP | Streak: 🔥3д</div>
+      <div class="gm-xp">⚡ 13,440 XP | Streak: 🔥3д</div>
       <div class="progress-bar">
         <div class="progress-fill" style="width:0%"></div>
       </div>
@@ -2621,54 +2626,54 @@ git push origin main  # github.com/DmitriyMutagen/claude-memory
   <p>Автоматически обновляется при каждом запуске <code>python3 ~/.claude/generate_guide.py</code></p>
   <!-- AUTO:changelog START -->
 <div class="changelog-entry">
-      <span class="version-badge">v3.233</span>
-      <span class="date">2026-03-28 10:55</span>
-      <ul><li>Новые правила: modular-architecture</li><li>XP: 12,394 → 12,710 (+316)</li></ul>
+      <span class="version-badge">v3.246</span>
+      <span class="date">2026-03-28 11:49</span>
+      <ul><li>XP: 13,298 → 13,316 (+18)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.232</span>
-      <span class="date">2026-03-28 10:48</span>
-      <ul><li>XP: 12,123 → 12,394 (+271)</li></ul>
+      <span class="version-badge">v3.245</span>
+      <span class="date">2026-03-28 11:49</span>
+      <ul><li>Новые правила: git-workflow-enforcement</li><li>XP: 13,267 → 13,298 (+31)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.231</span>
-      <span class="date">2026-03-28 10:42</span>
-      <ul><li>XP: 12,092 → 12,123 (+31)</li></ul>
-    </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.230</span>
-      <span class="date">2026-03-28 10:41</span>
-      <ul><li>XP: 12,073 → 12,092 (+19)</li></ul>
-    </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.229</span>
-      <span class="date">2026-03-28 10:41</span>
-      <ul><li>XP: 11,901 → 12,073 (+172)</li></ul>
-    </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.228</span>
-      <span class="date">2026-03-28 10:34</span>
-      <ul><li>XP: 11,852 → 11,901 (+49)</li></ul>
-    </div>
-<div class="changelog-entry">
-      <span class="version-badge">v3.227</span>
-      <span class="date">2026-03-28 10:32</span>
+      <span class="version-badge">v3.244</span>
+      <span class="date">2026-03-28 11:47</span>
       <ul><li>Автообновление статистики</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.226</span>
-      <span class="date">2026-03-28 10:32</span>
-      <ul><li>XP: 11,836 → 11,852 (+16)</li></ul>
+      <span class="version-badge">v3.243</span>
+      <span class="date">2026-03-28 11:47</span>
+      <ul><li>XP: 13,236 → 13,267 (+31)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.225</span>
-      <span class="date">2026-03-28 10:32</span>
-      <ul><li>XP: 11,781 → 11,836 (+55)</li></ul>
+      <span class="version-badge">v3.242</span>
+      <span class="date">2026-03-28 11:44</span>
+      <ul><li>XP: 13,150 → 13,236 (+86)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.224</span>
-      <span class="date">2026-03-28 10:31</span>
-      <ul><li>XP: 11,413 → 11,781 (+368)</li></ul>
+      <span class="version-badge">v3.241</span>
+      <span class="date">2026-03-28 11:27</span>
+      <ul><li>Автообновление статистики</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.240</span>
+      <span class="date">2026-03-28 11:26</span>
+      <ul><li>XP: 13,057 → 13,150 (+93)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.239</span>
+      <span class="date">2026-03-28 11:05</span>
+      <ul><li>Автообновление статистики</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.238</span>
+      <span class="date">2026-03-28 11:04</span>
+      <ul><li>XP: 12,978 → 13,057 (+79)</li></ul>
+    </div>
+<div class="changelog-entry">
+      <span class="version-badge">v3.237</span>
+      <span class="date">2026-03-28 11:01</span>
+      <ul><li>XP: 12,915 → 12,978 (+63)</li></ul>
     </div>
 
 <!-- AUTO:changelog END -->
