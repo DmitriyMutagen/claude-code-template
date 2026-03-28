@@ -89,6 +89,20 @@
 - Agent memory stored in `.claude/agent-memory/` (git-tracked, shared between windows)
 - Hash file `.last-sync-hash` tracks last known git state (gitignored, local only)
 
+## MEGA Research v3.0 (2026-03-28)
+- **Задача**: создать deep research превосходящий Perplexity Computer Mode и Gemini Deep Research
+- **Анализ конкурентов**:
+  - Perplexity: single-thread agentic search, ~50-150 sources, 1 engine (proprietary)
+  - Gemini: parallel but limited to Google index, 30-100 sources
+  - ChatGPT: basic Bing search, 10-30 sources
+- **Наше решение**: 3-волновой pipeline с 10+ параллельными агентами
+  - Wave 1: 7-10 agents broad exploration (Firecrawl+Exa+WebSearch+Brave)
+  - Wave 2: gap analysis + 3-5 agents fill gaps
+  - Wave 3: cross-reference verification + cited source scraping
+- **Ключевые преимущества**: multi-engine (3+), iterative deepening, confidence scoring, 200-500+ sources
+- **Файлы**: `~/.claude/skills/mega-research/SKILL.md` (v3.0), `~/.claude/commands/mega-research.md`
+- **Вызов**: `/mega-research "topic"` или `/mega-research "topic" --depth exhaustive`
+
 ## Changelog
 - 2026-03-27: feat: elite-prompts v2 + infra-doctor v2 + cheatsheet HTML + checkpoint
 - 2026-03-28: feat: 2 custom MCP servers (security-scanner + vps-monitor) built and connected
@@ -104,3 +118,4 @@
   - Hooks optimization report (docs/HOOKS_OPTIMIZATION_REPORT.md)
   - P1 optimizations: observe.sh pre disabled, stale files cleaned
   - 9 skills at GOD TIER, total 3800+ lines of skill code
+- 2026-03-28: feat: MEGA Research v3.0 — GOD TIER deep research engine (beats Perplexity+Gemini)
