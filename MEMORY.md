@@ -11,6 +11,15 @@
 - Database: PostgreSQL
 - Deploy: Docker → VPS 94.198.219.232
 
+## Serena + Sentry Enforcement (2026-03-28)
+- **Проблема**: Serena и Sentry упоминались в rules но НИКОГДА не enforced — ~2-3% покрытие скиллов
+- **Решение (3 уровня)**:
+  1. Rule: `~/.claude/rules/serena-sentry-enforcement.md` — BLOCKING, 4 правила Serena + 6 правил Sentry
+  2. Hook: `~/.claude/hooks/skill-auto-activate.py` — TIER -1 injection для ВСЕХ code tasks (new module / deploy / bugfix)
+  3. Skills: `infra-doctor` Phase 0 + Chain I rewritten, `verify` Step 0 добавлен
+- **Триггеры хука**: 40+ regex keywords → Serena+Sentry enforcement + контекстные блоки
+- **Типичная дыра**: Sentry SDK в API но НЕ в worker/cron → ошибки фоновых задач невидимы
+
 ## Lessons Learned
 <!-- Updated automatically by session-summarizer hook -->
 <!-- Format: YYYY-MM-DD | What happened | What we learned -->
