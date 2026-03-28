@@ -69,8 +69,19 @@
 - Skolkovo добавлен в sleepless config
 - Full audit: ~/Documents/skolkovo/docs/FULL_AUDIT_2026-03-28.md
 
+## Cross-Session Sync (2026-03-28)
+- **Git Pull at SessionStart**: auto-pulls ~/.claude from GitHub before loading memory
+- **Heartbeat hook**: UserPromptSubmit checks if another session pushed changes, auto-syncs
+- **3 sync-agents** with `memory: project`:
+  - `sync-architect` — remembers ADRs, architecture decisions across sessions
+  - `sync-researcher` — caches research findings, avoids re-researching
+  - `sync-tester` — tracks test results, coverage trends, flaky tests
+- Agent memory stored in `.claude/agent-memory/` (git-tracked, shared between windows)
+- Hash file `.last-sync-hash` tracks last known git state (gitignored, local only)
+
 ## Changelog
 - 2026-03-27: feat: elite-prompts v2 + infra-doctor v2 + cheatsheet HTML + checkpoint
 - 2026-03-28: feat: 2 custom MCP servers (security-scanner + vps-monitor) built and connected
 - 2026-03-28: audit: Skolkovo 360° audit (10 agents) + 15 night tasks configured
 - 2026-03-28: MEGA NIGHT: 16 modules built for Skolkovo — auth, 6 science DBs, MCP server, labels, billing, compliance checker, reverse engineering, real company data import. 16 branches ready to merge.
+- 2026-03-28: feat: cross-session sync — git pull at start, heartbeat hook, 3 persistent-memory agents

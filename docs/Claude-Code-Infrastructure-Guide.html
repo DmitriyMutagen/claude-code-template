@@ -740,8 +740,8 @@
 <aside class="sidebar">
   <div class="sidebar-logo">
     <div class="logo-title">Claude Code Infra</div>
-    <div class="logo-version">v<span id="guide-version">v3.112</span> — <span id="guide-updated">2026-03-28 00:12</span></div>
-    <meta name="guide-version" content="3.112">
+    <div class="logo-version">v<span id="guide-version">v3.182</span> — <span id="guide-updated">2026-03-28 09:25</span></div>
+    <meta name="guide-version" content="3.182">
   </div>
   <nav>
     <div class="section-divider">Основы</div>
@@ -1138,6 +1138,11 @@ DoD:           [конкретные критерии готовности]</pre
           <td>Конечный результат = то что видит ПОЛЬЗОВАТЕЛЬ. Не код, не тесты — реальные данные на экране.</td>
         </tr>
         <tr>
+          <td><code>~/.claude/rules/docs-always</code></td>
+          <td>Docs Always — Docstrings and Documentation (MANDATORY)</td>
+          <td>Every piece of Python code MUST be documented. "Done" is BLOCKED if docstrings are missing.</td>
+        </tr>
+        <tr>
           <td><code>~/.claude/rules/marketplace-ops</code></td>
           <td>Marketplace Operations Rules (WB / Ozon / YM)</td>
           <td>- **Ozon**: Client ID 2003894</td>
@@ -1363,7 +1368,7 @@ DoD:           [конкретные критерии готовности]</pre
         </tr>
         <tr>
           <td><code>UserPromptSubmit</code></td>
-          <td class="badge">1 хуков</td>
+          <td class="badge">2 хуков</td>
           <td>Preflight check: Context7, Exa, tier classification</td>
         </tr>
         <tr>
@@ -1716,12 +1721,12 @@ N агентов (если запускались)</pre>
   <h3>📊 Текущий прогресс (авто)</h3>
   <!-- AUTO:gamification START -->
 <div class="gm-stats">
-      <div class="gm-level">🏆 Принципал</div>
-      <div class="gm-xp">⚡ 100 XP | Streak: 🔥2д</div>
+      <div class="gm-level">🏛️ Архитектор</div>
+      <div class="gm-xp">⚡ 7,262 XP | Streak: 🔥3д</div>
       <div class="progress-bar">
         <div class="progress-fill" style="width:0%"></div>
       </div>
-      <div class="progress-label">0% до Level 7 (40,000 XP)</div>
+      <div class="progress-label">0% до Level 8 (75,000 XP)</div>
     </div>
     <h3>Ачивки (топ-12)</h3>
     <div class="achievements-grid">
@@ -2253,11 +2258,11 @@ N агентов (если запускались)</pre>
         <div class="project-status">🟡 ACTIVE</div>
         <div class="project-last">CTO rules + testing stack deployed</div>
       </div>
-      <div class="project-card" style="border-left-color:#F59E0B">
+      <div class="project-card" style="border-left-color:#10B981">
         <div class="project-name">Bionovacia (Skolkovo)</div>
         <div class="project-path">~/Documents/skolkovo</div>
-        <div class="project-status">🟡 IN PROGRESS</div>
-        <div class="project-last">FastAPI+React+Neo4j, CTO rules + testing deployed</div>
+        <div class="project-status">🟢 BOOSTED</div>
+        <div class="project-last">16 modules built overnight, 47 commits, 16 branches to merge, 80+ new tests, 6 s</div>
       </div>
       <div class="project-card" style="border-left-color:#F59E0B">
         <div class="project-name">Bio-STM</div>
@@ -2606,54 +2611,54 @@ git push origin main  # github.com/DmitriyMutagen/claude-memory
   <p>Автоматически обновляется при каждом запуске <code>python3 ~/.claude/generate_guide.py</code></p>
   <!-- AUTO:changelog START -->
 <div class="changelog-entry">
-      <span class="version-badge">v3.111</span>
-      <span class="date">2026-03-28 00:11</span>
-      <ul><li>Автообновление статистики</li></ul>
+      <span class="version-badge">v3.181</span>
+      <span class="date">2026-03-28 09:25</span>
+      <ul><li>XP: 6,886 → 7,159 (+273)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.110</span>
-      <span class="date">2026-03-28 00:10</span>
-      <ul><li>Автообновление статистики</li></ul>
+      <span class="version-badge">v3.180</span>
+      <span class="date">2026-03-28 09:25</span>
+      <ul><li>Новые агенты: sync-architect, sync-researcher, sync-tester</li><li>XP: 6,731 → 6,886 (+155)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.109</span>
-      <span class="date">2026-03-28 00:10</span>
-      <ul><li>Автообновление статистики</li></ul>
+      <span class="version-badge">v3.179</span>
+      <span class="date">2026-03-28 09:24</span>
+      <ul><li>XP: 6,365 → 6,731 (+366)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.108</span>
-      <span class="date">2026-03-28 00:07</span>
-      <ul><li>Автообновление статистики</li></ul>
+      <span class="version-badge">v3.178</span>
+      <span class="date">2026-03-28 09:24</span>
+      <ul><li>XP: 6,228 → 6,365 (+137)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.107</span>
-      <span class="date">2026-03-28 00:04</span>
-      <ul><li>Автообновление статистики</li></ul>
+      <span class="version-badge">v3.177</span>
+      <span class="date">2026-03-28 09:23</span>
+      <ul><li>XP: 5,501 → 6,228 (+727)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.106</span>
-      <span class="date">2026-03-28 00:03</span>
-      <ul><li>Автообновление статистики</li></ul>
+      <span class="version-badge">v3.176</span>
+      <span class="date">2026-03-28 09:21</span>
+      <ul><li>XP: 4,815 → 5,501 (+686)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.105</span>
-      <span class="date">2026-03-28 00:01</span>
-      <ul><li>XP: 14,061 → 100 (+-13,961)</li></ul>
+      <span class="version-badge">v3.175</span>
+      <span class="date">2026-03-28 09:20</span>
+      <ul><li>XP: 4,753 → 4,815 (+62)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.104</span>
-      <span class="date">2026-03-27 23:47</span>
-      <ul><li>Автообновление статистики</li></ul>
+      <span class="version-badge">v3.174</span>
+      <span class="date">2026-03-28 09:20</span>
+      <ul><li>XP: 3,489 → 4,753 (+1,264)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.103</span>
-      <span class="date">2026-03-27 23:47</span>
-      <ul><li>XP: 14,036 → 14,061 (+25)</li></ul>
+      <span class="version-badge">v3.173</span>
+      <span class="date">2026-03-28 09:18</span>
+      <ul><li>XP: 3,213 → 3,489 (+276)</li></ul>
     </div>
 <div class="changelog-entry">
-      <span class="version-badge">v3.102</span>
-      <span class="date">2026-03-27 23:45</span>
-      <ul><li>XP: 14,006 → 14,036 (+30)</li></ul>
+      <span class="version-badge">v3.172</span>
+      <span class="date">2026-03-28 09:17</span>
+      <ul><li>XP: 3,164 → 3,213 (+49)</li></ul>
     </div>
 
 <!-- AUTO:changelog END -->
